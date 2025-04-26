@@ -32,7 +32,7 @@ class ProfileIcon extends StatelessWidget {
         ),
       ),
       onPressed: () {
-        //todo manar: here we will call the get profile api
+        //todo manar: here we will caءll the get profile api
         Navigator.pushNamed(
           context,
           AppRoutes.profile,

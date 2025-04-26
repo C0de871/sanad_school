@@ -1,7 +1,7 @@
-class EndPoints {
-  static const String baserUrl = "http://192.168.1.2:8000/api/";
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
-  static const String templateT = "";
+class EndPoints {
+  static String baserUrl = dotenv.get('BASEURL');
 }
 
 class ApiKey {

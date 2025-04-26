@@ -45,6 +45,7 @@ dependencies:
   flutter:
     sdk: flutter
   flutter_bloc: ^9.0.0
+  flutter_dotenv: ^5.2.1
   flutter_launcher_icons: ^0.14.3
   flutter_localizations:
     sdk: flutter
@@ -98,3 +99,4 @@ flutter:
     - assets/lottie/
     - assets/app_icon/
     - assets/videos/
+    - .env
