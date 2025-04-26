@@ -179,6 +179,8 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
     return AnimatedRaisedButton(
       onPressed: () {
         if (_formKey.currentState!.validate()) {
+          //todo manar: here we will call the login api
+          //todo manar: the pushNamedAndRemoveUntil should be in the listener of the cubit not here
           Navigator.pushNamedAndRemoveUntil(context, AppRoutes.home, (route) {
             return false;
           });

@@ -102,6 +102,8 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> with SingleTi
     return AnimatedRaisedButton(
       onPressed: () {
         if (_formKey.currentState!.validate()) {
+          //todo manar: here we should call the reset password api
+          //todo manar: transfer the pushNamed to the listener of the cubit
           Navigator.pushNamed(
             context,
             AppRoutes.login,

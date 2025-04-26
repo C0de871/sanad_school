@@ -51,7 +51,10 @@ class _OtpScreenState extends State<OtpScreen> {
                   _verfiyOtp(context),
                   const SizedBox(height: padding4 * 6),
                   GestureDetector(
-                    onTap: () {},
+                    onTap: () {
+                      //todo manar: here we will call the send a new otp api
+                      //todo manar: don't forget to add snackbar to notify the user that the otp has been sent or not
+                    },
                     child: Text(
                       "اطلب رمز تحقق جديد", // Use localized text here
                       style: const TextStyle(decoration: TextDecoration.underline),
@@ -93,6 +96,8 @@ class _OtpScreenState extends State<OtpScreen> {
   AnimatedRaisedButton _verfiyOtp(BuildContext context) {
     return AnimatedRaisedButton(
       onPressed: () {
+        //todo manar: here we will call the verify otp api
+        //todo manar: the pushnamed should be in the listener of the cubit not here
         Navigator.pushNamed(
           context,
           AppRoutes.resetPasswrod,

@@ -99,6 +99,8 @@ class _EnterEmailScreenState extends State<EnterEmailScreen> with SingleTickerPr
     return AnimatedRaisedButton(
       onPressed: () {
         if (_formKey.currentState!.validate()) {
+          //todo manar: here we will call the send otp api
+          //todo manar: the pushnamed should be in the listener of the cubit not here
           Navigator.pushNamed(
             context,
             AppRoutes.otp,

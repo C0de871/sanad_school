@@ -87,8 +87,6 @@ class _SchoolInfoScreenState extends State<SchoolInfoScreen> with SingleTickerPr
     showGeneralDialog(
       context: context,
       barrierDismissible: false,
-      // barrierColor: Colors.black.withOpacity(0.5),
-      // barrierColor: Colors.red,
       transitionDuration: const Duration(milliseconds: 400),
       pageBuilder: (context, animation, secondaryAnimation) {
         return ScaleTransition(
@@ -215,6 +213,8 @@ class _SchoolInfoScreenState extends State<SchoolInfoScreen> with SingleTickerPr
     return AnimatedRaisedButton(
       onPressed: () {
         if (_formKey.currentState!.validate()) {
+          //todo manar: here we will call the create account api
+          //todo manar: delete _showSuccessDialog from here and put it in the listener
           _showSuccessDialog();
         }
       },
