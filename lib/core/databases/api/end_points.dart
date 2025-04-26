@@ -2,6 +2,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class EndPoints {
   static String baserUrl = dotenv.get('BASEURL');
+  static const String templateT = "";
 }
 
 class ApiKey {
