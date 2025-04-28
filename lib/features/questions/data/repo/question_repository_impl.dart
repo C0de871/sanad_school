@@ -17,12 +17,30 @@ class QuestionRepositoryImpl extends QuestionRepository {
   });
 
   @override
-  Future<Either<Failure, List<QuestionEntity>>> getLessonQuestions({
+  Future<Either<Failure, List<QuestionEntity>>> getLessonQuestionsByType({
     required QuestionsInLessonWithTypeParams params,
   }) async {
     if (await networkInfo.isConnected!) {
       try {
-        final response = await remoteDataSource.getQuestions(
+        final response = await remoteDataSource.getQuestionsInLessonByType(
+          params: params,
+        );
+        return Right(response.questions);
+      } on ServerException catch (e) {
+        return Left(Failure(errMessage: e.errorModel.errorMessage));
+      }
+    } else {
+      return Left(Failure(errMessage: "There is no internet connection"));
+    }
+  }
+
+  @override
+  Future<Either<Failure, List<QuestionEntity>>> getSubjectQuestionsByTag({
+    required QuestionsInSubjectByTag params,
+  }) async {
+    if (await networkInfo.isConnected!) {
+      try {
+        final response = await remoteDataSource.getQuestionsInSubjectByTag(
           params: params,
         );
         return Right(response.questions);

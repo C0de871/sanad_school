@@ -14,6 +14,15 @@ class EndPoints {
     return '${baseUrl}lesson/${params.lessonId}/questions/${params.typeId}';
   }
 
+  static String questionInSubjectbByTag({required QuestionsInSubjectByTag params}) {
+    // "${EndPoints.lesson}/$lessonId/questions/$typeId"
+    return '${baseUrl}tag/${params.tagId}/questions';
+  }
+
+  static String getTagsOrExamsEndpoint(int subjectId, bool isExam) {
+    return '$baseUrl$subject/$subjectId/${isExam ? 'exams' : 'tags'}';
+  }
+
   static const String templateT = "";
 }
 

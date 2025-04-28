@@ -3,8 +3,9 @@ class AppRoutes {
   static const String signUp = '/sign-up-screen';
   static const String completeSignUp = '/complete-sign-up-screen';
   static const String home = '/home-screen';
-  static const String lessons = '/lessons-screen';
+  static const String subjectDetails = '/subject-details-screen';
   static const String questions = '/questions-screen';
+  static const String questionsFromTag = '/questions-screen-from-tag';
   static const String profile = '/profile-screen';
   static const String subscription = '/subscription-screen';
   static const String questionsAndAnswers = '/questions-and-answers-screen';

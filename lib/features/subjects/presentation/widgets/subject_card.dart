@@ -43,7 +43,7 @@ class SubjectCard extends StatelessWidget {
         log("pressed");
         Navigator.pushNamed(
           context,
-          AppRoutes.lessons,
+          AppRoutes.subjectDetails,
           arguments: {
             "subject": subject,
             "color": color,
@@ -167,15 +167,37 @@ class _DecorativeIcon extends StatelessWidget {
       child: Transform.rotate(
         angle: 0.2,
         child: Icon(
-          IconData(
-            int.parse(subject.iconCodePoint, radix: 16),
-            fontFamily: 'MaterialIcons',
-          ),
+          getIcon(),
           size: 140,
           color: getIt<AppTheme>().extendedColors.white.withValues(alpha: 0.05),
         ),
       ),
     );
+  }
+
+  IconData getIcon() {
+    switch (subject.id) {
+      case 1:
+        return Icons.calculate; // الرياضيات
+      case 2:
+        return Icons.abc; // English
+      case 3:
+        return Icons.biotech; // علم الأحياء
+      case 4:
+        return Icons.content_cut; // المهارات الجراحية
+      case 5:
+        return Icons.sick; // علم المناعة و الدمويات
+      case 6:
+        return Icons.vaccines; // علم الأدوية
+      case 7:
+        return Icons.electric_bolt; // الفيزياء
+      case 8:
+        return Icons.science; // الكيمياء
+      case 9:
+        return Icons.mosque; // التربية الدينية
+      default:
+        return Icons.calculate; // fallback icon
+    }
   }
 }
 

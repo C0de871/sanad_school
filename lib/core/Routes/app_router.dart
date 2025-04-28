@@ -14,6 +14,8 @@ import 'package:sanad_school/features/reset_password/presentation/screens/otp_sc
 import 'package:sanad_school/features/reset_password/presentation/screens/reset_password_screen.dart';
 import 'package:sanad_school/features/subjects/domain/entities/subject_entity.dart';
 import 'package:sanad_school/features/subjects/presentation/cubit/subject_cubit.dart';
+import 'package:sanad_school/features/tags/domain/entities/tag_entity.dart';
+import 'package:sanad_school/features/tags/presentation/cubits/tag_cubit.dart';
 import 'package:sanad_school/main.dart';
 
 import '../../features/Q&A/presentation/questions_and_answers_screen.dart';
@@ -33,6 +35,8 @@ import 'app_routes.dart';
 
 class AppRouter with CubitProviderMixin {
   //? <======= cubits declration =======>
+  static const String tagCubitKey = "tags-cubit";
+  static const String examTagCubitKey = "exam-tag-cubit";
 
   //? ||================ choose route ==================||
   Route<dynamic> generateRoute(RouteSettings settings) {
@@ -71,20 +75,25 @@ class AppRouter with CubitProviderMixin {
             fatherName: (settings.arguments as List)[2],
           ),
         );
-      case AppRoutes.lessons:
+      case AppRoutes.subjectDetails:
         final arg = settings.arguments as Map;
         final SubjectEntity subject = arg["subject"];
         final Color color = arg["color"];
-        log("get lesson in app router");
         return SlidingPageRouteBuilder(
           settings: settings,
-          builder: (context) => BlocProvider(
-            lazy: false,
-            create: (context) => getCubit(() => LessonsCubit())..getLessons(subject.id),
-            child: LessonScreen(
+          builder: (context) => MultiBlocProvider(
+            providers: [
+              BlocProvider(
+                lazy: false,
+                create: (context) {
+                  return getCubit(() => LessonsCubit())..getLessons(subject.id);
+                },
+              ),
+            ],
+            child: SubjectDetailsScreen(
               subject: subject,
               color: color,
-            ), //todo: add subject
+            ),
           ),
         );
 
@@ -98,13 +107,32 @@ class AppRouter with CubitProviderMixin {
             final Color subjectColor = arg["color"];
             return BlocProvider(
               create: (context) => getCubit(() => QuestionCubit())
-                ..getQuestions(
+                ..getQuestionsByLessonAndType(
                   lessonId: lessonWithOneTypeEntity.id,
                   typeId: lessonWithOneTypeEntity.questionType.id,
                 ),
               child: QuestionsPage(
                 subjectColor: subjectColor,
                 lessonName: lessonWithOneTypeEntity.title,
+              ),
+            );
+          },
+        );
+      case AppRoutes.questionsFromTag:
+        return SlidingPageRouteBuilder(
+          settings: settings,
+          builder: (context) {
+            final arg = settings.arguments as Map;
+            final Color subjectColor = arg["color"];
+            final TagEntity tag = arg['tag'];
+            return BlocProvider(
+              create: (context) => getCubit(() => QuestionCubit())
+                ..getSubjectQuestionsByTag(
+                  tagId: tag.id,
+                ),
+              child: QuestionsPage(
+                subjectColor: subjectColor,
+                lessonName: tag.name,
               ),
             );
           },

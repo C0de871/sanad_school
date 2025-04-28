@@ -19,3 +19,19 @@ class QuestionsInLessonWithTypeParams {
 
   QuestionsInLessonWithTypeParams({required this.lessonId, required this.typeId});
 }
+
+class QuestionsInSubjectByTag {
+  final int tagId;
+
+  QuestionsInSubjectByTag({required this.tagId});
+}
+
+class TagParams {
+  final int subjectId;
+  final bool isExam;
+
+  TagParams({
+    required this.subjectId,
+    required this.isExam,
+  });
+}

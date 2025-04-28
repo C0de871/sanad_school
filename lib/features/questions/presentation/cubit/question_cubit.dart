@@ -4,13 +4,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/databases/params/params.dart';
 import '../../../../core/utils/services/service_locator.dart';
-import '../../domain/use_cases/get_questions_use_case.dart';
+import '../../domain/use_cases/get_questions_in_lesson_by_type_use_case.dart';
+import '../../domain/use_cases/get_questions_in_subject_by_tag.dart';
 import '../questions_screen.dart';
 import 'question_state.dart';
 import 'package:flutter_quill/flutter_quill.dart';
 
 class QuestionCubit extends Cubit<QuestionState> {
-  final GetQuestionsUseCase getQuestionsUseCase;
+  final GetQuestionsInLessonByTypeUseCase getLessonQuestionsByTypeUseCase;
+  final GetQuestionsInSubjectByTagUseCase getQuestionsInSubjectByTagUseCase;
   Timer? timer;
   TextEditingController noteController = TextEditingController();
   FocusNode noteFocusNode = FocusNode();
@@ -21,7 +23,8 @@ class QuestionCubit extends Cubit<QuestionState> {
   static String answersControllerNodeKey = "answers-controller";
 
   QuestionCubit()
-      : getQuestionsUseCase = getIt(),
+      : getLessonQuestionsByTypeUseCase = getIt(),
+        getQuestionsInSubjectByTagUseCase = getIt(),
         super(QuestionInitial());
 
   FocusNode getQuestionFocusNode(int questionIndex) {
@@ -48,13 +51,64 @@ class QuestionCubit extends Cubit<QuestionState> {
     return questionsScrollController[questionIndex][answersControllerNodeKey][answerIndex];
   }
 
-  Future<void> getQuestions({
+  Future<void> getQuestionsByLessonAndType({
     required int lessonId,
     required int typeId,
   }) async {
     emit(QuestionLoading());
     QuestionsInLessonWithTypeParams params = QuestionsInLessonWithTypeParams(lessonId: lessonId, typeId: typeId);
-    final result = await getQuestionsUseCase.call(
+    final result = await getLessonQuestionsByTypeUseCase.call(
+      params: params,
+    );
+    result.fold(
+      (failure) => emit(QuestionFailure(failure.errMessage)),
+      (questions) {
+        questionsController = List.generate(questions.length, (questionIndex) {
+          return {
+            questionControllersNodeKey: QuillController(
+              document: Document.fromJson(questions[questionIndex].textQuestion),
+              selection: const TextSelection.collapsed(offset: 0),
+              readOnly: true,
+            ),
+            answersControllerNodeKey: List.generate(
+              questions[questionIndex].choices.length,
+              (choiceIndex) {
+                return QuillController(
+                  document: Document.fromJson(questions[questionIndex].choices[choiceIndex]),
+                  selection: const TextSelection.collapsed(offset: 0),
+                  readOnly: true,
+                );
+              },
+            ),
+          };
+        });
+        questionsScrollController = List.generate(questions.length, (index) {
+          return {
+            questionControllersNodeKey: ScrollController(),
+            answersControllerNodeKey: List.filled(questions[index].choices.length, ScrollController()),
+          };
+        });
+        questionsFocusNode = List.generate(questions.length, (index) {
+          return {
+            questionControllersNodeKey: FocusNode(),
+            answersControllerNodeKey: List.filled(questions[index].choices.length, FocusNode()),
+          };
+        });
+        emit(QuestionSuccess(
+          questions: questions,
+          userAnswers: List.generate(questions.length, (index) => null),
+          isCorrect: List.generate(questions.length, (index) => null),
+        ));
+      },
+    );
+  }
+
+  Future<void> getSubjectQuestionsByTag({
+    required int tagId,
+  }) async {
+    emit(QuestionLoading());
+    QuestionsInSubjectByTag params = QuestionsInSubjectByTag(tagId: tagId);
+    final result = await getQuestionsInSubjectByTagUseCase.call(
       params: params,
     );
     result.fold(

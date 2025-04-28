@@ -27,5 +27,3 @@ void main() async {
   // await FireBaseService().initNotifications();
   runApp(const MyApp());
 }
-
-

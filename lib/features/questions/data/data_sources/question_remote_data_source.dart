@@ -8,11 +8,20 @@ class QuestionRemoteDataSource {
 
   QuestionRemoteDataSource({required this.api});
 
-  Future<QuestionsResponseModel> getQuestions({
+  Future<QuestionsResponseModel> getQuestionsInLessonByType({
     required QuestionsInLessonWithTypeParams params,
   }) async {
     final response = await api.get(
-      EndPoints.questionInLessonWithType(params:params),
+      EndPoints.questionInLessonWithType(params: params),
+    );
+    return QuestionsResponseModel.fromMap(response);
+  }
+
+  Future<QuestionsResponseModel> getQuestionsInSubjectByTag({
+    required QuestionsInSubjectByTag params,
+  }) async {
+    final response = await api.get(
+      EndPoints.questionInSubjectbByTag(params: params),
     );
     return QuestionsResponseModel.fromMap(response);
   }
