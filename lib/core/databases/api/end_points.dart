@@ -1,7 +1,19 @@
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
+import '../params/params.dart';
+
 class EndPoints {
-  static String baserUrl = dotenv.get('BASEURL');
+  static String baseUrl = dotenv.get('BASEURL');
+  static String subject = dotenv.get('SUBJECT');
+  static String lessonEndpoint(int subjectId) {
+    return '$baseUrl$subject/$subjectId/lessons';
+  }
+
+  static String questionInLessonWithType({required QuestionsInLessonWithTypeParams params}) {
+    // "${EndPoints.lesson}/$lessonId/questions/$typeId"
+    return '${baseUrl}lesson/${params.lessonId}/questions/${params.typeId}';
+  }
+
   static const String templateT = "";
 }
 

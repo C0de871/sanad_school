@@ -7,7 +7,6 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'core/app/app.dart';
 import 'core/databases/cache/shared_prefs_helper.dart';
 import 'core/utils/services/service_locator.dart';
-import 'features/questions/presentation/questions_screen.dart';
 // import 'features/questions/temp.dart';
 
 void main() async {
@@ -29,22 +28,4 @@ void main() async {
   runApp(const MyApp());
 }
 
-class Subject {
-  final String title;
-  final IconData icon;
-  final String description;
-  final Color color;
-  final double completePercentage;
-  final int lessonCount;
-  final List<Question>? questions;
 
-  Subject({
-    required this.title,
-    required this.icon,
-    required this.description,
-    required this.color,
-    this.completePercentage = 23,
-    this.lessonCount = 19,
-    this.questions,
-  });
-}

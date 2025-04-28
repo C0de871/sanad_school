@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:sanad_school/core/theme/theme.dart';
-
-import '../../../../core/utils/services/service_locator.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:sanad_school/features/subjects/presentation/cubit/subject_cubit.dart';
 import '../../../../main.dart';
-import '../../../questions/presentation/questions_screen.dart';
+import '../../domain/entities/subject_entity.dart';
 import 'subject_card.dart';
 
 class SubjectsGrid extends StatelessWidget {
@@ -29,6 +28,17 @@ class _SubjectsLayoutState extends State<SubjectsLayout> {
   int? expandedIndex;
 
   late List<bool> isExpanded = [];
+  final List<Color> subjectColors = [
+    Color(0xFF4CAF50), // Green
+    Color(0xFF1A1B1F), // Dark color
+    Color(0xFF2196F3), // Blue
+    Color(0xFFFF9800), // Orange
+    Color(0xFFE91E63), // Pink
+    Color(0xFF9C27B0), // Purple
+    Color(0xFF00BCD4), // Cyan
+    Color(0xFF795548), // Brown
+    Color(0xFF607D8B), // Blue Grey
+  ];
   @override
   void initState() {
     super.initState();
@@ -37,94 +47,41 @@ class _SubjectsLayoutState extends State<SubjectsLayout> {
 
   @override
   Widget build(BuildContext context) {
-    final subjects = [
-      //0xFFDB8E44
-      //0xFFB06F36
-      Subject(
-        title: 'علوم',
-        icon: Icons.science,
-        description: 'اكتشف عالم العلوم الطبيعية والظواهر العلمية من خلال دروس تفاعلية وتجارب عملية',
-        color: getIt<AppTheme>().extendedColors.gradientGreen,
-        questions: sampleQuestions,
-      ),
-      Subject(
-        title: 'فرنسي',
-        icon: Icons.abc,
-        description: 'تعلم اللغة الفرنسية من خلال محتوى تعليمي متميز وتدريبات لغوية متنوعة',
-        color: getIt<AppTheme>().extendedColors.gradientBlue,
-        questions: sampleQuestions,
-      ),
-      Subject(
-        title: 'انجليزي',
-        icon: Icons.abc,
-        description: 'أتقن اللغة الإنجليزية مع دروس شاملة تغطي القواعد والمحادثة والكتابة',
-        color: getIt<AppTheme>().extendedColors.gradientPurple,
-        questions: sampleQuestions,
-      ),
-      Subject(
-        title: 'رياضيات',
-        icon: Icons.calculate,
-        description: 'استكشف عالم الرياضيات مع شرح مبسط للمفاهيم وتمارين تطبيقية',
-        color: getIt<AppTheme>().extendedColors.gradientPink,
-        questions: sampleQuestions,
-      ),
-      Subject(
-        title: 'فيزياء',
-        icon: Icons.bolt,
-        description: 'تعرف على قوانين الفيزياء وتطبيقاتها في الحياة اليومية',
-        color: getIt<AppTheme>().extendedColors.gradientIndigo,
-        questions: sampleQuestions,
-      ),
-      Subject(
-        title: 'كيمياء',
-        icon: Icons.biotech,
-        description: 'ادرس التفاعلات الكيميائية والعناصر مع تجارب افتراضية تفاعلية',
-        color: getIt<AppTheme>().extendedColors.gradientOrange,
-        questions: sampleQuestions,
-      ),
-      Subject(
-        title: 'ديانة',
-        icon: Icons.menu_book,
-        description: 'تعمق في دراسة العلوم الدينية والأخلاق والقيم الإسلامية',
-        color: getIt<AppTheme>().extendedColors.gradientBrown,
-        questions: sampleQuestions,
-      ),
-      Subject(
-        title: 'وطنية',
-        icon: Icons.flag,
-        description: 'تعرف على تاريخ وطنك وقيمه ومؤسساته الوطنية',
-        color: getIt<AppTheme>().extendedColors.gradientBlueGrey,
-        questions: sampleQuestions,
-      ),
-      Subject(
-        title: 'عربي',
-        icon: Icons.language,
-        description: 'أتقن اللغة العربية من خلال دروس في النحو والأدب والبلاغة',
-        color: getIt<AppTheme>().extendedColors.gradientTeal,
-        questions: sampleQuestions,
-      ),
-    ];
     return LayoutBuilder(
       builder: (context, constraints) {
         // final int rowCount = (subjects.length / 2).ceil();
-        return ListView.builder(
-          padding: const EdgeInsets.all(16),
-          itemCount: subjects.length,
-          itemBuilder: (context, index) {
-            return _card(index, subjects);
+        return BlocBuilder<SubjectCubit, SubjectState>(
+          builder: (context, state) {
+            return switch (state) {
+              SubjectInitial() => SizedBox(),
+              SubjectLoading() => Center(
+                  child: CircularProgressIndicator(),
+                ),
+              SubjectSuccess() => ListView.builder(
+                  padding: const EdgeInsets.all(16),
+                  itemCount: state.subjects.length,
+                  itemBuilder: (context, index) {
+                    return _card(index, state.subjects);
+                  },
+                ),
+              SubjectFailure() => Center(
+                  child: Text(state.message),
+                )
+            };
           },
         );
       },
     );
   }
 
-  Widget _card(int index, List<Subject> subjects) {
+  Widget _card(int index, List<SubjectEntity> subjects) {
     return Column(
       children: [
         SubjectCard(
           subject: subjects[index],
           isExpanded: isExpanded[index],
           isShrunk: ((index < isExpanded.length && isExpanded[index])), // index+1
+          color: subjectColors[index % subjectColors.length],
           onLongPress: () {
             setState(() {
               isExpanded[index] = !isExpanded[index];

@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:sanad_school/core/Routes/app_routes.dart';
 import 'package:sanad_school/core/utils/services/service_locator.dart';
@@ -5,12 +7,14 @@ import 'package:sanad_school/features/auth/presentation/widgets/animated_raised_
 
 import '../../../../core/theme/theme.dart';
 import '../../../../main.dart';
+import '../../domain/entities/subject_entity.dart';
 
 class SubjectCard extends StatelessWidget {
-  final Subject subject;
+  final SubjectEntity subject;
   final bool isExpanded;
   final bool isShrunk;
   final VoidCallback onLongPress;
+  final Color color;
 
   const SubjectCard({
     super.key,
@@ -18,6 +22,7 @@ class SubjectCard extends StatelessWidget {
     required this.isExpanded,
     required this.isShrunk,
     required this.onLongPress,
+    required this.color,
   });
 
   @override
@@ -27,18 +32,22 @@ class SubjectCard extends StatelessWidget {
         begin: Alignment.topLeft,
         end: Alignment.bottomRight,
         colors: [
-          subject.color,
-          Color.lerp(subject.color, Theme.of(context).colorScheme.scrim, 0.2) ?? subject.color,
+          color,
+          Color.lerp(color, Theme.of(context).colorScheme.scrim, 0.2) ?? color,
         ],
         stops: const [0.3, 1],
       ),
       borderRadius: BorderRadius.circular(24),
       onLongPressed: onLongPress,
       onPressed: () {
+        log("pressed");
         Navigator.pushNamed(
           context,
           AppRoutes.lessons,
-          arguments: subject,
+          arguments: {
+            "subject": subject,
+            "color": color,
+          },
         );
       },
       child: Column(
@@ -146,7 +155,7 @@ class SubjectCard extends StatelessWidget {
 
 /// A widget to display the large, decorative background icon.
 class _DecorativeIcon extends StatelessWidget {
-  final Subject subject;
+  final SubjectEntity subject;
 
   const _DecorativeIcon({required this.subject});
 
@@ -158,7 +167,10 @@ class _DecorativeIcon extends StatelessWidget {
       child: Transform.rotate(
         angle: 0.2,
         child: Icon(
-          subject.icon,
+          IconData(
+            int.parse(subject.iconCodePoint, radix: 16),
+            fontFamily: 'MaterialIcons',
+          ),
           size: 140,
           color: getIt<AppTheme>().extendedColors.white.withValues(alpha: 0.05),
         ),
@@ -170,7 +182,7 @@ class _DecorativeIcon extends StatelessWidget {
 /// The main content of the card which arranges the icon/title and,
 /// optionally, the description section.
 class _SubjectContent extends StatelessWidget {
-  final Subject subject;
+  final SubjectEntity subject;
   final bool isExpanded;
   final bool isShrunk;
 
@@ -209,7 +221,7 @@ class _SubjectContent extends StatelessWidget {
 /// Displays the subject icon inside an animated container and
 /// the subject title using an animated text style.
 class _IconTitleSection extends StatelessWidget {
-  final Subject subject;
+  final SubjectEntity subject;
   final bool isShrunk;
 
   const _IconTitleSection({
@@ -239,11 +251,12 @@ class _IconTitleSection extends StatelessWidget {
         height: 1.2,
       ),
       textAlign: TextAlign.center,
-      child: Text(subject.title),
+      child: Text(subject.name),
     );
   }
 
   AnimatedContainer _subjectIcon(BuildContext context) {
+    log("icon code:${int.parse(subject.iconCodePoint, radix: 16)}");
     return AnimatedContainer(
       duration: const Duration(milliseconds: 300),
       padding: EdgeInsets.all(16), // 8
@@ -256,18 +269,45 @@ class _IconTitleSection extends StatelessWidget {
         ),
       ),
       child: Icon(
-        subject.icon,
+        // IconData(
+        getIcon(),
+        // ),
         size: 48, // 24
         color: getIt<AppTheme>().extendedColors.white,
       ),
     );
+  }
+
+  IconData getIcon() {
+    switch (subject.id) {
+      case 1:
+        return Icons.calculate; // الرياضيات
+      case 2:
+        return Icons.abc; // English
+      case 3:
+        return Icons.biotech; // علم الأحياء
+      case 4:
+        return Icons.content_cut; // المهارات الجراحية
+      case 5:
+        return Icons.sick; // علم المناعة و الدمويات
+      case 6:
+        return Icons.vaccines; // علم الأدوية
+      case 7:
+        return Icons.electric_bolt; // الفيزياء
+      case 8:
+        return Icons.science; // الكيمياء
+      case 9:
+        return Icons.mosque; // التربية الدينية
+      default:
+        return Icons.calculate; // fallback icon
+    }
   }
 }
 
 /// Displays the subject description along with a "Learn More" button.
 /// This widget is only visible when the card is expanded.
 class _DescriptionSection extends StatelessWidget {
-  final Subject subject;
+  final SubjectEntity subject;
 
   const _DescriptionSection({required this.subject});
 

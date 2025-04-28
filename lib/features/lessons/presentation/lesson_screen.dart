@@ -3,17 +3,24 @@ import 'dart:math';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:sanad_school/features/lessons/domain/entities/lesson_entity.dart';
+import 'package:sanad_school/features/lessons/presentation/cubit/lessons_cubit.dart';
+import 'package:sanad_school/features/lessons/presentation/cubit/lessons_state.dart';
 import '../../../core/Routes/app_routes.dart';
 import '../../../core/theme/theme.dart';
 import '../../../core/utils/services/service_locator.dart';
 import '../../../main.dart';
 import '../../auth/presentation/widgets/animated_raised_button.dart';
+import '../../subjects/domain/entities/subject_entity.dart';
 
 class LessonScreen extends StatefulWidget {
-  final Subject subject;
+  final SubjectEntity subject;
+  final Color color;
   const LessonScreen({
     super.key,
     required this.subject,
+    required this.color,
   });
 
   @override
@@ -38,11 +45,11 @@ class _LessonScreenState extends State<LessonScreen> with SingleTickerProviderSt
 
   @override
   Widget build(BuildContext context) {
-    final String subjectName = widget.subject.title;
-    final double completePercentage = widget.subject.completePercentage;
+    final String subjectName = widget.subject.name;
+    // final double completePercentage = widget.subject.completePercentage;
     final String subjectDescription = widget.subject.description;
-    final Color subjectColor = widget.subject.color;
-    final int lessonCount = widget.subject.lessonCount;
+    final Color subjectColor = widget.color;
+    // final int lessonCount = widget.subject.lessonCount;
     final colors = getIt<AppTheme>().extendedColors;
 
     return Scaffold(
@@ -85,10 +92,10 @@ class _LessonScreenState extends State<LessonScreen> with SingleTickerProviderSt
                     LessonsTab(
                       subject: widget.subject,
                       subjectName: subjectName,
-                      completePercentage: completePercentage,
+                      // completePercentage: completePercentage,
                       subjectDescription: subjectDescription,
                       subjectColor: subjectColor,
-                      lessonCount: lessonCount,
+                      // lessonCount: lessonCount,
                     ),
                     const Center(child: Text('المفضلة')),
                     const Center(child: Text('الاختبارات')),
@@ -108,19 +115,19 @@ class _LessonScreenState extends State<LessonScreen> with SingleTickerProviderSt
 
 class LessonsTab extends StatelessWidget {
   final String subjectName;
-  final double completePercentage;
+  // final double completePercentage;
   final String subjectDescription;
   final Color subjectColor;
-  final int lessonCount;
-  final Subject subject;
+  // final int lessonCount;
+  final SubjectEntity subject;
 
   const LessonsTab({
     super.key,
     required this.subjectName,
-    required this.completePercentage,
+    // required this.completePercentage,
     required this.subjectDescription,
     required this.subjectColor,
-    required this.lessonCount,
+    // required this.lessonCount,
     required this.subject,
   });
 
@@ -130,6 +137,7 @@ class LessonsTab extends StatelessWidget {
     return Column(
       children: [
         Container(
+          width: double.infinity,
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
             color: subjectColor,
@@ -157,7 +165,7 @@ class LessonsTab extends StatelessWidget {
               ClipRRect(
                 borderRadius: BorderRadius.circular(10),
                 child: LinearProgressIndicator(
-                  value: completePercentage / 100,
+                  value: 20 / 100,
                   backgroundColor: colors.white.withAlpha(77),
                   valueColor: AlwaysStoppedAnimation<Color>(colors.white),
                   minHeight: 8,
@@ -165,7 +173,7 @@ class LessonsTab extends StatelessWidget {
               ),
               const SizedBox(height: 8),
               Text(
-                '$lessonCount دروس',
+                '23 دروس',
                 style: TextStyle(
                   color: colors.white,
                   fontSize: 16,
@@ -187,7 +195,7 @@ class LessonsTab extends StatelessWidget {
 
 class LessonsGridView extends StatefulWidget {
   final Color subjectColor;
-  final Subject subject;
+  final SubjectEntity subject;
 
   const LessonsGridView({
     super.key,
@@ -204,23 +212,42 @@ class _LessonsGridViewState extends State<LessonsGridView> {
 
   @override
   Widget build(BuildContext context) {
-    return ListView.builder(
-      padding: const EdgeInsets.all(16),
-      itemBuilder: (context, index) => Column(
-        children: [
-          LessonCard(
-            subject: widget.subject,
-            lessonNumber: index + 1,
-            isExpanded: _expandedLessons[index] ?? false,
-            onTap: () => _toggleLesson(index),
-            subjectColor: widget.subjectColor,
-          ),
-          SizedBox(
-            height: 16,
-          ),
-        ],
-      ),
-      itemCount: 8,
+    return BlocBuilder<LessonsCubit, LessonsState>(
+      builder: (context, state) {
+        switch (state) {
+          case LessonsInitial():
+            return SizedBox();
+
+          case LessonsLoading():
+            return Center(
+              child: CircularProgressIndicator(),
+            );
+
+          case LessonsLoaded():
+            state.lessons.removeWhere((ele) => ele.questionTypes.isEmpty);
+            return ListView.builder(
+              padding: const EdgeInsets.all(16),
+              itemBuilder: (context, index) => Column(
+                children: [
+                  LessonCard(
+                    lesson: state.lessons[index],
+                    subject: widget.subject,
+                    isExpanded: _expandedLessons[index] ?? false,
+                    onTap: () => _toggleLesson(index),
+                    subjectColor: widget.subjectColor,
+                  ),
+                  SizedBox(height: 16),
+                ],
+              ),
+              itemCount: 8,
+            );
+
+          case LessonsError():
+            return Center(
+              child: Text(state.message),
+            );
+        }
+      },
     );
   }
 
@@ -232,19 +259,19 @@ class _LessonsGridViewState extends State<LessonsGridView> {
 }
 
 class LessonCard extends StatefulWidget {
-  final int lessonNumber;
   final bool isExpanded;
   final VoidCallback onTap;
   final Color subjectColor;
-  final Subject subject;
+  final SubjectEntity subject;
+  final LessonEntity lesson;
 
   const LessonCard({
     super.key,
-    required this.lessonNumber,
     required this.isExpanded,
     required this.onTap,
     required this.subjectColor,
     required this.subject,
+    required this.lesson,
   });
 
   @override
@@ -256,14 +283,14 @@ class _LessonCardState extends State<LessonCard> with TickerProviderStateMixin {
   late final List<AnimationController> controllers;
   final ScrollController _scrollController = ScrollController();
   late final List<Animation<double>> _subLessonAnimations;
-  final List<String> catagories = ["لعيون سند", "صح او خطأ", "اختر الاجابة الصحيحة", 'مفردات', 'اختبارات'];
+  // final List<String> catagories = ["لعيون سند", "صح او خطأ", "اختر الاجابة الصحيحة", 'مفردات', 'اختبارات'];
 
   @override
   void initState() {
     super.initState();
 
     controllers = List.generate(
-      8,
+      widget.lesson.questionTypes.length,
       (index) => AnimationController(
         vsync: this,
         duration: const Duration(milliseconds: 600),
@@ -360,7 +387,8 @@ class _LessonCardState extends State<LessonCard> with TickerProviderStateMixin {
   Widget _buildCollapsedContent() {
     return Center(
       child: Text(
-        'الدرس ${widget.lessonNumber}',
+        'الدرس ${widget.lesson.title}',
+        textAlign: TextAlign.center,
         style: TextStyle(
           fontSize: 18,
           fontWeight: FontWeight.bold,
@@ -406,13 +434,17 @@ class _LessonCardState extends State<LessonCard> with TickerProviderStateMixin {
               onPressed: () {
                 Navigator.pushNamed(
                   context,
-                  arguments: widget.subject,
+                  arguments: {
+                    "subject": widget.subject,
+                    "lesson": widget.lesson.toLessonWithOneTypeEntity(index),
+                    "color": widget.subjectColor,
+                  },
                   AppRoutes.questions,
                 );
               },
               child: Center(
                 child: Text(
-                  catagories[index % 5],
+                  widget.lesson.questionTypes[index].name,
                   style: TextStyle(
                     fontSize: 12,
                     color: widget.subjectColor,
@@ -423,7 +455,7 @@ class _LessonCardState extends State<LessonCard> with TickerProviderStateMixin {
             ),
           );
         },
-        itemCount: 8,
+        itemCount: widget.lesson.questionTypes.length,
       ),
     );
   }
