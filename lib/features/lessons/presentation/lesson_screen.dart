@@ -12,6 +12,7 @@ import 'package:sanad_school/features/tags/presentation/screens/all_tag_screen.d
 import '../../../core/Routes/app_router.dart';
 import '../../../core/Routes/app_routes.dart';
 import '../../../core/helper/cubit_helper.dart';
+import '../../../core/shared/widgets/animated_adaptive_grid_layout.dart';
 import '../../../core/theme/theme.dart';
 import '../../../core/utils/services/service_locator.dart';
 import '../../auth/presentation/widgets/animated_raised_button.dart';
@@ -20,10 +21,12 @@ import '../../subjects/domain/entities/subject_entity.dart';
 class SubjectDetailsScreen extends StatefulWidget {
   final SubjectEntity subject;
   final Color color;
+  final TextDirection textDirection;
   const SubjectDetailsScreen({
     super.key,
     required this.subject,
     required this.color,
+    required this.textDirection,
   });
 
   @override
@@ -70,7 +73,7 @@ class _SubjectDetailsScreenState extends State<SubjectDetailsScreen> with Single
 
     return Scaffold(
       // floatingActionButton: FloatingActionButton.extended(
-      //   onPressed: () {
+      //   onPressed: () {`
       //     Navigator.pushNamed(
       //       context,
       //       AppRoutes.quizSelection,
@@ -138,7 +141,7 @@ class _SubjectDetailsScreenState extends State<SubjectDetailsScreen> with Single
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      '23 دروس',
+                      '23 درس',
                       style: TextStyle(
                         color: colors.white,
                         fontSize: 16,
@@ -154,6 +157,7 @@ class _SubjectDetailsScreenState extends State<SubjectDetailsScreen> with Single
                     LessonsTab(
                       subject: widget.subject,
                       subjectColor: subjectColor,
+                      direction: widget.textDirection,
                     ),
                     BlocProvider.value(
                       value: tagCubit
@@ -163,6 +167,7 @@ class _SubjectDetailsScreenState extends State<SubjectDetailsScreen> with Single
                         ),
                       child: AllTagsTab(
                         color: subjectColor,
+                        direction: widget.textDirection,
                       ),
                     ),
                     BlocProvider.value(
@@ -173,6 +178,7 @@ class _SubjectDetailsScreenState extends State<SubjectDetailsScreen> with Single
                         ),
                       child: AllTagsTab(
                         color: subjectColor,
+                        direction: widget.textDirection,
                       ),
                     ),
                   ],
@@ -189,11 +195,13 @@ class _SubjectDetailsScreenState extends State<SubjectDetailsScreen> with Single
 class LessonsTab extends StatelessWidget {
   final Color subjectColor;
   final SubjectEntity subject;
+  final TextDirection direction;
 
   const LessonsTab({
     super.key,
     required this.subjectColor,
     required this.subject,
+    required this.direction,
   });
 
   @override
@@ -205,6 +213,7 @@ class LessonsTab extends StatelessWidget {
           child: LessonsGridView(
             subjectColor: subjectColor,
             subject: subject,
+            textDirection: direction,
           ),
         ),
       ],
@@ -215,11 +224,13 @@ class LessonsTab extends StatelessWidget {
 class LessonsGridView extends StatefulWidget {
   final Color subjectColor;
   final SubjectEntity subject;
+  final TextDirection textDirection;
 
   const LessonsGridView({
     super.key,
     required this.subjectColor,
     required this.subject,
+    required this.textDirection,
   });
 
   @override
@@ -254,6 +265,7 @@ class _LessonsGridViewState extends State<LessonsGridView> {
                     isExpanded: _expandedLessons[index] ?? false,
                     onTap: () => _toggleLesson(index),
                     subjectColor: widget.subjectColor,
+                    textDirection: widget.textDirection,
                   ),
                   SizedBox(height: 16),
                 ],
@@ -283,6 +295,7 @@ class LessonCard extends StatefulWidget {
   final Color subjectColor;
   final SubjectEntity subject;
   final LessonEntity lesson;
+  final TextDirection textDirection;
 
   const LessonCard({
     super.key,
@@ -291,6 +304,7 @@ class LessonCard extends StatefulWidget {
     required this.subjectColor,
     required this.subject,
     required this.lesson,
+    required this.textDirection,
   });
 
   @override
@@ -298,78 +312,10 @@ class LessonCard extends StatefulWidget {
 }
 
 class _LessonCardState extends State<LessonCard> with TickerProviderStateMixin {
-  // late AnimationController _controller;
-  late final List<AnimationController> controllers;
   final ScrollController _scrollController = ScrollController();
-  late final List<Animation<double>> _subLessonAnimations;
-  // final List<String> catagories = ["لعيون سند", "صح او خطأ", "اختر الاجابة الصحيحة", 'مفردات', 'اختبارات'];
-
-  @override
-  void initState() {
-    super.initState();
-
-    controllers = List.generate(
-      widget.lesson.questionTypes.length,
-      (index) => AnimationController(
-        vsync: this,
-        duration: const Duration(milliseconds: 600),
-      ),
-    );
-
-    _subLessonAnimations = controllers.map((controller) {
-      return CurvedAnimation(parent: controller, curve: Curves.easeOut);
-    }).toList();
-
-    if (widget.isExpanded) {
-      startAnimationsIntertwined(0);
-    }
-  }
-
-  void startAnimationsIntertwined(int index) {
-    if (index >= controllers.length) return;
-
-    controllers[index].forward();
-
-    Future.delayed(const Duration(milliseconds: 60), () {
-      startAnimationsIntertwined(index + 1);
-    });
-  }
-
-  Future<void> startAnimationsIntertwinedReverse() async {
-    List<Future<void>> futures = [];
-
-    for (int i = controllers.length - 1; i >= 0; i--) {
-      // Start reversing the animation
-      Future<void> animationFuture = controllers[i].reverse();
-
-      // Add the future to the list to track it
-      futures.add(animationFuture);
-
-      // Wait for the gap before starting the next animation
-      await Future.delayed(const Duration(milliseconds: 60));
-    }
-
-    // Wait for all animations to complete before returning
-    await Future.wait(futures);
-  }
-
-  @override
-  void didUpdateWidget(LessonCard oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (widget.isExpanded != oldWidget.isExpanded) {
-      if (widget.isExpanded) {
-        startAnimationsIntertwined(0);
-      } else {
-        startAnimationsIntertwinedReverse();
-      }
-    }
-  }
 
   @override
   void dispose() {
-    for (var controller in controllers) {
-      controller.dispose();
-    }
     _scrollController.dispose();
     super.dispose();
   }
@@ -383,11 +329,6 @@ class _LessonCardState extends State<LessonCard> with TickerProviderStateMixin {
       shadowColor: getIt<AppTheme>().isDark ? Colors.blueGrey.withAlpha(70) : null,
       // shadowColor: ,
       onPressed: () async {
-        if (!widget.isExpanded) {
-          startAnimationsIntertwined(0);
-        } else {
-          await startAnimationsIntertwinedReverse();
-        }
         widget.onTap();
       },
       shadowOffset: 5,
@@ -406,7 +347,7 @@ class _LessonCardState extends State<LessonCard> with TickerProviderStateMixin {
   Widget _buildCollapsedContent() {
     return Center(
       child: Text(
-        'الدرس ${widget.lesson.title}',
+          widget.lesson.title,
         textAlign: TextAlign.center,
         style: TextStyle(
           fontSize: 18,
@@ -428,48 +369,42 @@ class _LessonCardState extends State<LessonCard> with TickerProviderStateMixin {
       mainAxisMargin: 6,
       fadeDuration: Duration(milliseconds: 300),
       crossAxisMargin: 2.5,
-      child: GridView.builder(
-        controller: _scrollController,
-        cacheExtent: 0,
+      child: AnimatedAdaptiveGridLayout(
+        spacing: 8,
+        // controller: _scrollController,
+        // cacheExtent: 0,
         padding: EdgeInsets.only(
           right: 8,
         ),
-        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 4,
-          crossAxisSpacing: 8,
-          mainAxisSpacing: 8,
-          childAspectRatio: 1.3,
-        ),
+        rowHeight: widget.lesson.questionTypes.length <= 4 ? 135 : 65,
         itemBuilder: (context, index) {
-          return ScaleTransition(
-            scale: _subLessonAnimations[index],
-            child: AnimatedRaisedButtonWithChild(
-              backgroundColor: colors.surfaceContainerLow,
-              shadowColor: getIt<AppTheme>().isDark ? Colors.blueGrey.withAlpha(70) : null,
-              shadowOffset: 3,
-              lerpValue: 0.1,
-              borderWidth: 1.5,
-              borderRadius: BorderRadius.circular(16),
-              onPressed: () {
-                Navigator.pushNamed(
-                  context,
-                  arguments: {
-                    "subject": widget.subject,
-                    "lesson": widget.lesson.toLessonWithOneTypeEntity(index),
-                    "color": widget.subjectColor,
-                  },
-                  AppRoutes.questions,
-                );
-              },
-              child: Center(
-                child: Text(
-                  widget.lesson.questionTypes[index].name,
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: widget.subjectColor,
-                  ),
-                  textAlign: TextAlign.center,
+          return AnimatedRaisedButtonWithChild(
+            backgroundColor: colors.surfaceContainerLow,
+            shadowColor: getIt<AppTheme>().isDark ? Colors.blueGrey.withAlpha(70) : null,
+            shadowOffset: 3,
+            lerpValue: 0.1,
+            borderWidth: 1.5,
+            borderRadius: BorderRadius.circular(16),
+            onPressed: () {
+              Navigator.pushNamed(
+                context,
+                arguments: {
+                  "subject": widget.subject,
+                  "lesson": widget.lesson.toLessonWithOneTypeEntity(index),
+                  "color": widget.subjectColor,
+                  "direction": widget.textDirection,
+                },
+                AppRoutes.questions,
+              );
+            },
+            child: Center(
+              child: Text(
+                widget.lesson.questionTypes[index].name,
+                style: TextStyle(
+                  fontSize: 12,
+                  color: widget.subjectColor,
                 ),
+                textAlign: TextAlign.center,
               ),
             ),
           );

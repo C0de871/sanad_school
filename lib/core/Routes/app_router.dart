@@ -20,6 +20,7 @@ import 'package:sanad_school/main.dart';
 
 import '../../features/Q&A/presentation/questions_and_answers_screen.dart';
 import '../../features/about_sanad/presentation/about_us_screen.dart';
+import '../../features/auth/presentation/cubit/auth_cubit/auth_cubit.dart';
 import '../../features/auth/presentation/screens/login/login_screen.dart';
 import '../../features/lessons/domain/entities/lesson_with_one_type_entity.dart';
 import '../helper/cubit_helper.dart';
@@ -45,8 +46,15 @@ class AppRouter with CubitProviderMixin {
       case AppRoutes.login:
         return MaterialPageRoute(
           settings: settings,
-          builder: (_) => BlocProvider(
-            create: (context) => ObsecureCubit(),
+          builder: (_) => MultiBlocProvider(
+            providers: [
+              BlocProvider(
+                create: (context) => ObsecureCubit(),
+              ),
+              BlocProvider(
+                create: (context) => getCubit(() => AuthCubit()),
+              ),
+            ],
             child: LoginScreen(),
           ),
         );
@@ -54,7 +62,10 @@ class AppRouter with CubitProviderMixin {
       case AppRoutes.signUp:
         return SlidingPageRouteBuilder(
           settings: settings,
-          builder: (context) => const PersonalInfoScreen(),
+          builder: (context) => BlocProvider.value(
+            value: getCubit(() => AuthCubit()),
+            child: const PersonalInfoScreen(),
+          ),
         );
 
       case AppRoutes.home:
@@ -69,16 +80,16 @@ class AppRouter with CubitProviderMixin {
       case AppRoutes.completeSignUp:
         return SlidingPageRouteBuilder(
           settings: settings,
-          builder: (context) => SchoolInfoScreen(
-            firstName: (settings.arguments as List)[0],
-            lastName: (settings.arguments as List)[1],
-            fatherName: (settings.arguments as List)[2],
+          builder: (context) => BlocProvider.value(
+            value: getCubit(() => AuthCubit()),
+            child: SchoolInfoScreen(),
           ),
         );
       case AppRoutes.subjectDetails:
         final arg = settings.arguments as Map;
         final SubjectEntity subject = arg["subject"];
         final Color color = arg["color"];
+        final TextDirection textDirection = arg["direction"];
         return SlidingPageRouteBuilder(
           settings: settings,
           builder: (context) => MultiBlocProvider(
@@ -93,6 +104,7 @@ class AppRouter with CubitProviderMixin {
             child: SubjectDetailsScreen(
               subject: subject,
               color: color,
+              textDirection: textDirection,
             ),
           ),
         );
@@ -105,6 +117,7 @@ class AppRouter with CubitProviderMixin {
             final LessonWithOneTypeEntity lessonWithOneTypeEntity = arg["lesson"];
             final SubjectEntity subject = arg["subject"];
             final Color subjectColor = arg["color"];
+            final TextDirection textDirection = arg["direction"];
             return BlocProvider(
               create: (context) => getCubit(() => QuestionCubit())
                 ..getQuestionsByLessonAndType(
@@ -114,6 +127,7 @@ class AppRouter with CubitProviderMixin {
               child: QuestionsPage(
                 subjectColor: subjectColor,
                 lessonName: lessonWithOneTypeEntity.title,
+                textDirection: textDirection,
               ),
             );
           },
@@ -125,6 +139,7 @@ class AppRouter with CubitProviderMixin {
             final arg = settings.arguments as Map;
             final Color subjectColor = arg["color"];
             final TagEntity tag = arg['tag'];
+            final TextDirection direction = arg['direction'];
             return BlocProvider(
               create: (context) => getCubit(() => QuestionCubit())
                 ..getSubjectQuestionsByTag(
@@ -133,6 +148,7 @@ class AppRouter with CubitProviderMixin {
               child: QuestionsPage(
                 subjectColor: subjectColor,
                 lessonName: tag.name,
+                textDirection: direction,
               ),
             );
           },

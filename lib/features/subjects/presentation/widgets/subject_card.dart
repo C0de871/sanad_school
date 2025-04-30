@@ -5,6 +5,7 @@ import 'package:sanad_school/core/Routes/app_routes.dart';
 import 'package:sanad_school/core/utils/services/service_locator.dart';
 import 'package:sanad_school/features/auth/presentation/widgets/animated_raised_button.dart';
 
+import '../../../../core/helper/string_to_icon_converter.dart';
 import '../../../../core/theme/theme.dart';
 import '../../../../main.dart';
 import '../../domain/entities/subject_entity.dart';
@@ -41,13 +42,13 @@ class SubjectCard extends StatelessWidget {
       onLongPressed: onLongPress,
       onPressed: () {
         log("pressed");
+        final englishFirstCharRegExp = RegExp(r'^[a-zA-Z]');
+
+        TextDirection direction = englishFirstCharRegExp.hasMatch(subject.name) ? TextDirection.ltr : TextDirection.rtl;
         Navigator.pushNamed(
-          context,
+        context,
           AppRoutes.subjectDetails,
-          arguments: {
-            "subject": subject,
-            "color": color,
-          },
+          arguments: {"subject": subject, "color": color, "direction": direction},
         );
       },
       child: Column(
@@ -168,6 +169,7 @@ class _DecorativeIcon extends StatelessWidget {
         angle: 0.2,
         child: Icon(
           getIcon(),
+          // getIconByName(subject.iconName),
           size: 140,
           color: getIt<AppTheme>().extendedColors.white.withValues(alpha: 0.05),
         ),
@@ -278,7 +280,7 @@ class _IconTitleSection extends StatelessWidget {
   }
 
   AnimatedContainer _subjectIcon(BuildContext context) {
-    log("icon code:${int.parse(subject.iconCodePoint, radix: 16)}");
+    // log("icon code:${int.parse(subject.iconCodePoint, radix: 16)}");
     return AnimatedContainer(
       duration: const Duration(milliseconds: 300),
       padding: EdgeInsets.all(16), // 8
@@ -291,9 +293,8 @@ class _IconTitleSection extends StatelessWidget {
         ),
       ),
       child: Icon(
-        // IconData(
         getIcon(),
-        // ),
+        // getIconByName(subject.iconName),
         size: 48, // 24
         color: getIt<AppTheme>().extendedColors.white,
       ),

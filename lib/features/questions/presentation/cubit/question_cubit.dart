@@ -20,6 +20,7 @@ class QuestionCubit extends Cubit<QuestionState> {
   List<Map<String, dynamic>> questionsScrollController = [];
   List<Map<String, dynamic>> questionsFocusNode = [];
   static String questionControllersNodeKey = "question-controller";
+  static String hintControllersNodeKey = "hint-controller";
   static String answersControllerNodeKey = "answers-controller";
 
   QuestionCubit()
@@ -39,6 +40,18 @@ class QuestionCubit extends Cubit<QuestionState> {
     return questionsController[questionIndex][questionControllersNodeKey];
   }
 
+  FocusNode getHintFocusNode(int questionIndex) {
+    return questionsFocusNode[questionIndex][hintControllersNodeKey];
+  }
+
+  ScrollController getHintScrollController(int questionIndex) {
+    return questionsScrollController[questionIndex][hintControllersNodeKey];
+  }
+
+  QuillController getHintController(int questionIndex) {
+    return questionsController[questionIndex][hintControllersNodeKey];
+  }
+
   QuillController getAnswerController(int questionIndex, int answerIndex) {
     return questionsController[questionIndex][answersControllerNodeKey][answerIndex];
   }
@@ -53,7 +66,7 @@ class QuestionCubit extends Cubit<QuestionState> {
 
   Future<void> getQuestionsByLessonAndType({
     required int lessonId,
-    required int typeId,
+    required int? typeId,
   }) async {
     emit(QuestionLoading());
     QuestionsInLessonWithTypeParams params = QuestionsInLessonWithTypeParams(lessonId: lessonId, typeId: typeId);
@@ -67,6 +80,11 @@ class QuestionCubit extends Cubit<QuestionState> {
           return {
             questionControllersNodeKey: QuillController(
               document: Document.fromJson(questions[questionIndex].textQuestion),
+              selection: const TextSelection.collapsed(offset: 0),
+              readOnly: true,
+            ),
+            hintControllersNodeKey: QuillController(
+              document: questions[questionIndex].hint == null || questions[questionIndex].hint!.isEmpty ? Document() : Document.fromJson(questions[questionIndex].hint!),
               selection: const TextSelection.collapsed(offset: 0),
               readOnly: true,
             ),
@@ -85,12 +103,14 @@ class QuestionCubit extends Cubit<QuestionState> {
         questionsScrollController = List.generate(questions.length, (index) {
           return {
             questionControllersNodeKey: ScrollController(),
+            hintControllersNodeKey: ScrollController(),
             answersControllerNodeKey: List.filled(questions[index].choices.length, ScrollController()),
           };
         });
         questionsFocusNode = List.generate(questions.length, (index) {
           return {
             questionControllersNodeKey: FocusNode(),
+            hintControllersNodeKey: FocusNode(),
             answersControllerNodeKey: List.filled(questions[index].choices.length, FocusNode()),
           };
         });

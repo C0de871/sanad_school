@@ -26,7 +26,8 @@ class LessonModel extends LessonEntity {
                 (e) => QuestionTypeModel.fromMap(e),
               ),
             )
-          : [],
+          : []
+        ..add(QuestionTypeModel(id: null, name: "جميع اسئلة الدرس")),
     );
   }
 

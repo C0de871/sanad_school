@@ -48,7 +48,7 @@ class QuestionModel extends QuestionEntity {
           (choice) => List<Map<String, dynamic>>.from(choice[opsKey]),
         ),
       ),
-      rightChoice: map[rightChoiceKey],
+      rightChoice: map[rightChoiceKey] - 1, // start from 0 not 1
       isEdited: map[isEditedKey],
       hint: map[hintKey] == null ? [] : List<Map<String, dynamic>>.from(map[hintKey][opsKey]),
       hintPhoto: map[hintPhotoKey],

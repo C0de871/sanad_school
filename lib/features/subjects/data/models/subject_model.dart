@@ -11,7 +11,7 @@ class SubjectModel extends SubjectEntity {
   const SubjectModel({
     required super.id,
     required super.name,
-    required super.iconCodePoint,
+    required super.iconName,
     required super.link,
     required super.teacher,
     required super.description,
@@ -21,7 +21,7 @@ class SubjectModel extends SubjectEntity {
     return SubjectModel(
       id: map[idKey],
       name: map[nameKey],
-      iconCodePoint: map[iconKey],
+      iconName: map[iconKey],
       link: map[linkKey],
       teacher: map[teacherKey],
       description: map[descriptionKey],
@@ -32,7 +32,7 @@ class SubjectModel extends SubjectEntity {
     return {
       idKey: id,
       nameKey: name,
-      iconKey: iconCodePoint,
+      iconKey: iconName,
       linkKey: link,
       teacherKey: teacher,
       descriptionKey: description,

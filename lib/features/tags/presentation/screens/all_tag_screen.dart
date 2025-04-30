@@ -1,8 +1,10 @@
+// ignore_for_file: public_member_api_docs, sort_constructors_first
 // AllTagsScreen.dart
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+
 import 'package:sanad_school/core/Routes/app_routes.dart';
 import 'package:sanad_school/features/tags/presentation/cubits/tag_cubit.dart';
 
@@ -11,19 +13,19 @@ import '../../../../../core/utils/services/service_locator.dart';
 import '../../../auth/presentation/widgets/animated_raised_button.dart';
 
 class AllTagsTab extends StatelessWidget {
-  const AllTagsTab({super.key, required this.color});
+  const AllTagsTab({
+    super.key,
+    required this.color,
+    required this.direction,
+  });
   final Color color;
+  final TextDirection direction;
 
   @override
   Widget build(BuildContext context) {
     return Directionality(
       textDirection: TextDirection.rtl,
       child: Scaffold(
-        appBar: AppBar(
-          title: const Text("جميع التصنيفات"),
-          backgroundColor: Theme.of(context).colorScheme.primary,
-          foregroundColor: Theme.of(context).colorScheme.onPrimary,
-        ),
         body: BlocBuilder<TagCubit, TagState>(
           builder: (context, state) {
             log("");
@@ -49,6 +51,7 @@ class AllTagsTab extends StatelessWidget {
                       onPressed: () => Navigator.pushNamed(context, AppRoutes.questionsFromTag, arguments: {
                         'color': color,
                         'tag': tag,
+                        'direction': direction,
                       }),
                       // backgroundColor: isSelected ? Theme.of(context).colorScheme.primary : Theme.of(context).colorScheme.surfaceVariant,
                       // shadowColor: isSelected ? (getIt<AppTheme>().extendedColors.buttonShadow) : (getIt<AppTheme>().isDark ? Colors.blueGrey.withAlpha(70) : null),

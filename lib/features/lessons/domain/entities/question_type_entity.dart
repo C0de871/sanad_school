@@ -2,7 +2,7 @@
 import 'package:equatable/equatable.dart';
 
 class QuestionTypeEntity extends Equatable {
-  final int id;
+  final int? id;
   final String name;
 
   const QuestionTypeEntity({

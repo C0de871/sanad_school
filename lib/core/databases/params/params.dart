@@ -15,7 +15,7 @@ class LessonsParams {
 
 class QuestionsInLessonWithTypeParams {
   final int lessonId;
-  final int typeId;
+  final int? typeId;
 
   QuestionsInLessonWithTypeParams({required this.lessonId, required this.typeId});
 }

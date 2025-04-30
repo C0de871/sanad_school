@@ -1,7 +1,5 @@
 import 'lesson_table.dart';
-import 'photo_table.dart';
 import 'type_question_table.dart';
-import 'user_table.dart';
 
 class QuestionTable {
   static const String id = "id";
@@ -10,13 +8,10 @@ class QuestionTable {
   static const String rightChoice = "right_choice";
   static const String isEdited = "is_edited";
   static const String hint = "hint";
-  static const String photoHint = "photo_hint";
-  static const String createdAt = "created_at";
-  static const String updatedAt = "updated_at";
-  static const String idLesson = "id_lesson";
-  static const String idTypeQuestion = "id_type_question";
-  static const String idPhoto = "id_photo";
-  static const String idUser = "id_user";
+  static const String idLesson = "lesson_id";
+  static const String idTypeQuestion = "type_id";
+  static const String questionPhoto = "question_photo";
+  static const String hintPhoto = "hint_photo";
 
   static const String tableName = "questions";
 
@@ -26,19 +21,14 @@ class QuestionTable {
       $textQuestion TEXT, 
       $choices TEXT, 
       $rightChoice INTEGER,   
-      $isEdited INTEGER, 
+      $isEdited TINY_INT 1, //TODO CHEKC THE TINY INT SYNTAX AND THE DATE TIME SYNTAX IN SUBJECT
       $hint TEXT, 
-      $photoHint TEXT,
-      $createdAt TEXT NOT NULL, 
-      $updatedAt TEXT NOT NULL,
+      $hintPhoto TEXT,
       $idLesson INTEGER NOT NULL,
       $idTypeQuestion INTEGER UNIQUE NOT NULL,
-      $idPhoto INTEGER,
-      $idUser INTEGER NOT NULL,
+      $questionPhoto TEXT,
       FOREIGN KEY ($idLesson) REFERENCES ${LessonTable.tableName} (${LessonTable.id}) ON DELETE CASCADE,
       FOREIGN KEY ($idTypeQuestion) REFERENCES ${TypeQuestionTable.tableName} (${TypeQuestionTable.id}) ON DELETE CASCADE,
-      FOREIGN KEY ($idPhoto) REFERENCES ${PhotoTable.tableName} (${PhotoTable.id}) ON DELETE CASCADE,
-      FOREIGN KEY ($idUser) REFERENCES ${UserTable.tableName} (${UserTable.id}) ON DELETE CASCADE
     )
   ''';
 }

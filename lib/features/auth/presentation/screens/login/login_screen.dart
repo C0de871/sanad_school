@@ -1,14 +1,13 @@
 // login_screen.dart (updated)
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:sanad_school/features/auth/presentation/cubit/auth_cubit/auth_cubit.dart';
+import 'package:sanad_school/features/auth/presentation/screens/login/widgets/sign_in_button.dart';
 import 'package:sanad_school/features/auth/presentation/widgets/form_container.dart';
 
 import '../../../../../core/Routes/app_routes.dart';
-import '../../../../../core/theme/theme.dart';
-import '../../../../../core/utils/services/service_locator.dart';
 import '../../cubit/obscure_cubit/obsecure_cubit.dart';
 import '../../widgets/animated_logo.dart';
-import '../../widgets/animated_raised_button.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -19,8 +18,6 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin {
   final _formKey = GlobalKey<FormState>();
-  final _emailController = TextEditingController();
-  final _passwordController = TextEditingController();
 
   late AnimationController _fadeController;
   late Animation<double> _fadeAnimation;
@@ -44,8 +41,6 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
   @override
   void dispose() {
     _fadeController.dispose();
-    _emailController.dispose();
-    _passwordController.dispose();
     super.dispose();
   }
 
@@ -55,33 +50,53 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
       backgroundColor: Theme.of(context).colorScheme.surfaceContainerLowest,
       // backgroundColor: Colors.white,
       body: SafeArea(
-        child: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.all(24.0),
-            child: FadeTransition(
-              opacity: _fadeAnimation,
-              child: Form(
-                key: _formKey,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    const SizedBox(height: 40),
-                    AnimatedLogo(
-                      color: Theme.of(context).colorScheme.primary,
-                    ),
-                    const SizedBox(height: 24),
-                    _helloText(context),
-                    const SizedBox(height: 8),
-                    _signInText(context),
-                    const SizedBox(height: 32),
-                    _signInForm(context),
-                    const SizedBox(height: 24),
-                    _signInButton(context),
-                    const SizedBox(height: 16),
-                    _createAccountTextAndButton(context),
-                    const SizedBox(height: 8),
-                    _resetPasswordTextAndButton(context),
-                  ],
+        child: BlocListener<AuthCubit, AuthState>(
+          listener: (context, state) {
+            if (state is LoginSucess) {
+              Navigator.pushNamedAndRemoveUntil(
+                context,
+                AppRoutes.home,
+                (route) => false,
+              );
+            } else if (state is AuthFailure) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(state.errMessage),
+                  duration: Duration(seconds: 2), // Optional: how long the snackbar stays
+                ),
+              );
+            }
+          },
+          child: SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.all(24.0),
+              child: FadeTransition(
+                opacity: _fadeAnimation,
+                child: Form(
+                  key: _formKey,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      const SizedBox(height: 40),
+                      AnimatedLogo(
+                        color: Theme.of(context).colorScheme.primary,
+                      ),
+                      const SizedBox(height: 24),
+                      _helloText(context),
+                      const SizedBox(height: 8),
+                      _signInText(context),
+                      const SizedBox(height: 32),
+                      _signInForm(context),
+                      const SizedBox(height: 24),
+                      SignInButton(
+                        formKey: _formKey,
+                      ),
+                      const SizedBox(height: 16),
+                      _createAccountTextAndButton(context),
+                      const SizedBox(height: 8),
+                      _resetPasswordTextAndButton(context),
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -175,29 +190,11 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
     );
   }
 
-  AnimatedRaisedButton _signInButton(BuildContext context) {
-    return AnimatedRaisedButton(
-      onPressed: () {
-        if (_formKey.currentState!.validate()) {
-          //todo manar: here we will call the login api
-          //todo manar: the pushNamedAndRemoveUntil should be in the listener of the cubit not here
-          Navigator.pushNamedAndRemoveUntil(context, AppRoutes.home, (route) {
-            return false;
-          });
-        }
-      },
-      text: 'تسجيل الدخول',
-      backgroundColor: Theme.of(context).colorScheme.primary,
-      foregroundColor: Theme.of(context).colorScheme.onPrimary,
-      shadowColor: getIt<AppTheme>().extendedColors.buttonShadow,
-    );
-  }
-
   BlocBuilder<ObsecureCubit, bool> _passwordField(BuildContext context) {
     return BlocBuilder<ObsecureCubit, bool>(
       builder: (context, state) {
         return TextFormField(
-          controller: _passwordController,
+          controller: context.read<AuthCubit>().loginPasswordController,
           decoration: InputDecoration(
             labelText: 'كلمة المرور',
             prefixIcon: Icon(
@@ -232,7 +229,7 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
 
   TextFormField _emailField(BuildContext context) {
     return TextFormField(
-      controller: _emailController,
+      controller: context.read<AuthCubit>().loginEmailController,
       decoration: InputDecoration(
         labelText: 'البريد الإلكتروني',
         prefixIcon: Icon(

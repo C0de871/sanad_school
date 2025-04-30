@@ -278,7 +278,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Widget _buildActionButtons() {
-    final actions = ['اشتراكاتي', 'اسئلة شائعة', 'حول التطبيق', 'حول المطورين'];
+    // final actions = ['اشتراكاتي', 'اسئلة شائعة', 'حول التطبيق', 'حول المطورين'];
+    final actions = ['اشتراكاتي', 'اسئلة شائعة', 'حول التطبيق'];
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -286,6 +287,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         const SizedBox(height: 16),
         ListView.builder(
           shrinkWrap: true,
+          // Icons
           physics: const NeverScrollableScrollPhysics(),
           itemCount: actions.length,
           itemBuilder: (context, index) => Padding(
@@ -313,13 +315,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   case 'حول التطبيق':
                     Navigator.pushNamed(
                       context,
-                      AppRoutes.aboutDevelopers,
+                      AppRoutes.aboutSanad,
                     );
-                  case 'حول المطورين':
-                    Navigator.pushNamed(
-                      context,
-                      AppRoutes.aboutDevelopers,
-                    );
+                  // case 'حول المطورين':
+                  //   Navigator.pushNamed(
+                  //     context,
+                  //     AppRoutes.aboutDevelopers,
+                  //   );
                 }
               },
               child: Center(

@@ -23,11 +23,13 @@ import '../domain/entities/question_entity.dart';
 class QuestionsPage extends StatefulWidget {
   final String lessonName;
   final Color subjectColor;
+  final TextDirection textDirection;
 
   const QuestionsPage({
     super.key,
     required this.lessonName,
     required this.subjectColor,
+    required this.textDirection,
   });
 
   @override
@@ -35,26 +37,8 @@ class QuestionsPage extends StatefulWidget {
 }
 
 class _QuestionsPageState extends State<QuestionsPage> {
-  // int correctAnswers = 0;
-  // int wrongAnswers = 0;
-  // Timer? timer;
-  // int seconds = 0;
-  // bool isTimerRunning = false;
-  // bool isInitialized = false;
-  // List<int?> userAnswers = [];
-  // List<bool?> isCorrect = [];
-
-  // Map<int, bool> isFavorite = {};
-  // Map<int, String> userNotes = {};
-  // Map<int, bool> expandedImages = {};
-  // Map<int, bool> expandedAnswers = {};
-  // TextEditingController noteController = TextEditingController();
-  // FocusNode noteFocusNode = FocusNode();
-
   @override
   void initState() {
-    // userAnswers = List.generate(widget.questions.length, (index) => null);
-    // isCorrect = List.generate(widget.questions.length, (index) => null);
     super.initState();
   }
 
@@ -65,7 +49,8 @@ class _QuestionsPageState extends State<QuestionsPage> {
     return '${hours.toString().padLeft(2, '0')}:${minutes.toString().padLeft(2, '0')}:${remainingSeconds.toString().padLeft(2, '0')}';
   }
 
-  void showHintBottomSheet(BuildContext context, String hint) {
+  void showHintBottomSheet(BuildContext context, int questionIndex, QuestionSuccess state) {
+    final questionCubit = context.read<QuestionCubit>();
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
@@ -103,9 +88,50 @@ class _QuestionsPageState extends State<QuestionsPage> {
               ],
             ),
             const SizedBox(height: 16),
-            Text(
-              hint,
-              style: const TextStyle(fontSize: 16, height: 1.5),
+            // Text(
+            //   hint,
+            //   style: const TextStyle(fontSize: 16, height: 1.5),
+            // ),
+            QuillEditor(
+              focusNode: questionCubit.getHintFocusNode(questionIndex),
+              controller: questionCubit.getHintController(questionIndex),
+              scrollController: questionCubit.getHintScrollController(questionIndex),
+              config: QuillEditorConfig(
+                scrollable: false,
+                requestKeyboardFocusOnCheckListChanged: false,
+                showCursor: false,
+                autoFocus: false,
+                padding: EdgeInsets.zero,
+                embedBuilders: [
+                  FormulaEmbedBuilder(),
+                ],
+              ),
+              // question.textQuestion,
+              // style: const TextStyle(
+              //   fontSize: 16,
+              //   fontWeight: FontWeight.bold,
+              //   height: 1.4,
+              // ),
+            ),
+            if (state.questions[questionIndex].hintPhoto != null) const SizedBox(height: 16),
+            ClipRRect(
+              borderRadius: BorderRadius.circular(16),
+              child: CachedNetworkImage(
+                imageUrl: state.questions[questionIndex].hintPhoto!,
+                placeholder: (context, url) => Container(
+                  height: 200,
+                  color: Colors.grey[200],
+                  child: const Center(child: CircularProgressIndicator()),
+                ),
+                errorWidget: (context, url, error) => Container(
+                  height: 200,
+                  color: Colors.grey[200],
+                  child: const Center(
+                    child: Icon(Icons.error_outline, size: 40, color: Colors.grey),
+                  ),
+                ),
+                fit: BoxFit.cover,
+              ),
             ),
             const SizedBox(height: 24),
           ],
@@ -301,120 +327,124 @@ class _QuestionsPageState extends State<QuestionsPage> {
   @override
   Widget build(BuildContext context) {
     final questionCubit = context.read<QuestionCubit>();
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.lessonName),
-        bottom: PreferredSize(
-          preferredSize: Size.fromHeight(58),
-          child: Container(
-            padding: EdgeInsets.only(bottom: padding4 * 2),
-            decoration: BoxDecoration(
-              // color: Colors.grey[100],
-              borderRadius: BorderRadius.circular(12),
+    return Directionality(
+      textDirection: widget.textDirection,
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text(widget.lessonName),
+          bottom: PreferredSize(
+            preferredSize: Size.fromHeight(58),
+            child: Container(
+              padding: EdgeInsets.only(bottom: padding4 * 2),
+              decoration: BoxDecoration(
+                // color: Colors.grey[100],
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: BlocBuilder<QuestionCubit, QuestionState>(
+                builder: (context, state) {
+                  return switch (state) {
+                    QuestionSuccess() => Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          _buildEnhancedStatCard(
+                            'Total Questions',
+                            state.questions.length.toString(),
+                            Icons.quiz,
+                            Color(0xFF84D6FD),
+                          ),
+                          _buildEnhancedStatCard(
+                            'Correct',
+                            state.correctAnswers.toString(),
+                            Icons.check_circle,
+                            Color(0xFFA7EF75),
+                          ),
+                          _buildEnhancedStatCard(
+                            'Wrong',
+                            state.wrongAnswers.toString(),
+                            Icons.cancel,
+                            Color.fromARGB(255, 254, 117, 117),
+                          ),
+                        ],
+                      ),
+                    _ => SizedBox(),
+                  };
+                },
+              ),
             ),
-            child: BlocBuilder<QuestionCubit, QuestionState>(
+          ),
+          actions: [
+            BlocBuilder<QuestionCubit, QuestionState>(
               builder: (context, state) {
                 return switch (state) {
-                  QuestionSuccess() => Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        _buildEnhancedStatCard(
-                          'Total Questions',
-                          state.questions.length.toString(),
-                          Icons.quiz,
-                          Color(0xFF84D6FD),
-                        ),
-                        _buildEnhancedStatCard(
-                          'Correct',
-                          state.correctAnswers.toString(),
-                          Icons.check_circle,
-                          Color(0xFFA7EF75),
-                        ),
-                        _buildEnhancedStatCard(
-                          'Wrong',
-                          state.wrongAnswers.toString(),
-                          Icons.cancel,
-                          Color.fromARGB(255, 254, 117, 117),
-                        ),
-                      ],
+                  QuestionSuccess() => GestureDetector(
+                      onLongPress: () {
+                        questionCubit.resetTimer();
+                      },
+                      child: IconButton(
+                        icon: const Icon(Icons.timer),
+                        onPressed: () {
+                          if (state.isTimerRunning) {
+                            questionCubit.stopTimer();
+                          } else {
+                            questionCubit.startTimer();
+                          }
+                        },
+                      ),
                     ),
                   _ => SizedBox(),
                 };
               },
             ),
-          ),
-        ),
-        actions: [
-          BlocBuilder<QuestionCubit, QuestionState>(
-            builder: (context, state) {
-              return switch (state) {
-                QuestionSuccess() => GestureDetector(
-                    onLongPress: () {
-                      questionCubit.resetTimer();
-                    },
-                    child: IconButton(
-                      icon: const Icon(Icons.timer),
-                      onPressed: () {
-                        if (state.isTimerRunning) {
-                          questionCubit.stopTimer();
-                        } else {
-                          questionCubit.startTimer();
-                        }
-                      },
-                    ),
-                  ),
-                _ => SizedBox(),
-              };
-            },
-          ),
-          BlocBuilder<QuestionCubit, QuestionState>(
-            builder: (context, state) {
-              return switch (state) {
-                QuestionSuccess() => Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                    child: Center(
-                      child: Text(
-                        formatTime(state.seconds),
-                        style: const TextStyle(fontSize: 16),
-                      ),
-                    ),
-                  ),
-                _ => SizedBox(),
-              };
-            },
-          ),
-        ],
-      ),
-      body: BlocBuilder<QuestionCubit, QuestionState>(
-        builder: (context, state) {
-          return switch (state) {
-            QuestionSuccess() => Stack(
-                children: [
-                  Column(
-                    children: [
-                      Expanded(
-                        child: ListView.builder(
-                          padding: const EdgeInsets.all(16),
-                          itemCount: state.questions.length,
-                          itemBuilder: (context, index) {
-                            final question = state.questions[index];
-                            return _buildQuestionCard(question, index, state);
-                          },
+            BlocBuilder<QuestionCubit, QuestionState>(
+              builder: (context, state) {
+                return switch (state) {
+                  QuestionSuccess() => Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                      child: Center(
+                        child: Text(
+                          formatTime(state.seconds),
+                          style: const TextStyle(fontSize: 16),
                         ),
                       ),
-                    ],
-                  ),
-                  Positioned(
-                    bottom: 0,
-                    left: 0,
-                    right: 0,
-                    child: _buildBottomActionBar(),
-                  ),
-                ],
-              ),
-            _ => const Center(child: CircularProgressIndicator()),
-          };
-        },
+                    ),
+                  _ => SizedBox(),
+                };
+              },
+            ),
+          ],
+        ),
+        body: BlocBuilder<QuestionCubit, QuestionState>(
+          builder: (context, state) {
+            return switch (state) {
+              QuestionSuccess() => Stack(
+                  children: [
+                    Column(
+                      children: [
+                        Expanded(
+                          child: ListView.builder(
+                            padding: const EdgeInsets.all(16),
+                            itemCount: state.questions.length,
+                            itemBuilder: (context, index) {
+                              final question = state.questions[index];
+                              return _buildQuestionCard(question, index, state);
+                            },
+                          ),
+                        ),
+                        SizedBox(height: 64),
+                      ],
+                    ),
+                    Positioned(
+                      bottom: 0,
+                      left: 0,
+                      right: 0,
+                      child: _buildBottomActionBar(),
+                    ),
+                  ],
+                ),
+              _ => const Center(child: CircularProgressIndicator()),
+            };
+          },
+        ),
       ),
     );
   }
@@ -607,8 +637,8 @@ class _QuestionsPageState extends State<QuestionsPage> {
                     color: Color(0xFFFFB347),
                     onPressed: () => showHintBottomSheet(
                       context,
-                      "",
-                      // question.hint ?? 'No hint available', //todo : here quill editor go
+                      questionIndex,
+                      state,
                     ),
                   ),
                   const SizedBox(width: 8),
@@ -942,11 +972,15 @@ class FormulaEmbedBuilder extends EmbedBuilder {
 
     return Container(
       padding: EdgeInsets.symmetric(vertical: 8),
-      child: Math.tex(
-        formula,
-        textStyle: embedContext.textStyle,
-        mathStyle: MathStyle.display,
+      child: Directionality(
+        textDirection: TextDirection.ltr,
+        child: Math.tex(
+          formula,
+          textStyle: embedContext.textStyle,
+          mathStyle: MathStyle.display,
+        ),
       ),
     );
   }
 }
+  

@@ -1,9 +1,6 @@
 import 'dart:developer';
 
 import 'package:path/path.dart';
-import 'package:rive/rive.dart';
-import 'package:sanad_school/core/databases/local_database/tables/bridge_tables/type_subject_table.dart';
-import 'package:sanad_school/core/databases/local_database/tables/city_table.dart';
 import 'package:sanad_school/core/databases/local_database/tables/subject_table.dart';
 import 'package:sanad_school/core/databases/local_database/tables/type_question_table.dart';
 import 'package:sanad_school/core/databases/local_database/tables/type_table.dart';
@@ -11,10 +8,9 @@ import 'package:sqflite/sqflite.dart';
 
 import 'tables/bridge_tables/tag_question_table.dart';
 import 'tables/lesson_table.dart';
-import 'tables/photo_table.dart';
 import 'tables/question_table.dart';
 import 'tables/tag_table.dart';
-import 'tables/user_table.dart';
+import 'tables/student_table.dart';
 
 class SqlDB {
   static Database? _db;
@@ -54,17 +50,14 @@ class SqlDB {
 
   _createTables(Database db) {
     Batch batch = db.batch();
-    batch.execute(UserTable.createTableQuery);
+    batch.execute(StudentTable.createTableQuery);
     batch.execute(TypeTable.createTableQuery);
     batch.execute(TypeQuestionTable.createTableQuery);
     batch.execute(QuestionTable.createTableQuery);
-    batch.execute(PhotoTable.createTableQuery);
     batch.execute(LessonTable.createTableQuery);
     batch.execute(TagTable.createTableQuery);
     batch.execute(TagQuestionTable.createTableQuery);
-    batch.execute(CityTable.createTableQuery);
     batch.execute(SubjectTable.createTableQuery);
-    batch.execute(TypeSubjectTable.createTableQuery);
     batch.commit();
   }
 

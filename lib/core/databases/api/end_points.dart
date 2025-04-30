@@ -5,12 +5,16 @@ import '../params/params.dart';
 class EndPoints {
   static String baseUrl = dotenv.get('BASEURL');
   static String subject = dotenv.get('SUBJECT');
+  static const String register = 'auth/register';
+  static const String login = 'auth/login';
+  static const String types = 'type';
   static String lessonEndpoint(int subjectId) {
     return '$baseUrl$subject/$subjectId/lessons';
   }
 
   static String questionInLessonWithType({required QuestionsInLessonWithTypeParams params}) {
     // "${EndPoints.lesson}/$lessonId/questions/$typeId"
+    if (params.typeId == null) return '${baseUrl}lesson/${params.lessonId}/questions';
     return '${baseUrl}lesson/${params.lessonId}/questions/${params.typeId}';
   }
 
@@ -35,7 +39,7 @@ class ApiKey {
 
   static String hasMorePage = "";
 
-  static String message = "";
+  static String message = "message";
 
   static String statusCode = "";
 }

@@ -24,10 +24,10 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
 
   Text _appName(BuildContext context) {
     return Text(
-      'منصة سند',
+      'منصة سند الطالب',
       style: TextStyle(
         color: Theme.of(context).colorScheme.onPrimary,
-        fontSize: 28,
+        fontSize: 20,
         fontWeight: FontWeight.w600,
         letterSpacing: 0.5,
       ),

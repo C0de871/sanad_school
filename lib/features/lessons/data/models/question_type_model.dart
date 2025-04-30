@@ -6,7 +6,7 @@ class QuestionTypeModel extends QuestionTypeEntity {
   static const String nameKey = 'name';
 
   const QuestionTypeModel({
-    required super.id,
+    super.id,
     required super.name,
   });
 

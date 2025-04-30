@@ -1,22 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sanad_school/core/shared/widgets/step_indicator.dart';
 import 'package:sanad_school/core/theme/theme.dart';
 import 'package:sanad_school/core/utils/services/service_locator.dart';
+import 'package:sanad_school/features/auth/presentation/cubit/auth_cubit/auth_cubit.dart';
+import 'package:sanad_school/features/auth/presentation/screens/school_info/widgets/certificate_dropdown_button.dart';
 import 'package:sanad_school/features/auth/presentation/widgets/animated_raised_button.dart';
 import 'package:sanad_school/features/auth/presentation/widgets/form_container.dart';
 
 import '../../../../../core/Routes/app_routes.dart';
+import 'widgets/create_account_button.dart';
 
 class SchoolInfoScreen extends StatefulWidget {
-  final String firstName;
-  final String lastName;
-  final String fatherName;
-
   const SchoolInfoScreen({
     super.key,
-    required this.firstName,
-    required this.lastName,
-    required this.fatherName,
   });
 
   @override
@@ -24,33 +21,9 @@ class SchoolInfoScreen extends StatefulWidget {
 }
 
 class _SchoolInfoScreenState extends State<SchoolInfoScreen> with SingleTickerProviderStateMixin {
-  final _formKey = GlobalKey<FormState>();
-  final _schoolNameController = TextEditingController();
-  String? _selectedCity;
-  String? _selectedCertificateType;
-
   late AnimationController _slideController;
   late Animation<Offset> _slideAnimation;
   late Animation<double> _fadeAnimation;
-
-  final List<String> _syrianCities = [
-    'دمشق',
-    'حلب',
-    'حمص',
-    'حماة',
-    'اللاذقية',
-    'طرطوس',
-    'دير الزور',
-    'الرقة',
-    'الحسكة',
-    'القامشلي',
-  ];
-
-  final List<String> _certificateTypes = [
-    'علمي',
-    'أدبي',
-    'تاسع',
-  ];
 
   @override
   void initState() {
@@ -79,13 +52,12 @@ class _SchoolInfoScreenState extends State<SchoolInfoScreen> with SingleTickerPr
   @override
   void dispose() {
     _slideController.dispose();
-    _schoolNameController.dispose();
     super.dispose();
   }
 
-  void _showSuccessDialog() {
+  void _showSuccessDialog(BuildContext parentContext) {
     showGeneralDialog(
-      context: context,
+      context: parentContext,
       barrierDismissible: false,
       transitionDuration: const Duration(milliseconds: 400),
       pageBuilder: (context, animation, secondaryAnimation) {
@@ -124,7 +96,7 @@ class _SchoolInfoScreenState extends State<SchoolInfoScreen> with SingleTickerPr
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  'مرحباً بك ${widget.firstName}',
+                  'مرحباً بك ${parentContext.read<AuthCubit>().registerFirstNameController.text}',
                   style: TextStyle(
                     fontSize: 16,
                     color: Theme.of(context).colorScheme.outline,
@@ -135,9 +107,8 @@ class _SchoolInfoScreenState extends State<SchoolInfoScreen> with SingleTickerPr
                 const SizedBox(height: 24),
                 AnimatedRaisedButton(
                   onPressed: () {
-                    Navigator.of(context).popUntil(
-                      (route) => route.settings.name == AppRoutes.login,
-                    );
+                    parentContext.read<AuthCubit>().emitLoginSuccess();
+                   
                   },
                   text: 'تم',
                   backgroundColor: Theme.of(context).colorScheme.primary,
@@ -163,28 +134,44 @@ class _SchoolInfoScreenState extends State<SchoolInfoScreen> with SingleTickerPr
         elevation: 0,
       ),
       body: SafeArea(
-        child: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.all(24.0),
-            child: SlideTransition(
-              position: _slideAnimation,
-              child: FadeTransition(
-                opacity: _fadeAnimation,
-                child: Form(
-                  key: _formKey,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      _schoolInfoText(context),
-                      const SizedBox(height: 8),
-                      _enterSchoolInfoText(context),
-                      const SizedBox(height: 32),
-                      _schoolForm(context),
-                      const SizedBox(height: 24),
-                      _createAccountButton(context),
-                      const SizedBox(height: 16),
-                      StepIndicator(index: 1, length: 2),
-                    ],
+        child: BlocListener<AuthCubit, AuthState>(
+          listener: (context, state) {
+            switch (state) {
+              case RegisterSuccess():
+                _showSuccessDialog(context);
+              case AuthFailure():
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(state.errMessage),
+                    duration: Duration(seconds: 2), // Optional: how long it shows
+                  ),
+                );
+              case _:
+            }
+          },
+          child: SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.all(24.0),
+              child: SlideTransition(
+                position: _slideAnimation,
+                child: FadeTransition(
+                  opacity: _fadeAnimation,
+                  child: Form(
+                    key: context.read<AuthCubit>().schoolInfoFormKey,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        _schoolInfoText(context),
+                        const SizedBox(height: 8),
+                        _enterSchoolInfoText(context),
+                        const SizedBox(height: 32),
+                        _schoolForm(context),
+                        const SizedBox(height: 24),
+                        CreateAccountButton(),
+                        const SizedBox(height: 16),
+                        StepIndicator(index: 1, length: 2),
+                      ],
+                    ),
                   ),
                 ),
               ),
@@ -203,61 +190,18 @@ class _SchoolInfoScreenState extends State<SchoolInfoScreen> with SingleTickerPr
           const SizedBox(height: 16),
           _cityDropDownButton(context),
           const SizedBox(height: 16),
-          _certificateDropDownButton(context),
+          CertificateDropdownButton(),
         ],
       ),
     );
   }
 
-  AnimatedRaisedButton _createAccountButton(BuildContext context) {
-    return AnimatedRaisedButton(
-      onPressed: () {
-        if (_formKey.currentState!.validate()) {
-          //todo manar: here we will call the create account api
-          //todo manar: delete _showSuccessDialog from here and put it in the listener
-          _showSuccessDialog();
-        }
-      },
-      text: 'إنشاء الحساب',
-      backgroundColor: Theme.of(context).colorScheme.primary,
-      shadowColor: getIt<AppTheme>().extendedColors.buttonShadow,
-      foregroundColor: Theme.of(context).colorScheme.onPrimary,
-    );
-  }
-
-  DropdownButtonFormField<String> _certificateDropDownButton(BuildContext context) {
-    return DropdownButtonFormField<String>(
-      value: _selectedCertificateType,
-      decoration: InputDecoration(
-        labelText: 'نوع الشهادة',
-        prefixIcon: Icon(
-          Icons.card_membership_outlined,
-          color: Theme.of(context).colorScheme.primary,
-        ),
-      ),
-      items: _certificateTypes.map((String type) {
-        return DropdownMenuItem<String>(
-          value: type,
-          child: Text(type),
-        );
-      }).toList(),
-      onChanged: (String? newValue) {
-        setState(() {
-          _selectedCertificateType = newValue;
-        });
-      },
-      validator: (value) {
-        if (value == null || value.isEmpty) {
-          return 'الرجاء اختيار نوع الشهادة';
-        }
-        return null;
-      },
-    );
-  }
-
   DropdownButtonFormField<String> _cityDropDownButton(BuildContext context) {
+    final citiesMap = context.read<AuthCubit>().syrianCitiesMap;
+    final selectedKey = context.read<AuthCubit>().selectedCity;
+
     return DropdownButtonFormField<String>(
-      value: _selectedCity,
+      value: selectedKey,
       decoration: InputDecoration(
         labelText: 'المدينة',
         prefixIcon: Icon(
@@ -265,16 +209,14 @@ class _SchoolInfoScreenState extends State<SchoolInfoScreen> with SingleTickerPr
           color: Theme.of(context).colorScheme.primary,
         ),
       ),
-      items: _syrianCities.map((String city) {
+      items: citiesMap.entries.map((entry) {
         return DropdownMenuItem<String>(
-          value: city,
-          child: Text(city),
+          value: entry.key, // English key
+          child: Text(entry.value), // Arabic name
         );
       }).toList(),
-      onChanged: (String? newValue) {
-        setState(() {
-          _selectedCity = newValue;
-        });
+      onChanged: (String? newKey) {
+        context.read<AuthCubit>().selectedCity = newKey!;
       },
       validator: (value) {
         if (value == null || value.isEmpty) {
@@ -287,7 +229,7 @@ class _SchoolInfoScreenState extends State<SchoolInfoScreen> with SingleTickerPr
 
   TextFormField _schoolNameField(BuildContext context) {
     return TextFormField(
-      controller: _schoolNameController,
+      controller: context.read<AuthCubit>().schoolNameController,
       decoration: InputDecoration(
         labelText: 'اسم المدرسة',
         prefixIcon: Icon(
