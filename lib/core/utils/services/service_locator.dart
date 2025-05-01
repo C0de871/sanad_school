@@ -1,6 +1,7 @@
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:dio/dio.dart';
 import 'package:get_it/get_it.dart';
+import 'package:sanad_school/core/utils/services/qr_service/qr_service.dart';
 import 'package:sanad_school/features/auth/data/data%20sources/auth_local_data_source.dart';
 import 'package:sanad_school/features/auth/data/data%20sources/auth_remote_data_source.dart';
 import 'package:sanad_school/features/auth/domain/repository/auth_repository.dart';
@@ -51,6 +52,7 @@ void setupServicesLocator() {
   getIt.registerLazySingleton<Connectivity>(() => Connectivity());
   getIt.registerLazySingleton<NetworkInfo>(() => NetworkInfoConnectivity(getIt()));
   getIt.registerLazySingleton<AppTheme>(() => AppTheme());
+  getIt.registerLazySingleton<QrCodeScannerService>(() => QrCodeScannerService());
 
   //! Data Sources:
   getIt.registerLazySingleton<LessonsRemoteDataSource>(() => LessonsRemoteDataSource(api: getIt()));

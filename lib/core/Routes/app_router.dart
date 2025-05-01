@@ -2,6 +2,8 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:sanad_school/core/utils/services/qr_service/qr_result.dart';
+import 'package:sanad_school/core/utils/services/qr_service/qr_screen.dart';
 import 'package:sanad_school/features/about_developers/presentation/about_developers_screen.dart';
 import 'package:sanad_school/features/auth/presentation/cubit/obscure_cubit/obsecure_cubit.dart';
 import 'package:sanad_school/features/auth/presentation/screens/personal_info/personal_info_screen.dart';
@@ -14,6 +16,7 @@ import 'package:sanad_school/features/reset_password/presentation/screens/otp_sc
 import 'package:sanad_school/features/reset_password/presentation/screens/reset_password_screen.dart';
 import 'package:sanad_school/features/subjects/domain/entities/subject_entity.dart';
 import 'package:sanad_school/features/subjects/presentation/cubit/subject_cubit.dart';
+import 'package:sanad_school/features/subscription/presentation/cubits/subscription_cubit.dart';
 import 'package:sanad_school/features/tags/domain/entities/tag_entity.dart';
 import 'package:sanad_school/features/tags/presentation/cubits/tag_cubit.dart';
 import 'package:sanad_school/main.dart';
@@ -162,7 +165,10 @@ class AppRouter with CubitProviderMixin {
       case AppRoutes.subscription:
         return SlidingPageRouteBuilder(
           settings: settings,
-          builder: (context) => SubscriptionScreen(),
+          builder: (context) => BlocProvider(
+            create: (context) => getCubit(() => SubscriptionCubit()),
+            child: SubscriptionScreen(),
+          ),
         );
 
       case AppRoutes.aboutSanad:
@@ -196,6 +202,11 @@ class AppRouter with CubitProviderMixin {
         return SlidingPageRouteBuilder(
           settings: settings,
           builder: (context) => ResetPasswordScreen(),
+        );
+      case AppRoutes.qrScanner:
+        return SlidingPageRouteBuilder<QrCodeResult?>(
+          settings: settings,
+          builder: (context) => QrScannerScreen(),
         );
       // case AppRoutes.quizSelection:
       //   return SlidingPageRouteBuilder(
