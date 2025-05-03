@@ -12,6 +12,6 @@ class GetQuestionsInLessonByTypeUseCase {
   Future<Either<Failure, List<QuestionEntity>>> call({
     required QuestionsInLessonWithTypeParams params,
   }) async {
-    return await repository.getLessonQuestionsByType(params: params);
+    return await repository.getLessonQuestionsByTypeOrAll(params: params);
   }
 }

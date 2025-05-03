@@ -7,6 +7,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sanad_school/features/lessons/domain/entities/lesson_entity.dart';
 import 'package:sanad_school/features/lessons/presentation/cubit/lessons_cubit.dart';
 import 'package:sanad_school/features/lessons/presentation/cubit/lessons_state.dart';
+import 'package:sanad_school/features/subjects/presentation/cubit/subject_sync_cubit.dart';
 import 'package:sanad_school/features/tags/presentation/cubits/tag_cubit.dart';
 import 'package:sanad_school/features/tags/presentation/screens/all_tag_screen.dart';
 import '../../../core/Routes/app_router.dart';
@@ -44,16 +45,6 @@ class _SubjectDetailsScreenState extends State<SubjectDetailsScreen> with Single
   void initState() {
     super.initState();
     _tabController = TabController(length: _tabs.length, vsync: this);
-    // _tabController.addListener(() {
-    //   if (!_tabController.indexIsChanging) {
-    //     switch (_tabController.index) {
-    //       case 1:
-    //         break;
-    //       case 2:
-    //         break;
-    //     }
-    //   }
-    // });
   }
 
   @override
@@ -87,104 +78,117 @@ class _SubjectDetailsScreenState extends State<SubjectDetailsScreen> with Single
           statusBarIconBrightness: Theme.of(context).brightness == Brightness.light ? Brightness.dark : Brightness.light,
         ),
         child: SafeArea(
-          child: Column(
-            children: [
-              Container(
-                color: subjectColor,
-                child: TabBar(
-                  enableFeedback: true,
-                  tabAlignment: TabAlignment.start,
-                  isScrollable: true,
-                  physics: const BouncingScrollPhysics(),
-                  controller: _tabController,
-                  tabs: _tabs.map((tab) => Tab(text: tab)).toList(),
-                  labelColor: colors.white,
-                  unselectedLabelColor: colors.white.withAlpha(150),
-                  indicatorColor: colors.white,
-                  dragStartBehavior: DragStartBehavior.down,
-                ),
-              ),
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
+          child: BlocListener<SubjectSyncCubit, SubjectSyncState>(
+            listener: (context, state) {
+              if (state is SubjectSyncFailure) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(state.message),
+                  ),
+                );
+              } else if (state is SubjectSyncSuccess) {
+                context.read<LessonsCubit>().getLessons(widget.subject.id);
+              }
+            },
+            child: Column(
+              children: [
+                Container(
                   color: subjectColor,
+                  child: TabBar(
+                    enableFeedback: true,
+                    tabAlignment: TabAlignment.start,
+                    isScrollable: true,
+                    physics: const BouncingScrollPhysics(),
+                    controller: _tabController,
+                    tabs: _tabs.map((tab) => Tab(text: tab)).toList(),
+                    labelColor: colors.white,
+                    unselectedLabelColor: colors.white.withAlpha(150),
+                    indicatorColor: colors.white,
+                    dragStartBehavior: DragStartBehavior.down,
+                  ),
                 ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      subjectName,
-                      style: TextStyle(
-                        color: colors.white,
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      subjectDescription,
-                      style: TextStyle(
-                        color: colors.white.withAlpha(179),
-                        fontSize: 16,
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(10),
-                      child: LinearProgressIndicator(
-                        value: 20 / 100,
-                        backgroundColor: colors.white.withAlpha(77),
-                        valueColor: AlwaysStoppedAnimation<Color>(colors.white),
-                        minHeight: 8,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      '23 درس',
-                      style: TextStyle(
-                        color: colors.white,
-                        fontSize: 16,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Expanded(
-                child: TabBarView(
-                  controller: _tabController,
-                  children: [
-                    LessonsTab(
-                      subject: widget.subject,
-                      subjectColor: subjectColor,
-                      direction: widget.textDirection,
-                    ),
-                    BlocProvider.value(
-                      value: tagCubit
-                        ..fetchTagsOrExams(
-                          subjectId: widget.subject.id,
-                          isExam: false,
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: subjectColor,
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        subjectName,
+                        style: TextStyle(
+                          color: colors.white,
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
                         ),
-                      child: AllTagsTab(
-                        color: subjectColor,
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        subjectDescription,
+                        style: TextStyle(
+                          color: colors.white.withAlpha(179),
+                          fontSize: 16,
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(10),
+                        child: LinearProgressIndicator(
+                          value: 20 / 100,
+                          backgroundColor: colors.white.withAlpha(77),
+                          valueColor: AlwaysStoppedAnimation<Color>(colors.white),
+                          minHeight: 8,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        '23 درس',
+                        style: TextStyle(
+                          color: colors.white,
+                          fontSize: 16,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Expanded(
+                  child: TabBarView(
+                    controller: _tabController,
+                    children: [
+                      LessonsTab(
+                        subject: widget.subject,
+                        subjectColor: subjectColor,
                         direction: widget.textDirection,
                       ),
-                    ),
-                    BlocProvider.value(
-                      value: examCubit
-                        ..fetchTagsOrExams(
-                          subjectId: widget.subject.id,
-                          isExam: true,
+                      BlocProvider.value(
+                        value: tagCubit
+                          ..fetchTagsOrExams(
+                            subjectId: widget.subject.id,
+                            isExam: false,
+                          ),
+                        child: AllTagsTab(
+                          color: subjectColor,
+                          direction: widget.textDirection,
                         ),
-                      child: AllTagsTab(
-                        color: subjectColor,
-                        direction: widget.textDirection,
                       ),
-                    ),
-                  ],
+                      BlocProvider.value(
+                        value: examCubit
+                          ..fetchTagsOrExams(
+                            subjectId: widget.subject.id,
+                            isExam: true,
+                          ),
+                        child: AllTagsTab(
+                          color: subjectColor,
+                          direction: widget.textDirection,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
@@ -242,38 +246,58 @@ class _LessonsGridViewState extends State<LessonsGridView> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<LessonsCubit, LessonsState>(
+    return BlocBuilder<SubjectSyncCubit, SubjectSyncState>(
       builder: (context, state) {
         switch (state) {
-          case LessonsInitial():
+          case SubjectSyncInitial():
             return SizedBox();
 
-          case LessonsLoading():
+          case SubjectSyncLoading():
             return Center(
               child: CircularProgressIndicator(),
             );
 
-          case LessonsLoaded():
-            state.lessons.removeWhere((ele) => ele.questionTypes.isEmpty);
-            return ListView.builder(
-              padding: const EdgeInsets.all(16),
-              itemBuilder: (context, index) => Column(
-                children: [
-                  LessonCard(
-                    lesson: state.lessons[index],
-                    subject: widget.subject,
-                    isExpanded: _expandedLessons[index] ?? false,
-                    onTap: () => _toggleLesson(index),
-                    subjectColor: widget.subjectColor,
-                    textDirection: widget.textDirection,
-                  ),
-                  SizedBox(height: 16),
-                ],
-              ),
-              itemCount: state.lessons.length,
+          case SubjectSyncSuccess():
+            return BlocBuilder<LessonsCubit, LessonsState>(
+              builder: (context, state) {
+                switch (state) {
+                  case LessonsInitial():
+                    return SizedBox();
+
+                  case LessonsLoading():
+                    return Center(
+                      child: CircularProgressIndicator(),
+                    );
+
+                  case LessonsLoaded():
+                    state.lessons.removeWhere((ele) => ele.questionTypes.isEmpty);
+                    return ListView.builder(
+                      padding: const EdgeInsets.all(16),
+                      itemBuilder: (context, index) => Column(
+                        children: [
+                          LessonCard(
+                            lesson: state.lessons[index],
+                            subject: widget.subject,
+                            isExpanded: _expandedLessons[index] ?? false,
+                            onTap: () => _toggleLesson(index),
+                            subjectColor: widget.subjectColor,
+                            textDirection: widget.textDirection,
+                          ),
+                          SizedBox(height: 16),
+                        ],
+                      ),
+                      itemCount: state.lessons.length,
+                    );
+
+                  case LessonsError():
+                    return Center(
+                      child: Text(state.message),
+                    );
+                }
+              },
             );
 
-          case LessonsError():
+          case SubjectSyncFailure():
             return Center(
               child: Text(state.message),
             );
@@ -347,7 +371,7 @@ class _LessonCardState extends State<LessonCard> with TickerProviderStateMixin {
   Widget _buildCollapsedContent() {
     return Center(
       child: Text(
-          widget.lesson.title,
+        widget.lesson.title,
         textAlign: TextAlign.center,
         style: TextStyle(
           fontSize: 18,

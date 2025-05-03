@@ -5,6 +5,7 @@ import 'package:sanad_school/core/databases/errors/failure.dart';
 import 'package:sanad_school/features/auth/data/data sources/auth_remote_data_source.dart';
 import 'package:sanad_school/features/auth/domain/entities/student_entity.dart';
 import 'package:sanad_school/features/auth/domain/repository/auth_repository.dart';
+import 'package:sanad_school/features/auth/data/model/logout_response_model.dart';
 
 import '../../../../core/databases/params/body.dart';
 import '../data sources/auth_local_data_source.dart';
@@ -63,5 +64,20 @@ class AuthRepositoryImpl implements AuthRepository {
   @override
   Future<void> deleteToken() async {
     await localDataSource.deleteToken();
+  }
+
+  @override
+  Future<Either<Failure, LogoutResponseModel>> logout() async {
+    if (await networkInfo.isConnected!) {
+      try {
+        final response = await remoteDataSource.logout();
+        await localDataSource.deleteToken();
+        return Right(response);
+      } on ServerException catch (e) {
+        return Left(Failure(errMessage: e.errorModel.errorMessage));
+      }
+    } else {
+      return Left(Failure(errMessage: "There is no internet connection"));
+    }
   }
 }

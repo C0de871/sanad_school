@@ -3,6 +3,7 @@ import 'package:sanad_school/core/databases/api/end_points.dart';
 
 import '../../../../core/databases/params/body.dart';
 import '../model/register_response_model.dart';
+import '../model/logout_response_model.dart';
 
 class AuthRemoteDataSource {
   final ApiConsumer api;
@@ -23,5 +24,12 @@ class AuthRemoteDataSource {
       data: params.toMap(),
     );
     return AuthResponseModel.fromMap(response);
+  }
+
+  Future<LogoutResponseModel> logout() async {
+    final response = await api.post(
+      "${EndPoints.baseUrl}${EndPoints.logout} ",
+    );
+    return LogoutResponseModel.fromMap(response);
   }
 }

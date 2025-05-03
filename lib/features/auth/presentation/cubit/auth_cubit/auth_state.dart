@@ -11,6 +11,10 @@ class AuthInitial extends AuthState {}
 
 class AuthLoading extends AuthState {}
 
+class PreviouslyAuthentecated extends AuthState {}
+
+class UnAuthentecated extends AuthState {}
+
 class LoginSucess extends AuthState {
   final StudentEntity student;
 
@@ -57,3 +61,5 @@ class AuthFailure extends AuthState {
   @override
   List<Object> get props => [errMessage];
 }
+
+class LogoutSuccess extends AuthState {}

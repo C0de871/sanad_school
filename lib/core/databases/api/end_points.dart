@@ -8,6 +8,13 @@ class EndPoints {
   static const String register = 'auth/register';
   static const String login = 'auth/login';
   static const String types = 'type';
+  static const String studentProfile = 'auth/profile/';
+  static const String logout = 'auth/logout';
+
+  static String subjectSyncEndpoint(int subjectId) {
+    return '$baseUrl$subject/$subjectId/sync';
+  }
+
   static String lessonEndpoint(int subjectId) {
     return '$baseUrl$subject/$subjectId/lessons';
   }
@@ -32,14 +39,10 @@ class EndPoints {
 
 class ApiKey {
   static String currentPage = "";
-
   static String totalPages = "";
-
   static String totalItems = "";
-
   static String hasMorePage = "";
-
   static String message = "message";
-
   static String statusCode = "";
+  static String data = "data";
 }

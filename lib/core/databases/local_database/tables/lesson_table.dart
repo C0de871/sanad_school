@@ -5,7 +5,7 @@ class LessonTable {
   static const String title = 'title';
   static const String subjectId = "subject_id";
 
-  static const String tableName = 'lesson';
+  static const String tableName = 'lessons';
 
   static const String createTableQuery = '''
     CREATE TABLE $tableName(

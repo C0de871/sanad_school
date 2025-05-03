@@ -113,26 +113,27 @@ class _QuestionsPageState extends State<QuestionsPage> {
               //   height: 1.4,
               // ),
             ),
-            if (state.questions[questionIndex].hintPhoto != null) const SizedBox(height: 16),
-            ClipRRect(
-              borderRadius: BorderRadius.circular(16),
-              child: CachedNetworkImage(
-                imageUrl: state.questions[questionIndex].hintPhoto!,
-                placeholder: (context, url) => Container(
-                  height: 200,
-                  color: Colors.grey[200],
-                  child: const Center(child: CircularProgressIndicator()),
-                ),
-                errorWidget: (context, url, error) => Container(
-                  height: 200,
-                  color: Colors.grey[200],
-                  child: const Center(
-                    child: Icon(Icons.error_outline, size: 40, color: Colors.grey),
+            const SizedBox(height: 16),
+            if (state.questions[questionIndex].hintPhoto != null)
+              ClipRRect(
+                borderRadius: BorderRadius.circular(16),
+                child: CachedNetworkImage(
+                  imageUrl: state.questions[questionIndex].hintPhoto!,
+                  placeholder: (context, url) => Container(
+                    height: 200,
+                    color: Colors.grey[200],
+                    child: const Center(child: CircularProgressIndicator()),
                   ),
+                  errorWidget: (context, url, error) => Container(
+                    height: 200,
+                    color: Colors.grey[200],
+                    child: const Center(
+                      child: Icon(Icons.error_outline, size: 40, color: Colors.grey),
+                    ),
+                  ),
+                  fit: BoxFit.cover,
                 ),
-                fit: BoxFit.cover,
               ),
-            ),
             const SizedBox(height: 24),
           ],
         ),
@@ -983,4 +984,3 @@ class FormulaEmbedBuilder extends EmbedBuilder {
     );
   }
 }
-  

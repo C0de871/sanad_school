@@ -11,6 +11,7 @@ import 'tables/lesson_table.dart';
 import 'tables/question_table.dart';
 import 'tables/tag_table.dart';
 import 'tables/student_table.dart';
+import 'tables/bridge_tables/question_groups_table.dart';
 
 class SqlDB {
   static Database? _db;
@@ -22,24 +23,41 @@ class SqlDB {
   SqlDB._internal();
 
   Future<Database?> get db async {
-    _db ??= await initalDB();
+    _db ??= await initialDb();
     return _db;
   }
 
-  Future<Database> initalDB() async {
-    String dataBasePath = await getDatabasesPath();
-    String path = join(dataBasePath, 'notes.db');
-    Database notesDB = await openDatabase(path, onCreate: _onCreate, version: 1, onUpgrade: _onUpgrade);
-    return notesDB;
+  initialDb() async {
+    String databasePath = await getDatabasesPath();
+    String path = join(databasePath, 'sanad_school.db');
+    Database myDb = await openDatabase(
+      path,
+      onCreate: _onCreate,
+      version: 6,
+      onUpgrade: _onUpgrade,
+    );
+    return myDb;
   }
 
   deleteDB() async {
     String dataBasePath = await getDatabasesPath();
-    String path = join(dataBasePath, 'notes.db');
+    String path = join(dataBasePath, 'sanad_school.db');
     await deleteDatabase(path);
   }
 
   _onUpgrade(Database db, int oldVersion, int newVersion) async {
+    Batch batch = db.batch();
+
+    batch.execute(TypeTable.createTableQuery);
+    batch.execute(StudentTable.createTableQuery);
+    batch.execute(SubjectTable.createTableQuery);
+    batch.execute(LessonTable.createTableQuery);
+    batch.execute(QuestionGroupsTable.createTableQuery);
+    batch.execute(TypeQuestionTable.createTableQuery);
+    batch.execute(QuestionTable.createTableQuery);
+    batch.execute(TagTable.createTableQuery);
+    batch.execute(TagQuestionTable.createTableQuery);
+    batch.commit();
     log("upgrade database ================");
   }
 
@@ -50,14 +68,15 @@ class SqlDB {
 
   _createTables(Database db) {
     Batch batch = db.batch();
-    batch.execute(StudentTable.createTableQuery);
     batch.execute(TypeTable.createTableQuery);
+    batch.execute(StudentTable.createTableQuery);
+    batch.execute(SubjectTable.createTableQuery);
+    batch.execute(LessonTable.createTableQuery);
+    batch.execute(QuestionGroupsTable.createTableQuery);
     batch.execute(TypeQuestionTable.createTableQuery);
     batch.execute(QuestionTable.createTableQuery);
-    batch.execute(LessonTable.createTableQuery);
     batch.execute(TagTable.createTableQuery);
     batch.execute(TagQuestionTable.createTableQuery);
-    batch.execute(SubjectTable.createTableQuery);
     batch.commit();
   }
 
@@ -85,9 +104,9 @@ class SqlDB {
     return response;
   }
 
-  Future<List<Map>> readData(String table) async {
+  Future<List<Map<String, dynamic>>> readData(String table) async {
     Database? myDB = await db;
-    List<Map> response = await myDB!.query(table);
+    List<Map<String, dynamic>> response = await myDB!.query(table);
     return response;
   }
 

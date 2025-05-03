@@ -5,10 +5,7 @@ import '../../presentation/questions_screen.dart';
 class QuestionEntity extends Equatable {
   final int id;
   final String uuid;
-  final int lessonId;
   final int typeId;
-  final int? previousQuestionId;
-  final int? nextQuestionId;
   final List<Map<String, dynamic>> textQuestion;
   final String? questionPhoto;
   final List<List<Map<String, dynamic>>> choices;
@@ -21,10 +18,7 @@ class QuestionEntity extends Equatable {
   const QuestionEntity({
     required this.id,
     required this.uuid,
-    required this.lessonId,
     required this.typeId,
-    required this.previousQuestionId,
-    required this.nextQuestionId,
     required this.textQuestion,
     required this.questionPhoto,
     required this.choices,
@@ -39,10 +33,7 @@ class QuestionEntity extends Equatable {
   List<Object?> get props => [
         id,
         uuid,
-        lessonId,
         typeId,
-        previousQuestionId,
-        nextQuestionId,
         textQuestion,
         questionPhoto,
         choices,

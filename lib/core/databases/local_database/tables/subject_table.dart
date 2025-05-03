@@ -4,13 +4,29 @@ class SubjectTable {
   static const String name = 'name';
   static const String link = 'link';
   static const String syncAt = "sync_at";
+  static const String isLocked = "is_locked";
+  static const String numberOfLessons = "number_of_lessons";
+  static const String numberOfTags = "number_of_tags";
+  static const String numberOfExams = "number_of_exams";
+  static const String numberOfQuestions = "number_of_questions";
+  static const String description = "description";
+  static const String teacher = "teacher";
+  static const String icon = "icon";
 
   static const String createTableQuery = '''
     CREATE TABLE $tableName (
     $id INTEGER PRIMARY KEY AUTOINCREMENT,
     $name TEXT NOT NULL,
     $link TEXT NOT NULL,
-    $syncAt DATE_TIME NOT NULL,
+    $syncAt TEXT NOT NULL,
+    $isLocked INTEGER NOT NULL,
+    $numberOfLessons INTEGER NOT NULL,
+    $numberOfTags INTEGER NOT NULL,
+    $numberOfExams INTEGER NOT NULL,
+    $numberOfQuestions INTEGER NOT NULL,
+    $description TEXT NOT NULL,
+    $teacher TEXT NOT NULL,
+    $icon TEXT NOT NULL
     )
   ''';
 }

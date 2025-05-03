@@ -19,6 +19,10 @@ class DioConsumer extends ApiConsumer {
     ));
   }
 
+  addInterceptors(Interceptor interceptor) {
+    dio.interceptors.add(interceptor);
+  }
+
 //!POST
   @override
   Future post(

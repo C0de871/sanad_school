@@ -2,7 +2,7 @@ import 'package:sanad_school/core/databases/local_database/tables/subject_table.
 
 class TagTable {
   static const String id = 'id';
-  static const String title = 'title';
+  static const String title = 'name';
   static const String isExam = 'is_exam';
   static const String idSubject = "subject_id";
 

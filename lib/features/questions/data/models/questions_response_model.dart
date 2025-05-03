@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'question_model.dart';
 
 class QuestionsResponseModel {
@@ -16,10 +18,10 @@ class QuestionsResponseModel {
   });
 
   factory QuestionsResponseModel.fromMap(Map<String, dynamic> map) {
+    log("map: $map");
+    log("dataKey: ${map[dataKey]}");
     return QuestionsResponseModel(
-      questions: List<QuestionModel>.from(
-        (map[dataKey] as List).map((e) => QuestionModel.fromMap(e)),
-      ),
+      questions: (map[dataKey] as List).map((e) => QuestionModel.fromMap(e)).toList(),
       message: map[messageKey],
       status: map[statusKey],
     );

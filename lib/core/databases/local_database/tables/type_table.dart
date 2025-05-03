@@ -7,7 +7,7 @@ class TypeTable {
   static const String createTableQuery = '''
     CREATE TABLE $tableName (
       $id INTEGER PRIMARY KEY AUTOINCREMENT,
-      $name TEXT NOT NULL,
+      $name TEXT NOT NULL
     )
   ''';
 }

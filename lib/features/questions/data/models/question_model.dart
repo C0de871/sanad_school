@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import '../../domain/entities/question_entity.dart';
 import '../../presentation/questions_screen.dart';
 
@@ -20,10 +22,7 @@ class QuestionModel extends QuestionEntity {
   const QuestionModel({
     required super.id,
     required super.uuid,
-    required super.lessonId,
     required super.typeId,
-    required super.previousQuestionId,
-    required super.nextQuestionId,
     required super.textQuestion,
     required super.questionPhoto,
     required super.choices,
@@ -34,13 +33,15 @@ class QuestionModel extends QuestionEntity {
   }) : super(type: typeId <= 1 ? QuestionType.multipleChoice : QuestionType.written);
 
   factory QuestionModel.fromMap(Map<String, dynamic> map) {
+    // log("question model map: $map");
+    log("hint: ${map[hintKey]}");
     return QuestionModel(
       id: map[idKey],
       uuid: map[uuidKey],
-      lessonId: map[lessonIdKey],
+      // lessonId: map[lessonIdKey],
       typeId: map[typeIdKey],
-      previousQuestionId: map[previousQuestionIdKey],
-      nextQuestionId: map[nextQuestionIdKey],
+      // previousQuestionId: map[previousQuestionIdKey],
+      // nextQuestionId: map[nextQuestionIdKey],
       textQuestion: List<Map<String, dynamic>>.from(map[textQuestionKey][opsKey]),
       questionPhoto: map[questionPhotoKey],
       choices: List<List<Map<String, dynamic>>>.from(
@@ -50,7 +51,7 @@ class QuestionModel extends QuestionEntity {
       ),
       rightChoice: map[rightChoiceKey] - 1, // start from 0 not 1
       isEdited: map[isEditedKey],
-      hint: map[hintKey] == null ? [] : List<Map<String, dynamic>>.from(map[hintKey][opsKey]),
+      hint: (map[hintKey] == null || map[hintKey][opsKey] == null) ? [] : List<Map<String, dynamic>>.from(map[hintKey][opsKey]),
       hintPhoto: map[hintPhotoKey],
     );
   }
@@ -59,10 +60,7 @@ class QuestionModel extends QuestionEntity {
     return {
       idKey: id,
       uuidKey: uuid,
-      lessonIdKey: lessonId,
       typeIdKey: typeId,
-      previousQuestionIdKey: previousQuestionId,
-      nextQuestionIdKey: nextQuestionId,
       textQuestionKey: {opsKey: textQuestion},
       questionPhotoKey: questionPhoto,
       choicesKey: choices.map((choice) => {opsKey: choice}).toList(),

@@ -12,6 +12,6 @@ class GetQuestionsInSubjectByTagUseCase {
   Future<Either<Failure, List<QuestionEntity>>> call({
     required QuestionsInSubjectByTag params,
   }) async {
-    return await repository.getSubjectQuestionsByTag(params: params);
+    return await repository.getSubjectQuestionsByTagOrExam(params: params);
   }
 }

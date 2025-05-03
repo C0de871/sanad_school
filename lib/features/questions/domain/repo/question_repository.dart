@@ -5,11 +5,11 @@ import '../../../../core/databases/params/params.dart';
 import '../entities/question_entity.dart';
 
 abstract class QuestionRepository {
-  Future<Either<Failure, List<QuestionEntity>>> getLessonQuestionsByType({
+  Future<Either<Failure, List<QuestionEntity>>> getLessonQuestionsByTypeOrAll({
     required QuestionsInLessonWithTypeParams params,
   });
 
-  Future<Either<Failure, List<QuestionEntity>>> getSubjectQuestionsByTag({
+  Future<Either<Failure, List<QuestionEntity>>> getSubjectQuestionsByTagOrExam({
     required QuestionsInSubjectByTag params,
   });
 }

@@ -66,7 +66,7 @@ class _SubjectsLayoutState extends State<SubjectsLayout> {
                 ),
               SubjectFailure() => Center(
                   child: Text(state.message),
-                )
+                ),
             };
           },
         );

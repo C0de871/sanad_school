@@ -1,6 +1,9 @@
 import '../../domain/entities/type_entity.dart';
 
 class TypeModel extends TypeEntity {
+  static const String idKey = 'id';
+  static const String nameKey = 'name';
+
   const TypeModel({
     required super.id,
     required super.name,
@@ -8,15 +11,15 @@ class TypeModel extends TypeEntity {
 
   factory TypeModel.fromMap(Map<String, dynamic> map) {
     return TypeModel(
-      id: map['id'],
-      name: map['name'],
+      id: map[idKey],
+      name: map[nameKey],
     );
   }
 
   Map<String, dynamic> toMap() {
     return {
-      'id': id,
-      'name': name,
+      idKey: id,
+      nameKey: name,
     };
   }
 }

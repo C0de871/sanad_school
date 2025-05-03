@@ -9,13 +9,16 @@ import 'package:sanad_school/features/auth/presentation/cubit/obscure_cubit/obse
 import 'package:sanad_school/features/auth/presentation/screens/personal_info/personal_info_screen.dart';
 import 'package:sanad_school/features/auth/presentation/screens/school_info/school_info_screen.dart';
 import 'package:sanad_school/features/lessons/presentation/cubit/lessons_cubit.dart';
+import 'package:sanad_school/features/profile/presentation/cubits/profile_cubit.dart';
 import 'package:sanad_school/features/questions/presentation/cubit/question_cubit.dart';
 import 'package:sanad_school/features/questions/presentation/questions_screen.dart';
 import 'package:sanad_school/features/reset_password/presentation/screens/enter_email_screen.dart';
 import 'package:sanad_school/features/reset_password/presentation/screens/otp_screen.dart';
 import 'package:sanad_school/features/reset_password/presentation/screens/reset_password_screen.dart';
+import 'package:sanad_school/features/spalsh/presentation/spalsh_screen.dart';
 import 'package:sanad_school/features/subjects/domain/entities/subject_entity.dart';
 import 'package:sanad_school/features/subjects/presentation/cubit/subject_cubit.dart';
+import 'package:sanad_school/features/subjects/presentation/cubit/subject_sync_cubit.dart';
 import 'package:sanad_school/features/subscription/presentation/cubits/subscription_cubit.dart';
 import 'package:sanad_school/features/tags/domain/entities/tag_entity.dart';
 import 'package:sanad_school/features/tags/presentation/cubits/tag_cubit.dart';
@@ -26,6 +29,7 @@ import '../../features/about_sanad/presentation/about_us_screen.dart';
 import '../../features/auth/presentation/cubit/auth_cubit/auth_cubit.dart';
 import '../../features/auth/presentation/screens/login/login_screen.dart';
 import '../../features/lessons/domain/entities/lesson_with_one_type_entity.dart';
+import '../../features/testing/repo.dart';
 import '../helper/cubit_helper.dart';
 import '../shared/widgets/slide_transion_page_route_builder.dart';
 import '../../features/lessons/presentation/lesson_screen.dart';
@@ -46,6 +50,14 @@ class AppRouter with CubitProviderMixin {
   Route<dynamic> generateRoute(RouteSettings settings) {
     switch (settings.name) {
       //! login screen:
+      case AppRoutes.splash:
+        return MaterialPageRoute(
+          builder: (_) => BlocProvider(
+            create: (context) => getCubit(() => AuthCubit()..checkToken()),
+            child: SplashScreen(),
+          ),
+        );
+
       case AppRoutes.login:
         return MaterialPageRoute(
           settings: settings,
@@ -54,8 +66,8 @@ class AppRouter with CubitProviderMixin {
               BlocProvider(
                 create: (context) => ObsecureCubit(),
               ),
-              BlocProvider(
-                create: (context) => getCubit(() => AuthCubit()),
+              BlocProvider.value(
+                value: getCubit(() => AuthCubit()),
               ),
             ],
             child: LoginScreen(),
@@ -100,7 +112,13 @@ class AppRouter with CubitProviderMixin {
               BlocProvider(
                 lazy: false,
                 create: (context) {
-                  return getCubit(() => LessonsCubit())..getLessons(subject.id);
+                  return getCubit(() => LessonsCubit());
+                },
+              ),
+              BlocProvider(
+                lazy: false,
+                create: (context) {
+                  return getCubit(() => SubjectSyncCubit())..getSubjectSync(subject.id);
                 },
               ),
             ],
@@ -159,7 +177,10 @@ class AppRouter with CubitProviderMixin {
       case AppRoutes.profile:
         return SlidingPageRouteBuilder(
           settings: settings,
-          builder: (context) => const ProfileScreen(),
+          builder: (context) => BlocProvider(
+            create: (context) => getCubit(() => ProfileCubit()..fetchStudentProfile()),
+            child: const ProfileScreen(),
+          ),
         );
 
       case AppRoutes.subscription:
@@ -219,6 +240,16 @@ class AppRouter with CubitProviderMixin {
       //     ),
       //     settings: settings,
       //   );
+      case AppRoutes.test1:
+        return SlidingPageRouteBuilder(
+          settings: settings,
+          builder: (context) => Test1Screen(subjectId: settings.arguments as int),
+        );
+      case AppRoutes.test2:
+        return SlidingPageRouteBuilder(
+          settings: settings,
+          builder: (context) => Test2Screen(lessonId: settings.arguments as int),
+        );
 
       //!default route:
       default:

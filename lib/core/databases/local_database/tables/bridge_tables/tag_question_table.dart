@@ -3,8 +3,8 @@ import '../tag_table.dart';
 
 class TagQuestionTable {
   static String tableName = 'tag_question';
-  static String idTag = 'id_tag';
-  static String idQuestion = 'id_question';
+  static String idTag = 'tag_id';
+  static String idQuestion = 'question_id';
 
   static String createTableQuery = '''
     CREATE TABLE $tableName (

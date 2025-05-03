@@ -1,6 +1,7 @@
 import 'package:dartz/dartz.dart';
 import 'package:sanad_school/core/databases/errors/failure.dart';
 import 'package:sanad_school/features/auth/domain/entities/student_entity.dart';
+import 'package:sanad_school/features/auth/data/model/logout_response_model.dart';
 
 import '../../../../core/databases/params/body.dart';
 
@@ -12,4 +13,5 @@ abstract class AuthRepository {
   Future<String?> getToken();
   Future<void> saveToken(String token);
   Future<void> deleteToken();
+  Future<Either<Failure, LogoutResponseModel>> logout();
 }

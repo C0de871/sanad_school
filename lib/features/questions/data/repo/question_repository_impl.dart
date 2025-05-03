@@ -1,4 +1,7 @@
+import 'dart:developer';
+
 import 'package:dartz/dartz.dart';
+import 'package:sanad_school/features/questions/data/data_sources/question_local_data_source.dart';
 import '../../../../core/databases/connection/network_info.dart';
 import '../../../../core/databases/errors/expentions.dart';
 import '../../../../core/databases/errors/failure.dart';
@@ -10,21 +13,26 @@ import '../data_sources/question_remote_data_source.dart';
 class QuestionRepositoryImpl extends QuestionRepository {
   final NetworkInfo networkInfo;
   final QuestionRemoteDataSource remoteDataSource;
+  final QuestionLocalDataSource localDataSource;
 
   QuestionRepositoryImpl({
     required this.networkInfo,
     required this.remoteDataSource,
+    required this.localDataSource,
   });
 
   @override
-  Future<Either<Failure, List<QuestionEntity>>> getLessonQuestionsByType({
+  Future<Either<Failure, List<QuestionEntity>>> getLessonQuestionsByTypeOrAll({
     required QuestionsInLessonWithTypeParams params,
   }) async {
     if (await networkInfo.isConnected!) {
       try {
-        final response = await remoteDataSource.getQuestionsInLessonByType(
-          params: params,
-        );
+        // final response = await remoteDataSource.getQuestionsInLessonByType(
+        //   params: params,
+        // );
+
+        final response = await localDataSource.getQuestionsByLessonAndType(params.lessonId, params.typeId!);
+        log("response: ${response.questions.toString()}");
         return Right(response.questions);
       } on ServerException catch (e) {
         return Left(Failure(errMessage: e.errorModel.errorMessage));
@@ -35,7 +43,7 @@ class QuestionRepositoryImpl extends QuestionRepository {
   }
 
   @override
-  Future<Either<Failure, List<QuestionEntity>>> getSubjectQuestionsByTag({
+  Future<Either<Failure, List<QuestionEntity>>> getSubjectQuestionsByTagOrExam({
     required QuestionsInSubjectByTag params,
   }) async {
     if (await networkInfo.isConnected!) {

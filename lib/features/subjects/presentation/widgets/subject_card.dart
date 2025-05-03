@@ -5,9 +5,7 @@ import 'package:sanad_school/core/Routes/app_routes.dart';
 import 'package:sanad_school/core/utils/services/service_locator.dart';
 import 'package:sanad_school/features/auth/presentation/widgets/animated_raised_button.dart';
 
-import '../../../../core/helper/string_to_icon_converter.dart';
 import '../../../../core/theme/theme.dart';
-import '../../../../main.dart';
 import '../../domain/entities/subject_entity.dart';
 
 class SubjectCard extends StatelessWidget {

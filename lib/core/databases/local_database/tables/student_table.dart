@@ -11,7 +11,7 @@ class StudentTable {
   static const String email = "email";
   static const String phone = "phone";
   static const String password = "password";
-  static const String idType = 'id_type';
+  static const String idType = 'type_id';
   static const String city = 'city';
 
   //!create table query:
@@ -27,7 +27,7 @@ class StudentTable {
     $password TEXT NOT NULL,
     $idType INTEGER NOT NULL,
     $city INTEGER NOT NULL,
-    FOREIGN KEY ($idType) REFERENCES ${TypeTable.tableName} (${TypeTable.id}) ON DELETE CASCADE,
+    FOREIGN KEY ($idType) REFERENCES ${TypeTable.tableName} (${TypeTable.id}) ON DELETE CASCADE
     )
     ''';
 }

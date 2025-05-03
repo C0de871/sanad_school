@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:sanad_school/core/shared/widgets/my_place_holder.dart';
-import '../../features/spalsh/presentation/spalsh_screen.dart';
+import '../../features/testing/repo.dart';
 import '../Routes/app_router.dart';
 import '../Routes/app_routes.dart';
 import '../helper/app_functions.dart';
@@ -35,11 +35,13 @@ class MyApp extends StatelessWidget {
 
       // initialRoute: AppRoutes.login,
       // initialRoute: AppRoutes.profile,
-      initialRoute: AppRoutes.home,
-      // home: SplashScreen(),
       // initialRoute: AppRoutes.home,
+      // home: SplashScreen(),
+      initialRoute: AppRoutes.home,
       // initialRoute: AppRoutes.quizSelection,
+      // initialRoute: AppRoutes.splash,
       onGenerateRoute: AppRouter().generateRoute,
+      // home: 
       // home: BeautifulEquations(),
     );
   }

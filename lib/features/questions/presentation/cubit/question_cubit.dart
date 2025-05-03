@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -77,6 +78,7 @@ class QuestionCubit extends Cubit<QuestionState> {
       (failure) => emit(QuestionFailure(failure.errMessage)),
       (questions) {
         questionsController = List.generate(questions.length, (questionIndex) {
+          log("question hint: ${questions[questionIndex].hint.toString() ?? "not hint the hint is null"}");
           return {
             questionControllersNodeKey: QuillController(
               document: Document.fromJson(questions[questionIndex].textQuestion),
@@ -84,7 +86,7 @@ class QuestionCubit extends Cubit<QuestionState> {
               readOnly: true,
             ),
             hintControllersNodeKey: QuillController(
-              document: questions[questionIndex].hint == null || questions[questionIndex].hint!.isEmpty ? Document() : Document.fromJson(questions[questionIndex].hint!),
+              document: (questions[questionIndex].hint == null || questions[questionIndex].hint!.isEmpty) ? Document() : Document.fromJson(questions[questionIndex].hint!),
               selection: const TextSelection.collapsed(offset: 0),
               readOnly: true,
             ),

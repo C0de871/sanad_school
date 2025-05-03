@@ -10,20 +10,6 @@ import 'core/utils/services/service_locator.dart';
 // import 'features/questions/temp.dart';
 
 void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  TeXRederingServer.renderingEngine = const TeXViewRenderingEngine.mathjax();
-
-  if (!kIsWeb) {
-    await TeXRederingServer.run();
-    await TeXRederingServer.initController();
-  }
-  await dotenv.load(fileName: ".env");
-  setupServicesLocator();
-  await getIt<SharedPrefsHelper>().init();
-  final SqlDB sqlDb = SqlDB();
-  await sqlDb.initalDB();
-  // await FireBaseService.initializeApp();
-
-  // await FireBaseService().initNotifications();
+  await initApp();
   runApp(const MyApp());
 }

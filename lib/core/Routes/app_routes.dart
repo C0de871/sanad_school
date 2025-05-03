@@ -16,4 +16,7 @@ class AppRoutes {
   static const String resetPasswrod = '/reset-password-screen';
   static const String quizSelection = '/quiz-selection-screen';
   static const String qrScanner = '/qr-scanner-screen';
+  static const String splash = '/spalsh-screen';
+  static const String test1 = '/test1-screen';
+  static const String test2 = '/test2-screen';
 }

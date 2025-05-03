@@ -24,7 +24,7 @@ class SubjectResponseModel {
       status: map[statusKey],
     );
   }
-
+    
   Map<String, dynamic> toMap() {
     return {
       dataKey: subjects.map((e) => e.toMap()).toList(),
