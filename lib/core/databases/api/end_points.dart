@@ -10,6 +10,8 @@ class EndPoints {
   static const String types = 'type';
   static const String studentProfile = 'auth/profile/';
   static const String logout = 'auth/logout';
+  static const String check = 'code/check';
+  static const String code = 'code';
 
   static String subjectSyncEndpoint(int subjectId) {
     return '$baseUrl$subject/$subjectId/sync';

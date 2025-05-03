@@ -35,3 +35,16 @@ class TagParams {
     required this.isExam,
   });
 }
+
+class CodeBody {
+  final String code;
+  static const String codeKey = 'code';
+
+  CodeBody({required this.code});
+
+  Map<String, dynamic> toMap() {
+    return {
+      codeKey: code,
+    };
+  }
+}

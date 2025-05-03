@@ -27,6 +27,14 @@ class ProfileLoaded extends ProfileState {
   List<Object> get props => [profile];
 }
 
+class LogoutSuccess extends ProfileState {}
+
+class FailedToLogout extends ProfileLoaded {
+  final String errMessage;
+  const FailedToLogout(super.profile, this.errMessage);
+  
+}
+
 class ProfileEditing extends ProfileLoaded {
   // final ProfileEntity updatedProfile;
 

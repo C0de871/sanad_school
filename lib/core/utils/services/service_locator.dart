@@ -34,6 +34,7 @@ import 'package:sanad_school/features/subject_type/domain/use_cases/get_types_us
 import 'package:sanad_school/features/subjects/data/data_sources/subject_remote_data_source.dart';
 import 'package:sanad_school/features/subjects/domain/repo/subject_repository.dart';
 import 'package:sanad_school/features/subjects/domain/use_cases/get_subjects_use_case.dart';
+import 'package:sanad_school/features/subscription/domain/use_cases/check_code_use_case.dart';
 import 'package:sanad_school/features/tags/data/data_sources/tag_local_data_source.dart';
 import 'package:sanad_school/features/tags/domain/use_cases/get_tags_or_exams.dart';
 import '../../../features/auth/data/repository/auth_repository_imple.dart';
@@ -43,6 +44,10 @@ import '../../../features/questions/domain/use_cases/get_questions_in_subject_by
 import '../../../features/subject_type/data/repo/repositories/type_repository_impl.dart';
 import '../../../features/subjects/data/data_sources/subject_local_data_source.dart';
 import '../../../features/subjects/data/repository/subject_repository.dart';
+import '../../../features/subscription/data/data_sources/code_remote_data_source.dart';
+import '../../../features/subscription/data/repository/code_repository_impl.dart';
+import '../../../features/subscription/domain/repository/code_repository.dart';
+import '../../../features/subscription/domain/use_cases/get_codes_use_case.dart';
 import '../../../features/tags/data/data_sources/tag_remote_data_source.dart';
 import '../../../features/tags/data/repo/tag_repository_impl.dart';
 import '../../../features/tags/domain/repo/tag_repository.dart';
@@ -82,6 +87,7 @@ void setupServicesLocator() {
   getIt.registerLazySingleton<AuthLocalDataSource>(() => AuthLocalDataSource(secureStorage: getIt()));
   getIt.registerLazySingleton<TypeRemoteDataSource>(() => TypeRemoteDataSource(api: getIt()));
   getIt.registerLazySingleton<ProfileRemoteDataSource>(() => ProfileRemoteDataSource(api: getIt()));
+  getIt.registerLazySingleton<CodeRemoteDataSource>(() => CodeRemoteDataSource(api: getIt()));
 
   //! local date soures:
   getIt.registerLazySingleton<SubjectLocalDataSource>(() => SubjectLocalDataSourceImpl(database: getIt()));
@@ -138,6 +144,12 @@ void setupServicesLocator() {
       remoteDataSource: getIt(),
     ),
   );
+  getIt.registerLazySingleton<CodeRepository>(
+    () => CodeRepositoryImpl(
+      networkInfo: getIt(),
+      remoteDataSource: getIt(),
+    ),
+  );
 
   //! use cases:
   getIt.registerLazySingleton<GetLessonsUseCase>(() => GetLessonsUseCase(repository: getIt()));
@@ -154,6 +166,8 @@ void setupServicesLocator() {
   getIt.registerLazySingleton<GetTypesUseCase>(() => GetTypesUseCase(repository: getIt()));
   getIt.registerLazySingleton<GetStudentProfileUseCase>(() => GetStudentProfileUseCase(repository: getIt()));
   getIt.registerLazySingleton<GetSubjectSyncUseCase>(() => GetSubjectSyncUseCase(repository: getIt()));
+  getIt.registerLazySingleton<GetCodesUseCase>(() => GetCodesUseCase(repository: getIt()));
+  getIt.registerLazySingleton<CheckCodeUseCase>(() => CheckCodeUseCase(repository: getIt()));
 
   //! Interceptors:
   getIt.registerLazySingleton<AuthInterceptor>(() => AuthInterceptor(retrieveAccessTokenUseCase: getIt()));

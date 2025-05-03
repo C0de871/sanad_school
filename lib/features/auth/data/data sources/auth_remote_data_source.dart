@@ -28,7 +28,7 @@ class AuthRemoteDataSource {
 
   Future<LogoutResponseModel> logout() async {
     final response = await api.post(
-      "${EndPoints.baseUrl}${EndPoints.logout} ",
+      "${EndPoints.baseUrl}${EndPoints.logout}",
     );
     return LogoutResponseModel.fromMap(response);
   }

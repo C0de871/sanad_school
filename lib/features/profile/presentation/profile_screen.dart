@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../core/Routes/app_routes.dart';
 import '../../../core/theme/theme.dart';
 import '../../../core/utils/services/service_locator.dart';
 import 'cubits/profile_cubit.dart';
@@ -30,6 +31,16 @@ class ProfileScreenContent extends StatelessWidget {
         } else if (state is ProfileError) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text(state.message)),
+          );
+        } else if (state is LogoutSuccess) {
+          Navigator.pushNamedAndRemoveUntil(
+            context,
+            AppRoutes.login,
+            (s) => false,
+          );
+        } else if (state is FailedToLogout) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(state.errMessage)),
           );
         }
       },
@@ -142,13 +153,25 @@ class ProfileScreenContent extends StatelessWidget {
               const SizedBox(height: 24),
               const ProfileAccountInfo(),
               const SizedBox(height: 24),
-              const ProfileActionButtons(),
-              const SizedBox(height: 24),
-              const ProfileThemeSelector(),
+              const LogoutButton(),
             ],
           ),
         ),
       ),
+    );
+  }
+}
+
+class LogoutButton extends StatelessWidget {
+  const LogoutButton({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return ElevatedButton(
+      onPressed: () {
+        context.read<ProfileCubit>().logout();
+      },
+      child: const Text('تسجيل الخروج'),
     );
   }
 }

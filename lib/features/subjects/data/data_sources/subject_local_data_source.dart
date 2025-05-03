@@ -200,26 +200,32 @@ class SubjectLocalDataSourceImpl implements SubjectLocalDataSource {
     log("Successfully synced subject data: ${subjectData.subject.name}");
   }
 
-  // Helper method to encode choices to a string format
-  String _encodeChoices(List<List<dynamic>> choices) {
-    return choices.map((choice) => choice.toString()).join('|||');
-  }
-
-  List<List<String>> _decodeChoices(String encoded) {
-    return encoded
-        .split('|||') // Split the string into parts
-        .map((str) => str
-            .replaceAll(RegExp(r'^\[|\]$'), '') // Remove the outer brackets
-            .split(', ') // Split the inner list elements
-            .map((e) => e.trim()) // Remove extra whitespace
-            .toList())
-        .toList();
-  }
 
   // Store subjects from API response
   @override
   Future<bool> storeSubjects(SubjectResponseModel response) async {
     await database.deleteData(SubjectTable.tableName, null);
+
+    // Insert all subjects
+    for (var subject in response.subjects) {
+      await database.insertData(
+        SubjectTable.tableName,
+        {
+          SubjectTable.id: subject.id,
+          SubjectTable.name: subject.name,
+          SubjectTable.icon: subject.icon,
+          SubjectTable.link: subject.link,
+          SubjectTable.syncAt: DateTime.now().toIso8601String(),
+          SubjectTable.isLocked: subject.isLocked ? 1 : 0,
+          SubjectTable.numberOfLessons: subject.numberOfLessons,
+          SubjectTable.numberOfTags: subject.numberOfTags,
+          SubjectTable.numberOfExams: subject.numberOfExams,
+          SubjectTable.numberOfQuestions: subject.numberOfQuestions,
+          SubjectTable.description: subject.description,
+          SubjectTable.teacher: subject.teacher,
+        },
+      );
+    }
 
     // Insert all subjects
     for (var subject in response.subjects) {

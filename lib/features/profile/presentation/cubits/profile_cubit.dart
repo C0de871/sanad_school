@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:equatable/equatable.dart';
 import '../../../../core/utils/services/service_locator.dart';
+import '../../../auth/domain/use_cases/logout_use_case.dart';
 import '../../domain/entities/profile_entity.dart';
 import '../../domain/use_cases/get_student_profile_use_case.dart';
 
@@ -9,6 +10,7 @@ part 'profile_state.dart';
 
 class ProfileCubit extends Cubit<ProfileState> {
   final GetStudentProfileUseCase getStudentProfile;
+  final LogoutUseCase logoutUseCase;
   // final UpdateStudentProfileUseCase? updateStudentProfile; // Optional for future implementation
 
   // Form Controllers
@@ -46,6 +48,7 @@ class ProfileCubit extends Cubit<ProfileState> {
 
   ProfileCubit()
       : getStudentProfile = getIt(),
+        logoutUseCase = getIt(),
         super(ProfileInitial()) {
     _setupControllerListeners();
   }
@@ -164,6 +167,23 @@ class ProfileCubit extends Cubit<ProfileState> {
   //     emit(ProfileUpdated(profile));
   //   }
   // }
+
+  Future<void> logout() async {
+    if (state is ProfileLoaded) {
+      final currentState = state as ProfileLoaded;
+      emit(ProfileLoading());
+      final result = await logoutUseCase.call();
+      result.fold(
+        (failure) => emit(FailedToLogout(
+          currentState.profile,
+          failure.errMessage,
+        )),
+        (response) {
+          emit(LogoutSuccess());
+        },
+      );
+    }
+  }
 
   void discardChanges() {
     if (_originalProfile != null) {

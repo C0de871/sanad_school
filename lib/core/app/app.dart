@@ -37,9 +37,9 @@ class MyApp extends StatelessWidget {
       // initialRoute: AppRoutes.profile,
       // initialRoute: AppRoutes.home,
       // home: SplashScreen(),
-      initialRoute: AppRoutes.home,
+      // initialRoute: AppRoutes.home,
       // initialRoute: AppRoutes.quizSelection,
-      // initialRoute: AppRoutes.splash,
+      initialRoute: AppRoutes.splash,
       onGenerateRoute: AppRouter().generateRoute,
       // home: 
       // home: BeautifulEquations(),

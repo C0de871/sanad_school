@@ -5,13 +5,13 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:sanad_school/core/Routes/app_routes.dart';
 import 'package:sanad_school/core/utils/services/qr_service/qr_result.dart';
-import 'package:sanad_school/core/utils/services/qr_service/scanner_cubit.dart';
 import 'package:sanad_school/features/subscription/presentation/cubits/subscription_cubit.dart';
 import 'package:sanad_school/features/subscription/presentation/cubits/subscription_state.dart';
 
 import '../../../core/theme/theme.dart';
 import '../../../core/utils/services/service_locator.dart';
 import '../../auth/presentation/widgets/animated_raised_button.dart';
+import '../domain/entities/code_entity.dart';
 
 class SubscriptionScreen extends StatelessWidget {
   const SubscriptionScreen({super.key});
@@ -38,40 +38,77 @@ class _SubscriptionScreenContent extends StatelessWidget {
         backgroundColor: Colors.transparent,
         foregroundColor: Theme.of(context).colorScheme.onBackground,
       ),
-      body: BlocBuilder<SubscriptionCubit, SubscriptionState>(
+      body: BlocConsumer<SubscriptionCubit, SubscriptionState>(
+        listener: (context, state) {
+          switch (state) {
+            case SubscriptionError():
+              ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(state.message)));
+            case AddCodeFailure():
+              log(state.errMessage);
+              ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(state.errMessage)));
+              break;
+            case AddCodeLoaded():
+              log(state.codeEntity.code ?? "where is the code");
+              ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("تم إضافة الاشتراك")));
+              break;
+            default:
+              break;
+          }
+        },
         builder: (context, state) {
           if (state is SubscriptionLoading) {
             return Center(child: CircularProgressIndicator());
           } else if (state is SubscriptionError) {
             return Center(child: Text(state.message));
           } else if (state is SubscriptionLoaded) {
-            return _buildSubscriptionList(context, state.subscriptions);
+            return _buildSubscriptionList(context, state.codes);
           }
           return SizedBox.shrink();
         },
       ),
-      floatingActionButton: TweenAnimationBuilder(
-        tween: Tween(begin: 0.0, end: 1.0),
-        duration: Duration(milliseconds: 800),
-        curve: Curves.elasticOut,
-        builder: (context, double value, child) {
-          return Transform.scale(
-            scale: value,
-            child: child,
-          );
+      floatingActionButton: BlocBuilder<SubscriptionCubit, SubscriptionState>(
+        builder: (context, state) {
+          if (state is SubscriptionLoaded) {
+            return TweenAnimationBuilder(
+              tween: Tween(begin: 0.0, end: 1.0),
+              duration: Duration(milliseconds: 800),
+              curve: Curves.elasticOut,
+              builder: (context, double value, child) {
+                return Transform.scale(
+                  scale: value,
+                  child: child,
+                );
+              },
+              child: AnimatedRaisedButtonWithChild(
+                width: MediaQuery.of(context).size.width - 32,
+                height: 50,
+                borderRadius: BorderRadius.circular(12),
+                onPressed: () => _showSubscriptionDialog(context),
+                backgroundColor: Theme.of(context).colorScheme.primary,
+                foregroundColor: Theme.of(context).colorScheme.onPrimary,
+                shadowColor: getIt<AppTheme>().extendedColors.buttonShadow,
+                child: Align(
+                  alignment: Alignment.center,
+                  child: Text(
+                    'أضف اشتراك',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ),
+            );
+          } else {
+            return SizedBox.shrink();
+          }
         },
-        child: AnimatedRaisedButton(
-          onPressed: () => _showSubscriptionDialog(context),
-          text: 'اضف اشتراك',
-          backgroundColor: Theme.of(context).colorScheme.primary,
-          foregroundColor: Theme.of(context).colorScheme.onPrimary,
-          shadowColor: getIt<AppTheme>().extendedColors.buttonShadow,
-        ),
       ),
     );
   }
 
-  Widget _buildSubscriptionList(BuildContext context, List<Map<String, dynamic>> subscriptions) {
+  Widget _buildSubscriptionList(BuildContext context, List<CodeEntity> codes) {
     return CustomScrollView(
       slivers: [
         SliverToBoxAdapter(
@@ -92,6 +129,7 @@ class _SubscriptionScreenContent extends StatelessWidget {
           sliver: SliverList(
             delegate: SliverChildBuilderDelegate(
               (context, index) {
+                final foramtedSubjects = codes[index].subjects?.join(', ');
                 return TweenAnimationBuilder(
                   tween: Tween(begin: 0.0, end: 1.0),
                   duration: Duration(milliseconds: 600 + (index * 100)),
@@ -118,7 +156,7 @@ class _SubscriptionScreenContent extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              subscriptions[index]['subject'],
+                              foramtedSubjects ?? "Unknown",
                               style: TextStyle(
                                 fontSize: 20,
                                 fontWeight: FontWeight.w600,
@@ -130,14 +168,14 @@ class _SubscriptionScreenContent extends StatelessWidget {
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 Text(
-                                  'الكود: ${subscriptions[index]['code']}',
+                                  'الكود: ${codes[index].code}',
                                   style: TextStyle(
                                     fontSize: 16,
                                     color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
                                   ),
                                 ),
                                 Text(
-                                  subscriptions[index]['price'],
+                                  '${codes[index].expiresAt}',
                                   style: TextStyle(
                                     fontSize: 18,
                                     fontWeight: FontWeight.w600,
@@ -153,7 +191,7 @@ class _SubscriptionScreenContent extends StatelessWidget {
                   ),
                 );
               },
-              childCount: subscriptions.length,
+              childCount: codes.length,
             ),
           ),
         ),
@@ -190,7 +228,7 @@ class _SubscriptionScreenContent extends StatelessWidget {
                       borderRadius: BorderRadius.circular(16),
                     ),
                     title: Text(
-                      'اضف اشتراك جديد',
+                      'أضف اشتراك جديد',
                       style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.w600,
@@ -198,64 +236,86 @@ class _SubscriptionScreenContent extends StatelessWidget {
                     ),
                     content: SizedBox(
                       width: MediaQuery.of(context).size.width * 0.8,
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          TextField(
-                            controller: context.read<SubscriptionCubit>().codeController,
-                            onChanged: (value) {
-                              context.read<SubscriptionCubit>().setSubscriptionCode(value);
-                            },
-                            decoration: InputDecoration(
-                              labelText: 'ادخل رمز الاشتراك',
-                              labelStyle: TextStyle(color: Theme.of(context).colorScheme.primary),
-                              enabledBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(12),
-                                borderSide: BorderSide(color: Theme.of(context).colorScheme.outline),
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(12),
-                                borderSide: BorderSide(
-                                  color: Theme.of(context).colorScheme.primary,
-                                  width: 2,
+                      child: Form(
+                        key: context.read<SubscriptionCubit>().formKey,
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            TextFormField(
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return "يجب أن يكون هناك رمز اشتراك";
+                                }
+                                return null;
+                              },
+                              controller: context.read<SubscriptionCubit>().codeController,
+                              onChanged: (value) {
+                                context.read<SubscriptionCubit>().setSubscriptionCode(value);
+                              },
+                              decoration: InputDecoration(
+                                labelText: 'أدخل رمز الاشتراك',
+                                labelStyle: TextStyle(color: Theme.of(context).colorScheme.primary),
+                                enabledBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                  borderSide: BorderSide(color: Theme.of(context).colorScheme.outline),
                                 ),
+                                focusedBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                  borderSide: BorderSide(
+                                    color: Theme.of(context).colorScheme.primary,
+                                    width: 2,
+                                  ),
+                                ),
+                                filled: true,
+                                fillColor: Theme.of(context).colorScheme.surface,
                               ),
-                              filled: true,
-                              fillColor: Theme.of(context).colorScheme.surface,
                             ),
-                          ),
-                          SizedBox(height: 20),
-                          AnimatedRaisedButton(
-                            onPressed: () async {
-                              QrCodeResult? result = await Navigator.pushNamed<QrCodeResult>(context, AppRoutes.qrScanner);
-                              log(result?.code ?? "where is the code");
-                              parentContext.read<SubscriptionCubit>().handleQrResult(result);
-                            },
-                            text: 'امسح رمز الاشتراك',
-                            backgroundColor: Theme.of(context).colorScheme.primary,
-                            foregroundColor: Theme.of(context).colorScheme.onPrimary,
-                            shadowColor: getIt<AppTheme>().extendedColors.buttonShadow,
-                          ),
-                        ],
+                            SizedBox(height: 20),
+                            AnimatedRaisedButtonWithChild(
+                              onPressed: () {
+                                if (context.read<SubscriptionCubit>().formKey.currentState!.validate()) context.read<SubscriptionCubit>().checkCode();
+                              },
+                              padding: EdgeInsets.all(10),
+                              borderRadius: BorderRadius.circular(12),
+                              width: double.infinity,
+                              backgroundColor: Theme.of(context).colorScheme.primary,
+                              foregroundColor: Theme.of(context).colorScheme.onPrimary,
+                              shadowColor: getIt<AppTheme>().extendedColors.buttonShadow,
+                              child: state is AddCodeLoading
+                                  ? CircularProgressIndicator()
+                                  : Align(
+                                      alignment: Alignment.center,
+                                      child: Text(
+                                        "تأكيد",
+                                        style: TextStyle(fontSize: 18),
+                                      ),
+                                    ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                     actions: [
-                      TextButton(
-                        onPressed: () => Navigator.pop(context),
-                        child: Text(
-                          'الغاء',
-                          style: TextStyle(
-                            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
-                            fontWeight: FontWeight.w600,
+                      Align(
+                        alignment: Alignment.center,
+                        child: TextButton(
+                          onPressed: () => Navigator.pop(context),
+                          child: Text(
+                            'الغاء',
+                            style: TextStyle(
+                              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+                              fontWeight: FontWeight.w600,
+                            ),
                           ),
                         ),
                       ),
                       AnimatedRaisedButton(
-                        onPressed: () {
-                          context.read<SubscriptionCubit>().addSubscription();
-                          Navigator.pop(context);
+                        onPressed: () async {
+                          QrCodeResult? result = await Navigator.pushNamed<QrCodeResult>(context, AppRoutes.qrScanner);
+                          log(result?.code ?? "where is the code");
+                          parentContext.read<SubscriptionCubit>().handleQrResult(result);
                         },
-                        text: 'تأكيد',
+                        text: 'امسح رمز الاشتراك',
                         backgroundColor: Theme.of(context).colorScheme.primary,
                         foregroundColor: Theme.of(context).colorScheme.onPrimary,
                         shadowColor: getIt<AppTheme>().extendedColors.buttonShadow,

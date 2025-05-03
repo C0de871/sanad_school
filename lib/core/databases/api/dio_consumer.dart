@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:dio/dio.dart';
 
 import '../errors/expentions.dart';
@@ -71,7 +73,7 @@ class DioConsumer extends ApiConsumer {
       return res.data;
     } on DioException catch (e) {
       handleDioException(e);
-    }
+    } 
   }
 
 //!DELETE
@@ -96,7 +98,7 @@ class DioConsumer extends ApiConsumer {
       return res.data;
     } on DioException catch (e) {
       handleDioException(e);
-    }
+    } 
   }
 
 //!PATCH
@@ -122,7 +124,7 @@ class DioConsumer extends ApiConsumer {
       return res.data;
     } on DioException catch (e) {
       handleDioException(e);
-    }
+    } 
   }
 
   @override
@@ -140,6 +142,6 @@ class DioConsumer extends ApiConsumer {
       return res.data;
     } on DioException catch (e) {
       handleDioException(e);
-    }
+    } 
   }
 }

@@ -187,7 +187,7 @@ class AppRouter with CubitProviderMixin {
         return SlidingPageRouteBuilder(
           settings: settings,
           builder: (context) => BlocProvider(
-            create: (context) => getCubit(() => SubscriptionCubit()),
+            create: (context) => getCubit(() => SubscriptionCubit()..loadSubscriptions()),
             child: SubscriptionScreen(),
           ),
         );

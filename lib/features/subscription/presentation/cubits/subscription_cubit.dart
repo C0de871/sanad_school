@@ -4,34 +4,69 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sanad_school/core/utils/services/qr_service/qr_result.dart';
+import 'package:sanad_school/features/subscription/domain/use_cases/get_codes_use_case.dart';
 import 'package:sanad_school/features/subscription/presentation/cubits/subscription_state.dart';
 
+import '../../../../core/databases/params/params.dart';
+import '../../../../core/utils/services/service_locator.dart';
+import '../../domain/use_cases/check_code_use_case.dart';
+
 class SubscriptionCubit extends Cubit<SubscriptionState> {
-  SubscriptionCubit() : super(SubscriptionInitial()) {
+  final GetCodesUseCase getCodesUseCase;
+  final CheckCodeUseCase checkCodeUseCase;
+
+  SubscriptionCubit()
+      : getCodesUseCase = getIt(),
+        checkCodeUseCase = getIt(),
+        super(SubscriptionInitial()) {
     loadSubscriptions();
   }
 
   final TextEditingController codeController = TextEditingController();
+  final GlobalKey<FormState> formKey = GlobalKey<FormState>();
 
-  final List<Map<String, dynamic>> _initialSubscriptions = [
-    {
-      'subject': 'الرياضيات',
-      'code': 'MATH2024',
-      'price': '\$49.99',
-    },
-    {
-      'subject': 'الفيزياء',
-      'code': 'PHYS2024',
-      'price': '\$39.99',
-    },
-  ];
-
-  void loadSubscriptions() {
+  void loadSubscriptions() async {
     emit(SubscriptionLoading());
 
-    // In a real app, you would fetch this data from a repository/API
-    // Here we're using the hardcoded data from the original widget
-    emit(SubscriptionLoaded(subscriptions: _initialSubscriptions));
+    emit(SubscriptionLoading());
+    final result = await getCodesUseCase.call();
+    result.fold(
+      (failure) => emit(SubscriptionError(failure.errMessage)),
+      (codeData) => emit(SubscriptionLoaded(
+        count: codeData.count ?? 0,
+        codes: codeData.codes ?? [],
+      )),
+    );
+  }
+
+  Future<void> checkCode() async {
+    if (state is SubscriptionLoaded) {
+      final currentState = state as SubscriptionLoaded;
+      emit(AddCodeLoading(
+        count: currentState.count,
+        codes: currentState.codes,
+        subscriptionCode: currentState.subscriptionCode,
+      ));
+
+      final params = CodeBody(code: codeController.text);
+      log("from check code ${params.toMap()}");
+      final result = await checkCodeUseCase.call(params);
+      log("from check code ${result.fold((failure) => failure.errMessage, (code) => code.code)}");
+      result.fold(
+        (failure) => emit(AddCodeFailure(
+          count: currentState.count,
+          codes: currentState.codes,
+          errMessage: failure.errMessage,
+          subscriptionCode: currentState.subscriptionCode,
+        )),
+        (code) => emit(AddCodeLoaded(
+          codeEntity: code,
+          count: currentState.count,
+          codes: currentState.codes,
+          subscriptionCode: currentState.subscriptionCode,
+        )),
+      );
+    }
   }
 
   void setSubscriptionCode(String code) {
@@ -44,25 +79,5 @@ class SubscriptionCubit extends Cubit<SubscriptionState> {
   void handleQrResult(QrCodeResult? result) {
     log("from handle result ${result?.code ?? " code not found"}");
     codeController.text = result?.code ?? "";
-  }
-
-  void addSubscription() {
-    // This would typically involve an API call to validate and add the subscription
-    // For now, just demonstrate the state management flow
-    if (state is SubscriptionLoaded) {
-      final currentState = state as SubscriptionLoaded;
-
-      // Here you would validate the code and add it to the user's subscriptions
-      // For this example, we'll just add a dummy subscription
-      final newSubscription = {
-        'subject': 'اشتراك جديد',
-        'code': codeController.text,
-        'price': '\$29.99',
-      };
-
-      final updatedSubscriptions = List<Map<String, dynamic>>.from(currentState.subscriptions)..add(newSubscription);
-
-      emit(SubscriptionLoaded(subscriptions: updatedSubscriptions));
-    }
   }
 }
