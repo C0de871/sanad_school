@@ -19,7 +19,7 @@ class LessonsCubit extends Cubit<LessonsState> {
 
   Future<void> getLessons(int subjectId) async {
     emit(LessonsLoading());
-    log("get lesson in lesson cubit");
+    // log("get lesson in lesson cubit");
     final Either<Failure, List<LessonEntity>> result = await getLessonsUseCase.call(LessonsParams(subjectId: subjectId));
     result.fold(
       (failure) => emit(LessonsError(failure.errMessage)),

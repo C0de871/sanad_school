@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:sanad_school/core/shared/widgets/my_place_holder.dart';
-import '../../features/testing/repo.dart';
 import '../Routes/app_router.dart';
 import '../Routes/app_routes.dart';
 import '../helper/app_functions.dart';
@@ -39,7 +38,7 @@ class MyApp extends StatelessWidget {
       // home: SplashScreen(),
       // initialRoute: AppRoutes.home,
       // initialRoute: AppRoutes.quizSelection,
-      initialRoute: AppRoutes.splash,
+      // initialRoute: AppRoutes.splash,
       onGenerateRoute: AppRouter().generateRoute,
       // home: 
       // home: BeautifulEquations(),

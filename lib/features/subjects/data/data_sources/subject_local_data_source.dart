@@ -1,259 +1,101 @@
-import 'dart:convert';
-
-import 'package:sanad_school/core/databases/local_database/sql_db.dart';
-import 'package:sanad_school/core/databases/local_database/tables/lesson_table.dart';
-import 'package:sanad_school/core/databases/local_database/tables/question_table.dart';
-import 'package:sanad_school/core/databases/local_database/tables/subject_table.dart';
-import 'package:sanad_school/core/databases/local_database/tables/tag_table.dart';
-import 'package:sanad_school/core/databases/local_database/tables/bridge_tables/tag_question_table.dart';
-import 'package:sanad_school/core/databases/local_database/tables/bridge_tables/question_groups_table.dart';
-
 import 'dart:developer';
 
-import '../../../../core/databases/local_database/tables/type_question_table.dart';
+import 'package:sanad_school/core/databases/local_database/sql_db.dart';
+import 'package:sanad_school/core/databases/local_database/tables/subject_table.dart';
+import 'package:sanad_school/core/databases/local_database/tables/type_question_table.dart';
+import 'package:sanad_school/features/lessons/data/models/question_type_model.dart';
+
 import '../models/subject_model.dart';
-import '../models/subject_response_model.dart';
-import '../models/subject_sync_model.dart';
+import '../models/subjects_response_model.dart';
 
-abstract class SubjectLocalDataSource {
-  Future<void> deleteSubjectData(int subjectId);
-  Future<void> insertSubjectData(SubjectSyncModel subjectData);
-  Future<void> syncSubjectData(SubjectSyncModel subjectData);
-  // Future<List<Map>> getLessonsWithQuestionTypes(int subjectId);
-  Future<bool> storeSubjects(SubjectResponseModel response);
-  Future<List<SubjectModel>> getAllSubjects();
-}
+class SubjectLocalDataSource {
+  final SqlDB _db = SqlDB();
 
-class SubjectLocalDataSourceImpl implements SubjectLocalDataSource {
-  final SqlDB database;
-
-  SubjectLocalDataSourceImpl({required this.database});
-
-  @override
-  Future<void> deleteSubjectData(int subjectId) async {
-    List<Map> relatedQuestions = await database.sqlReadData('''
-        SELECT q.${QuestionTable.id} 
-        FROM ${QuestionTable.tableName} q
-        JOIN ${QuestionGroupsTable.tableName} qg ON q.${QuestionTable.questionGroupId} = qg.${QuestionGroupsTable.id}
-        JOIN ${LessonTable.tableName} l ON qg.${QuestionGroupsTable.lessonId} = l.${LessonTable.id}
-        WHERE l.${LessonTable.subjectId} = $subjectId
-      ''');
-
-    // If there are related questions, delete their tag associations
-    if (relatedQuestions.isNotEmpty) {
-      String questionIds = relatedQuestions.map((q) => q['question_id'].toString()).join(',');
-      await database.sqlDeleteData('''
-          DELETE FROM ${TagQuestionTable.tableName}
-          WHERE ${TagQuestionTable.idQuestion} IN ($questionIds)
-        ''');
-    }
-
-    // 2. Delete all tags related to this subject
-    await database.sqlDeleteData('''
-        DELETE FROM ${TagTable.tableName}
-        WHERE ${TagTable.idSubject} = $subjectId
-      ''');
-
-    // 3. Delete all questions, by first deleting question groups
-    // (This will cascade delete questions due to foreign key constraints)
-    List<Map> relatedLessons = await database.sqlReadData('''
-        SELECT ${LessonTable.id} 
-        FROM ${LessonTable.tableName}
-        WHERE ${LessonTable.subjectId} = $subjectId
-      ''');
-
-    if (relatedLessons.isNotEmpty) {
-      String lessonIds = relatedLessons.map((l) => l[LessonTable.id].toString()).join(',');
-      await database.sqlDeleteData('''
-          DELETE FROM ${QuestionGroupsTable.tableName}
-          WHERE ${QuestionGroupsTable.lessonId} IN ($lessonIds)
-        ''');
-    }
-
-    // 4. Delete all types related to this subject
-    //first get all the types related to this subject
-    List<Map> types = await database.sqlReadData('''
-          SELECT DISTINCT tq.${TypeQuestionTable.id}, tq.${TypeQuestionTable.name}
-          FROM ${TypeQuestionTable.tableName} tq
-          JOIN ${QuestionTable.tableName} q ON q.${QuestionTable.idTypeQuestion} = tq.${TypeQuestionTable.id}
-          JOIN ${QuestionGroupsTable.tableName} qg ON q.${QuestionTable.questionGroupId} = qg.${QuestionGroupsTable.id}
-          JOIN ${LessonTable.tableName} l ON qg.${QuestionGroupsTable.lessonId} = l.${LessonTable.id}
-          WHERE l.${LessonTable.subjectId} = $subjectId
-      ''');
-
-    await database.sqlDeleteData('''
-        DELETE FROM ${TypeQuestionTable.tableName}
-        WHERE ${TypeQuestionTable.id} IN (${types.map((type) => type[TypeQuestionTable.id]).join(',')})
-      ''');
-    log("deleted all types related to this subject");
-
-    // 4. Delete all lessons related to this subject
-    await database.sqlDeleteData('''
-        DELETE FROM ${LessonTable.tableName}
-        WHERE ${LessonTable.subjectId} = $subjectId
-      ''');
-
-    // 5. Finally, delete the subject itself
-    await database.sqlDeleteData('''
-        DELETE FROM ${SubjectTable.tableName}
-        WHERE ${SubjectTable.id} = $subjectId
-      ''');
+  /// Syncs subjects and question types from the first API response
+  /// Updates existing data, inserts new data, and removes data not in the response
+  Future<void> syncSubjectsAndTypes(SubjectResponseModel responseModel) async {
+    await _syncSubjects(responseModel.data.subjects); //! data
+    await _syncQuestionTypes(responseModel.data.questionTypes); //!data
+    // await _db.logAllTables();
   }
 
-  @override
-  Future<void> insertSubjectData(SubjectSyncModel subjectData) async {
-    // 1. Insert subject
-    final subjectMap = {
-      SubjectTable.id: subjectData.subject.id,
-      SubjectTable.name: subjectData.subject.name,
-      SubjectTable.link: subjectData.subject.link,
-      SubjectTable.icon: subjectData.subject.icon,
-      SubjectTable.syncAt: DateTime.now().toIso8601String(),
-      SubjectTable.isLocked: subjectData.subject.isLocked ? 1 : 0,
-      SubjectTable.numberOfLessons: subjectData.subject.numberOfLessons,
-      SubjectTable.numberOfTags: subjectData.subject.numberOfTags,
-      SubjectTable.numberOfExams: subjectData.subject.numberOfExams,
-      SubjectTable.numberOfQuestions: subjectData.subject.numberOfQuestions,
-      SubjectTable.description: subjectData.subject.description,
-      SubjectTable.teacher: subjectData.subject.teacher,
-    };
-    await database.insertData(SubjectTable.tableName, subjectMap);
+  /// Syncs subjects with the local database
+  /// Updates existing subjects, inserts new subjects, and removes subjects not in the list
+  Future<void> _syncSubjects(List<SubjectModel> subjects) async {
+    final existingSubjects = await _db.readData(SubjectTable.tableName);
+    final existingSubjectIds = existingSubjects.map<int>((sub) => sub[SubjectTable.id] as int).toSet();
+    final responseSubjectIds = subjects.map((sub) => sub.id).toSet();
 
-    // 2. Insert lessons
-    for (final lesson in subjectData.lessons) {
-      final lessonMap = {
-        LessonTable.id: lesson.id,
-        LessonTable.title: lesson.title,
-        LessonTable.subjectId: lesson.subjectId,
-      };
-      await database.insertData(LessonTable.tableName, lessonMap);
+    // Insert or update subjects
+    for (final subject in subjects) {
+      final subjectMap = subject.toMap();
+      if (existingSubjectIds.contains(subject.id)) {
+        // Update existing subject
+        await _db.updateData(
+          SubjectTable.tableName,
+          subjectMap,
+          '${SubjectTable.id} = ${subject.id}',
+        );
+      } else {
+        // Insert new subject
+        log("inserting new subject: ${subjectMap}");
+        await _db.insertData(SubjectTable.tableName, subjectMap);
+      }
     }
 
-    // 3. Insert question groups
-    for (final group in subjectData.questionGroups) {
-      final groupMap = {
-        QuestionGroupsTable.id: group.id,
-        QuestionGroupsTable.name: group.name,
-        QuestionGroupsTable.lessonId: group.lessonId,
-        QuestionGroupsTable.displayOrder: group.order,
-      };
-      await database.insertData(QuestionGroupsTable.tableName, groupMap);
+    // Delete subjects that are in the local database but not in the response
+    final subjectsToDelete = existingSubjectIds.difference(responseSubjectIds);
+    for (final id in subjectsToDelete) {
+      await _db.deleteData(
+        SubjectTable.tableName,
+        '${SubjectTable.id} = $id',
+      );
     }
+  }
 
-    // 4. Insert types
-    for (final type in subjectData.types) {
+  /// Syncs question types with the local database
+  /// Updates existing types, inserts new types, and removes types not in the list
+  Future<void> _syncQuestionTypes(List<QuestionTypeModel> types) async {
+    final existingTypes = await _db.readData(TypeQuestionTable.tableName);
+    final existingTypeIds = existingTypes.map<int>((type) => type[TypeQuestionTable.id] as int).toSet();
+    final responseTypeIds = types.where((type) => type.id != null).map((type) => type.id!).toSet();
+
+    // Insert or update question types
+    for (final type in types) {
+      if (type.id == null) continue; // Skip types without ID
+
       final typeMap = {
         TypeQuestionTable.id: type.id,
         TypeQuestionTable.name: type.name,
       };
-      await database.insertData(TypeQuestionTable.tableName, typeMap);
-    }
-    // 5. Insert questions
-    for (final question in subjectData.questions) {
-      // log("choices without encode: ${question.choices}");
-      final questionMap = {
-        QuestionTable.id: question.id,
-        QuestionTable.textQuestion: jsonEncode(question.textQuestion), // Convert Delta format to string
-        QuestionTable.choices: jsonEncode(question.choices),
-        QuestionTable.rightChoice: question.rightChoice,
-        QuestionTable.isEdited: question.isEdited,
-        QuestionTable.hint: jsonEncode(question.hint),
-        QuestionTable.uuid: question.uuid,
-        QuestionTable.questionGroupId: question.questionGroupId,
-        QuestionTable.displayOrder: question.order,
-        QuestionTable.idTypeQuestion: question.typeId,
-        QuestionTable.questionPhoto: question.questionPhoto,
-        QuestionTable.hintPhoto: question.hintPhoto,
-      };
-      await database.insertData(QuestionTable.tableName, questionMap);
+
+      if (existingTypeIds.contains(type.id)) {
+        // Update existing type
+        await _db.updateData(
+          TypeQuestionTable.tableName,
+          typeMap,
+          '${TypeQuestionTable.id} = ${type.id}',
+        );
+      } else {
+        // Insert new type
+        await _db.insertData(TypeQuestionTable.tableName, typeMap);
+      }
     }
 
-    // 6. Insert tags
-    for (final tag in subjectData.tags) {
-      final tagMap = {
-        TagTable.id: tag.id,
-        TagTable.title: tag.title,
-        TagTable.isExam: tag.isExam,
-        TagTable.idSubject: tag.subjectId,
-      };
-      await database.insertData(TagTable.tableName, tagMap);
-    }
-
-    // 7. Insert question tags
-    for (final questionTag in subjectData.questionTags) {
-      final questionTagMap = {
-        TagQuestionTable.idQuestion: questionTag.questionId,
-        TagQuestionTable.idTag: questionTag.tagId,
-      };
-      await database.insertData(TagQuestionTable.tableName, questionTagMap);
-    }
-  }
-
-  @override
-  Future<void> syncSubjectData(SubjectSyncModel subjectData) async {
-    // First delete all existing data for this subject
-    await deleteSubjectData(subjectData.subject.id);
-
-    // Then insert the new data
-    await insertSubjectData(subjectData);
-
-    log("Successfully synced subject data: ${subjectData.subject.name}");
-  }
-
-
-  // Store subjects from API response
-  @override
-  Future<bool> storeSubjects(SubjectResponseModel response) async {
-    await database.deleteData(SubjectTable.tableName, null);
-
-    // Insert all subjects
-    for (var subject in response.subjects) {
-      await database.insertData(
-        SubjectTable.tableName,
-        {
-          SubjectTable.id: subject.id,
-          SubjectTable.name: subject.name,
-          SubjectTable.icon: subject.icon,
-          SubjectTable.link: subject.link,
-          SubjectTable.syncAt: DateTime.now().toIso8601String(),
-          SubjectTable.isLocked: subject.isLocked ? 1 : 0,
-          SubjectTable.numberOfLessons: subject.numberOfLessons,
-          SubjectTable.numberOfTags: subject.numberOfTags,
-          SubjectTable.numberOfExams: subject.numberOfExams,
-          SubjectTable.numberOfQuestions: subject.numberOfQuestions,
-          SubjectTable.description: subject.description,
-          SubjectTable.teacher: subject.teacher,
-        },
+    // Delete types that are in the local database but not in the response
+    final typesToDelete = existingTypeIds.difference(responseTypeIds);
+    for (final id in typesToDelete) {
+      await _db.deleteData(
+        TypeQuestionTable.tableName,
+        '${TypeQuestionTable.id} = $id',
       );
     }
-
-    // Insert all subjects
-    for (var subject in response.subjects) {
-      await database.insertData(
-        SubjectTable.tableName,
-        {
-          SubjectTable.id: subject.id,
-          SubjectTable.name: subject.name,
-          SubjectTable.icon: subject.icon,
-          SubjectTable.link: subject.link,
-          SubjectTable.syncAt: DateTime.now().toIso8601String(),
-          SubjectTable.isLocked: subject.isLocked ? 1 : 0,
-          SubjectTable.numberOfLessons: subject.numberOfLessons,
-          SubjectTable.numberOfTags: subject.numberOfTags,
-          SubjectTable.numberOfExams: subject.numberOfExams,
-          SubjectTable.numberOfQuestions: subject.numberOfQuestions,
-          SubjectTable.description: subject.description,
-          SubjectTable.teacher: subject.teacher,
-        },
-      );
-    }
-    return true;
   }
 
   // Get all subjects from database
-  @override
+
   Future<List<SubjectModel>> getAllSubjects() async {
-    final List<Map<String, dynamic>> response = await database.readData(SubjectTable.tableName);
+    final List<Map<String, dynamic>> response = await _db.readData(SubjectTable.tableName);
 
     return response.map((subjectMap) {
       return SubjectModel(
@@ -265,7 +107,7 @@ class SubjectLocalDataSourceImpl implements SubjectLocalDataSource {
         numberOfTags: subjectMap[SubjectTable.numberOfTags],
         numberOfExams: subjectMap[SubjectTable.numberOfExams],
         numberOfQuestions: subjectMap[SubjectTable.numberOfQuestions],
-        isLocked: subjectMap[SubjectTable.isLocked] == 1,
+        isLocked: subjectMap[SubjectTable.isLocked],
         teacher: subjectMap[SubjectTable.teacher],
         description: subjectMap[SubjectTable.description],
       );

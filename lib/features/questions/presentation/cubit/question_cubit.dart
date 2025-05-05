@@ -78,7 +78,7 @@ class QuestionCubit extends Cubit<QuestionState> {
       (failure) => emit(QuestionFailure(failure.errMessage)),
       (questions) {
         questionsController = List.generate(questions.length, (questionIndex) {
-          log("question hint: ${questions[questionIndex].hint.toString() ?? "not hint the hint is null"}");
+          // log("question hint: ${questions[questionIndex].hint.toString()}");
           return {
             questionControllersNodeKey: QuillController(
               document: Document.fromJson(questions[questionIndex].textQuestion),
@@ -220,12 +220,12 @@ class QuestionCubit extends Cubit<QuestionState> {
       List<bool?> updatedIsCorrect = List<bool?>.from(currentState.isCorrect);
 
       for (int i = 0; i < currentState.questions.length; i++) {
-        if (currentState.questions[i].type == QuestionType.multipleChoice) {
+        if (currentState.questions[i].type == QuestionTypeEnum.multipleChoice) {
           if (currentState.userAnswers[i] == null) {
             updatedIsCorrect[i] = false;
             wrongAnswers++;
           } else {
-            if (currentState.userAnswers[i] == currentState.questions[i].rightChoice) {
+            if (currentState.userAnswers[i] == currentState.questions[i].adjustedRightChoice) {
               correctAnswers++;
               updatedIsCorrect[i] = true;
             } else {
@@ -259,11 +259,11 @@ class QuestionCubit extends Cubit<QuestionState> {
       List<bool?> updatedIsCorrect = List<bool?>.from(currentState.isCorrect);
 
       for (int i = 0; i < currentState.questions.length; i++) {
-        if (currentState.questions[i].type == QuestionType.multipleChoice) {
+        if (currentState.questions[i].type == QuestionTypeEnum.multipleChoice) {
           if (currentState.userAnswers[i] == null || updatedIsCorrect[i] != null) {
             continue;
           } else {
-            if (currentState.userAnswers[i] == currentState.questions[i].rightChoice) {
+            if (currentState.userAnswers[i] == currentState.questions[i].adjustedRightChoice) {
               correctAnswers++;
               updatedIsCorrect[i] = true;
             } else {
@@ -288,14 +288,14 @@ class QuestionCubit extends Cubit<QuestionState> {
     final currentState = state;
     if (currentState is QuestionSuccess) {
       if (currentState.userAnswers[index] == null) {
-        return;
+        currentState.userAnswers[index] = currentState.questions[index].adjustedRightChoice;
       }
 
       int correctAnswers = currentState.correctAnswers;
       int wrongAnswers = currentState.wrongAnswers;
       List<bool?> updatedIsCorrect = List<bool?>.from(currentState.isCorrect);
 
-      if (currentState.userAnswers[index] == currentState.questions[index].rightChoice) {
+      if (currentState.userAnswers[index] == currentState.questions[index].adjustedRightChoice) {
         updatedIsCorrect[index] = true;
         correctAnswers++;
       } else {

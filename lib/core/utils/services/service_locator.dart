@@ -31,6 +31,7 @@ import 'package:sanad_school/features/questions/domain/use_cases/get_questions_i
 import 'package:sanad_school/features/subject_type/data/data_sources/type_remote_data_source.dart';
 import 'package:sanad_school/features/subject_type/domain/repo/type_repository.dart';
 import 'package:sanad_school/features/subject_type/domain/use_cases/get_types_use_case.dart';
+import 'package:sanad_school/features/subjects/data/data_sources/subject_details_data_source.dart';
 import 'package:sanad_school/features/subjects/data/data_sources/subject_remote_data_source.dart';
 import 'package:sanad_school/features/subjects/domain/repo/subject_repository.dart';
 import 'package:sanad_school/features/subjects/domain/use_cases/get_subjects_use_case.dart';
@@ -90,7 +91,8 @@ void setupServicesLocator() {
   getIt.registerLazySingleton<CodeRemoteDataSource>(() => CodeRemoteDataSource(api: getIt()));
 
   //! local date soures:
-  getIt.registerLazySingleton<SubjectLocalDataSource>(() => SubjectLocalDataSourceImpl(database: getIt()));
+  getIt.registerLazySingleton<SubjectLocalDataSource>(() => SubjectLocalDataSource());
+  getIt.registerLazySingleton<SubjectDetailLocalDataSource>(() => SubjectDetailLocalDataSource());
   getIt.registerLazySingleton<LessonsLocalDataSource>(() => LessonsLocalDataSource(database: getIt()));
   getIt.registerLazySingleton<QuestionLocalDataSource>(() => QuestionLocalDataSource(database: getIt()));
   getIt.registerLazySingleton<TagLocalDataSource>(() => TagLocalDataSource(database: getIt()));
@@ -115,6 +117,7 @@ void setupServicesLocator() {
       networkInfo: getIt(),
       remoteDataSource: getIt(),
       localDataSource: getIt(),
+      subjectDetailLocalDataSource: getIt(),
     ),
   );
   getIt.registerLazySingleton<TagRepository>(
@@ -183,7 +186,7 @@ Future<void> initApp() async {
   await dotenv.load(fileName: ".env");
   setupServicesLocator();
   final SqlDB sqlDb = getIt<SqlDB>();
-  await sqlDb.deleteDB();
+  // await sqlDb.deleteDB();
   await sqlDb.initialDb();
   await (getIt<ApiConsumer>() as DioConsumer).addInterceptors(getIt<AuthInterceptor>());
   // await FireBaseService.initializeApp();

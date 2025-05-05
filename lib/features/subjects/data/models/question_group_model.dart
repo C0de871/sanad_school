@@ -13,7 +13,7 @@ class QuestionGroupModel extends QuestionGroupEntity {
       id: map['id'] as int,
       name: map['name'] as String,
       lessonId: map['lesson_id'] as int,
-      order: map['order'] as int,
+      order: map['display_order'] as int,
     );
   }
 

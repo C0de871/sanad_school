@@ -25,20 +25,16 @@ class QuestionRepositoryImpl extends QuestionRepository {
   Future<Either<Failure, List<QuestionEntity>>> getLessonQuestionsByTypeOrAll({
     required QuestionsInLessonWithTypeParams params,
   }) async {
-    if (await networkInfo.isConnected!) {
-      try {
-        // final response = await remoteDataSource.getQuestionsInLessonByType(
-        //   params: params,
-        // );
+    try {
+      // final response = await remoteDataSource.getQuestionsInLessonByType(
+      //   params: params,
+      // );
 
-        final response = await localDataSource.getQuestionsByLessonAndType(params.lessonId, params.typeId!);
-        log("response: ${response.questions.toString()}");
-        return Right(response.questions);
-      } on ServerException catch (e) {
-        return Left(Failure(errMessage: e.errorModel.errorMessage));
-      }
-    } else {
-      return Left(Failure(errMessage: "There is no internet connection"));
+      final response = await localDataSource.getQuestionsByLessonAndType(params.lessonId, params.typeId);
+      // log("response: ${response.questions.toString()}");
+      return Right(response.questions);
+    } on ServerException catch (e) {
+      return Left(Failure(errMessage: e.errorModel.errorMessage));
     }
   }
 
@@ -46,17 +42,11 @@ class QuestionRepositoryImpl extends QuestionRepository {
   Future<Either<Failure, List<QuestionEntity>>> getSubjectQuestionsByTagOrExam({
     required QuestionsInSubjectByTag params,
   }) async {
-    if (await networkInfo.isConnected!) {
-      try {
-        final response = await remoteDataSource.getQuestionsInSubjectByTag(
-          params: params,
-        );
-        return Right(response.questions);
-      } on ServerException catch (e) {
-        return Left(Failure(errMessage: e.errorModel.errorMessage));
-      }
-    } else {
-      return Left(Failure(errMessage: "There is no internet connection"));
+    try {
+      final response = await localDataSource.getQuestionsByTag(params.tagId);
+      return Right(response.questions);
+    } on ServerException catch (e) {
+      return Left(Failure(errMessage: e.errorModel.errorMessage));
     }
   }
 }

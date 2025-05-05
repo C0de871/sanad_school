@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -10,9 +8,7 @@ import 'package:sanad_school/features/lessons/presentation/cubit/lessons_state.d
 import 'package:sanad_school/features/subjects/presentation/cubit/subject_sync_cubit.dart';
 import 'package:sanad_school/features/tags/presentation/cubits/tag_cubit.dart';
 import 'package:sanad_school/features/tags/presentation/screens/all_tag_screen.dart';
-import '../../../core/Routes/app_router.dart';
 import '../../../core/Routes/app_routes.dart';
-import '../../../core/helper/cubit_helper.dart';
 import '../../../core/shared/widgets/animated_adaptive_grid_layout.dart';
 import '../../../core/theme/theme.dart';
 import '../../../core/utils/services/service_locator.dart';
@@ -86,8 +82,6 @@ class _SubjectDetailsScreenState extends State<SubjectDetailsScreen> with Single
                     content: Text(state.message),
                   ),
                 );
-              } else if (state is SubjectSyncSuccess) {
-                context.read<LessonsCubit>().getLessons(widget.subject.id);
               }
             },
             child: Column(
@@ -136,7 +130,7 @@ class _SubjectDetailsScreenState extends State<SubjectDetailsScreen> with Single
                       ClipRRect(
                         borderRadius: BorderRadius.circular(10),
                         child: LinearProgressIndicator(
-                          value: 20 / 100,
+                          value: 100 / 100,
                           backgroundColor: colors.white.withAlpha(77),
                           valueColor: AlwaysStoppedAnimation<Color>(colors.white),
                           minHeight: 8,
@@ -144,7 +138,7 @@ class _SubjectDetailsScreenState extends State<SubjectDetailsScreen> with Single
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        '23 درس',
+                        '${widget.subject.numberOfLessons} درس',
                         style: TextStyle(
                           color: colors.white,
                           fontSize: 16,
@@ -257,44 +251,24 @@ class _LessonsGridViewState extends State<LessonsGridView> {
               child: CircularProgressIndicator(),
             );
 
-          case SubjectSyncSuccess():
-            return BlocBuilder<LessonsCubit, LessonsState>(
-              builder: (context, state) {
-                switch (state) {
-                  case LessonsInitial():
-                    return SizedBox();
-
-                  case LessonsLoading():
-                    return Center(
-                      child: CircularProgressIndicator(),
-                    );
-
-                  case LessonsLoaded():
-                    state.lessons.removeWhere((ele) => ele.questionTypes.isEmpty);
-                    return ListView.builder(
-                      padding: const EdgeInsets.all(16),
-                      itemBuilder: (context, index) => Column(
-                        children: [
-                          LessonCard(
-                            lesson: state.lessons[index],
-                            subject: widget.subject,
-                            isExpanded: _expandedLessons[index] ?? false,
-                            onTap: () => _toggleLesson(index),
-                            subjectColor: widget.subjectColor,
-                            textDirection: widget.textDirection,
-                          ),
-                          SizedBox(height: 16),
-                        ],
-                      ),
-                      itemCount: state.lessons.length,
-                    );
-
-                  case LessonsError():
-                    return Center(
-                      child: Text(state.message),
-                    );
-                }
-              },
+          case LessonsSuccess():
+            state.lessons.removeWhere((ele) => ele.questionTypes.isEmpty);
+            return ListView.builder(
+              padding: const EdgeInsets.all(16),
+              itemBuilder: (context, index) => Column(
+                children: [
+                  LessonCard(
+                    lesson: state.lessons[index],
+                    subject: widget.subject,
+                    isExpanded: _expandedLessons[index] ?? false,
+                    onTap: () => _toggleLesson(index),
+                    subjectColor: widget.subjectColor,
+                    textDirection: widget.textDirection,
+                  ),
+                  SizedBox(height: 16),
+                ],
+              ),
+              itemCount: state.lessons.length,
             );
 
           case SubjectSyncFailure():
@@ -383,6 +357,25 @@ class _LessonCardState extends State<LessonCard> with TickerProviderStateMixin {
   }
 
   Widget _buildExpandedContent(colors) {
+    if (widget.subject.isLocked == 1 && widget.lesson.questionTypes.length == 1) {
+      return Center(
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.lock,
+            ),
+            SizedBox(width: 12),
+            Text(
+              "عذرا اشترك بالمادة لفتح الدرس",
+              style: TextStyle(
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ],
+        ),
+      );
+    }
     return RawScrollbar(
       controller: _scrollController,
       scrollbarOrientation: ScrollbarOrientation.right,

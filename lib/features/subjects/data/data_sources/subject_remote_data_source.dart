@@ -1,7 +1,8 @@
 import '../../../../core/databases/api/api_consumer.dart';
 import '../../../../core/databases/api/end_points.dart';
-import '../models/subject_response_model.dart';
+
 import '../models/subject_sync_model.dart';
+import '../models/subjects_response_model.dart';
 
 class SubjectRemoteDataSource {
   final ApiConsumer api;

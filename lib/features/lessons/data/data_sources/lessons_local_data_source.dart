@@ -31,7 +31,7 @@ class LessonsLocalDataSource {
     List<Map<String, dynamic>> formattedLessons = [];
 
     for (var lesson in lessons) {
-      log(lesson.toString());
+      // log(lesson.toString());
       // Query to get question types for this lesson
       // This would need to be adapted based on your schema
       String typesQuery = '''
@@ -43,7 +43,7 @@ class LessonsLocalDataSource {
         ''';
 
       List<Map> types = await database.sqlReadData(typesQuery);
-      log(types.toString());
+      // log(types.toString());
 
       // Format the lesson with its types
       formattedLessons.add({

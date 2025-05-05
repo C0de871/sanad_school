@@ -25,7 +25,7 @@ class QuestionSuccess extends QuestionState {
   final List<bool?> isCorrect;
   final Map<int, bool> isFavorite;
   final Map<int, String> userNotes;
-  final Map<int, bool> expandedImages;
+  final Map<int, bool> expandedImages;  
   final Map<int, bool> expandedAnswers;
 
   const QuestionSuccess({

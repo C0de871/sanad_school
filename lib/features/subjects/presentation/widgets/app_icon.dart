@@ -18,8 +18,8 @@ class AppIcon extends StatelessWidget {
       ),
       child: Image.asset(
         "assets/app_icon/sanad_icon.png",
-        height: 32,
-        width: 32,
+        height: 40,
+        width: 40,
       ),
     );
   }

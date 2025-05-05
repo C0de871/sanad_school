@@ -10,6 +10,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
     return AppBar(
       backgroundColor: Theme.of(context).colorScheme.primary,
       scrolledUnderElevation: 0,
+      automaticallyImplyLeading: false,
       title: Row(
         children: [
           const AppIcon(),

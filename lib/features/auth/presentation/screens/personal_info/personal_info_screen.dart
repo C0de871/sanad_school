@@ -1,13 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sanad_school/core/shared/widgets/step_indicator.dart';
-import 'package:sanad_school/core/utils/services/service_locator.dart';
 import 'package:sanad_school/features/auth/presentation/cubit/auth_cubit/auth_cubit.dart';
-import 'package:sanad_school/features/auth/presentation/widgets/animated_raised_button.dart';
 import 'package:sanad_school/features/auth/presentation/widgets/form_container.dart';
 
 import '../../../../../core/Routes/app_routes.dart';
-import '../../../../../core/theme/theme.dart';
 import 'widgets/continue_button.dart';
 
 class PersonalInfoScreen extends StatefulWidget {

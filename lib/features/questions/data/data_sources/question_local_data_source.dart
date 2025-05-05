@@ -3,6 +3,7 @@ import 'dart:developer';
 
 import '../../../../core/databases/local_database/sql_db.dart';
 import '../../../../core/databases/local_database/tables/bridge_tables/question_groups_table.dart';
+import '../../../../core/databases/local_database/tables/bridge_tables/tag_question_table.dart';
 import '../../../../core/databases/local_database/tables/question_table.dart';
 import '../models/question_model.dart';
 import '../models/questions_response_model.dart';
@@ -13,8 +14,10 @@ class QuestionLocalDataSource {
   QuestionLocalDataSource({required this.database});
 
   // Get questions inside the lesson by type
-  Future<QuestionsResponseModel> getQuestionsByLessonAndType(int lessonId, int typeId) async {
-    String query = '''
+  Future<QuestionsResponseModel> getQuestionsByLessonAndType(int lessonId, int? typeId) async {
+    String query = '';
+    if (typeId != null) {
+      query = '''
         SELECT q.${QuestionTable.id}, q.${QuestionTable.uuid}, 
                q.${QuestionTable.questionGroupId}, q.${QuestionTable.displayOrder} as display_order, 
                q.${QuestionTable.idTypeQuestion} as type_id, 
@@ -29,6 +32,22 @@ class QuestionLocalDataSource {
         AND q.${QuestionTable.idTypeQuestion} = $typeId
         ORDER BY q.${QuestionTable.displayOrder}
       ''';
+    } else {
+      query = '''
+        SELECT q.${QuestionTable.id}, q.${QuestionTable.uuid}, 
+               q.${QuestionTable.questionGroupId}, q.${QuestionTable.displayOrder} as display_order, 
+               q.${QuestionTable.idTypeQuestion} as type_id, 
+               q.${QuestionTable.textQuestion} as text_question, 
+               q.${QuestionTable.questionPhoto}, q.${QuestionTable.choices}, 
+               q.${QuestionTable.rightChoice} as right_choice, 
+               q.${QuestionTable.isEdited} as is_edited, 
+               q.${QuestionTable.hint}, q.${QuestionTable.hintPhoto} as hint_photo
+        FROM ${QuestionTable.tableName} q
+        JOIN ${QuestionGroupsTable.tableName} qg ON q.${QuestionTable.questionGroupId} = qg.${QuestionGroupsTable.id}
+        WHERE qg.${QuestionGroupsTable.lessonId} = $lessonId
+        ORDER BY q.${QuestionTable.displayOrder}
+      ''';
+    }
 
     List<Map> questions = await database.sqlReadData(query);
     List<Map<String, dynamic>> formattedQuestions = _formatQuestions(questions);
@@ -51,7 +70,7 @@ class QuestionLocalDataSource {
         QuestionModel.idKey: q[QuestionTable.id],
         QuestionModel.uuidKey: q[QuestionTable.uuid],
         QuestionTable.questionGroupId: q[QuestionTable.questionGroupId],
-        'order': q[QuestionTable.displayOrder],
+        QuestionTable.displayOrder: q[QuestionTable.displayOrder],
         QuestionModel.typeIdKey: q[QuestionTable.idTypeQuestion],
         QuestionModel.textQuestionKey: q[QuestionTable.textQuestion] != null ? {"ops": jsonDecode(q[QuestionTable.textQuestion])} : null,
         QuestionModel.questionPhotoKey: q[QuestionTable.questionPhoto],
@@ -64,16 +83,11 @@ class QuestionLocalDataSource {
     }).toList();
   }
 
-  _deocodeChoices(String choices) {
-    return jsonDecode(choices);
-  }
-
-  // Get all questions inside a lesson
-  Future<Map<String, dynamic>> getAllQuestionsByLesson(int lessonId) async {
-    try {
-      String query = '''
+  // Get all questions inside a tag
+  Future<QuestionsResponseModel> getQuestionsByTag(int tagId) async {
+    String query = '''
         SELECT q.${QuestionTable.id}, q.${QuestionTable.uuid}, 
-               q.${QuestionTable.questionGroupId}, q.${QuestionTable.displayOrder} as order, 
+               q.${QuestionTable.questionGroupId}, q.${QuestionTable.displayOrder} as display_order, 
                q.${QuestionTable.idTypeQuestion} as type_id, 
                q.${QuestionTable.textQuestion} as text_question, 
                q.${QuestionTable.questionPhoto}, q.${QuestionTable.choices}, 
@@ -81,22 +95,20 @@ class QuestionLocalDataSource {
                q.${QuestionTable.isEdited} as is_edited, 
                q.${QuestionTable.hint}, q.${QuestionTable.hintPhoto} as hint_photo
         FROM ${QuestionTable.tableName} q
-        JOIN ${QuestionGroupsTable.tableName} qg ON q.${QuestionTable.questionGroupId} = qg.${QuestionGroupsTable.id}
-        WHERE qg.${QuestionGroupsTable.lessonId} = $lessonId
+        JOIN ${TagQuestionTable.tableName} tq ON q.${QuestionTable.id} = tq.${TagQuestionTable.idQuestion}
+        WHERE tq.${TagQuestionTable.idTag} = $tagId
         ORDER BY q.${QuestionTable.displayOrder}
       ''';
 
-      List<Map> questions = await database.sqlReadData(query);
-      List<Map<String, dynamic>> formattedQuestions = _formatQuestions(questions);
+    List<Map> questions = await database.sqlReadData(query);
 
-      return {
-        QuestionsResponseModel.dataKey: formattedQuestions,
-        QuestionsResponseModel.messageKey: 'Questions in Lesson $lessonId',
-        QuestionsResponseModel.statusKey: 200,
-      };
-    } catch (e) {
-      print('Error getting all questions by lesson: $e');
-      return {'data': [], 'message': 'Error: $e', 'status': 500};
-    }
+    List<Map<String, dynamic>> formattedQuestions = _formatQuestions(questions);
+
+    final response = {
+      QuestionsResponseModel.dataKey: formattedQuestions,
+      QuestionsResponseModel.messageKey: 'Questions in Tag $tagId',
+      QuestionsResponseModel.statusKey: 200,
+    };
+    return QuestionsResponseModel.fromMap(response);
   }
 }

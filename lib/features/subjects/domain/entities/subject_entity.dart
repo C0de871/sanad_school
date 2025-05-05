@@ -9,7 +9,7 @@ class SubjectEntity extends Equatable {
   final int numberOfTags;
   final int numberOfExams;
   final int numberOfQuestions;
-  final bool isLocked;
+  final int isLocked;
   final String teacher;
   final String description;
 

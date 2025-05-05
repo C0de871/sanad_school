@@ -32,6 +32,7 @@ class AuthInterceptor extends Interceptor {
     if (err.response?.statusCode == 401) {
       authEventBus.emit(AuthEvent.accessTokenExpired);
     }
+    handler.next(err);
   }
 }
 

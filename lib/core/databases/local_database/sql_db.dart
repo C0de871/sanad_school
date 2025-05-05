@@ -33,7 +33,7 @@ class SqlDB {
     Database myDb = await openDatabase(
       path,
       onCreate: _onCreate,
-      version: 6,
+      version: 11,
       onUpgrade: _onUpgrade,
     );
     return myDb;
@@ -116,7 +116,7 @@ class SqlDB {
     return response;
   }
 
-  Future<int> updataData(String table, Map<String, Object?> values, String? myWhere) async {
+  Future<int> updateData(String table, Map<String, Object?> values, String? myWhere) async {
     Database? myDB = await db;
     int response = await myDB!.update(table, values, where: myWhere);
     return response;
@@ -129,5 +129,24 @@ class SqlDB {
       where: myWhere,
     );
     return response;
+  }
+
+  Future<void> logAllTables() async {
+    log("=======================================");
+    log("subjects table: ${await readData(SubjectTable.tableName)}");
+    log("=======================================");
+    log("lessons table: ${await readData(LessonTable.tableName)}");
+    log("=======================================");
+    log("tags table: ${await readData(TagTable.tableName)}");
+    log("=======================================");
+    log("types table: ${await readData(TypeTable.tableName)}");
+    log("=======================================");
+    log("types question table: ${await readData(TypeQuestionTable.tableName)}");
+    log("=======================================");
+    log("tag question table: ${await readData(TagQuestionTable.tableName)}");
+    log("=======================================");
+    log("question groups table: ${await readData(QuestionGroupsTable.tableName)}");
+    log("=======================================");
+    log("questions table: ${await readData(QuestionTable.tableName)}");
   }
 }

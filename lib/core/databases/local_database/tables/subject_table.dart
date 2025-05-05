@@ -17,8 +17,8 @@ class SubjectTable {
     CREATE TABLE $tableName (
     $id INTEGER PRIMARY KEY AUTOINCREMENT,
     $name TEXT NOT NULL,
-    $link TEXT NOT NULL,
-    $syncAt TEXT NOT NULL,
+    $link TEXT ,
+    $syncAt TEXT ,
     $isLocked INTEGER NOT NULL,
     $numberOfLessons INTEGER NOT NULL,
     $numberOfTags INTEGER NOT NULL,

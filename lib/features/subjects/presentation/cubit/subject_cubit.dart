@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:equatable/equatable.dart';
 import '../../../../core/utils/services/service_locator.dart';
@@ -21,4 +23,12 @@ class SubjectCubit extends Cubit<SubjectState> {
       (subjects) => emit(SubjectSuccess(subjects)),
     );
   }
+
+  @override
+  Future<void> close() {
+    log("subject cubit is closed");
+    return super.close();
+  }
+
+  
 }

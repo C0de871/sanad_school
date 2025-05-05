@@ -49,9 +49,9 @@ class SubscriptionCubit extends Cubit<SubscriptionState> {
       ));
 
       final params = CodeBody(code: codeController.text);
-      log("from check code ${params.toMap()}");
+      // log("from check code ${params.toMap()}");
       final result = await checkCodeUseCase.call(params);
-      log("from check code ${result.fold((failure) => failure.errMessage, (code) => code.code)}");
+      // log("from check code ${result.fold((failure) => failure.errMessage, (code) => code.code)}");
       result.fold(
         (failure) => emit(AddCodeFailure(
           count: currentState.count,
@@ -77,7 +77,7 @@ class SubscriptionCubit extends Cubit<SubscriptionState> {
   }
 
   void handleQrResult(QrCodeResult? result) {
-    log("from handle result ${result?.code ?? " code not found"}");
+    // log("from handle result ${result?.code ?? " code not found"}");
     codeController.text = result?.code ?? "";
   }
 }

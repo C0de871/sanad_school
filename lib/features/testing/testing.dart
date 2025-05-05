@@ -58,12 +58,12 @@ class EquationCard extends StatelessWidget {
   final List<Color> gradientColors;
 
   const EquationCard({
-    Key? key,
+    super.key,
     required this.title,
     required this.subtitle,
     required this.equation,
     required this.gradientColors,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

@@ -141,28 +141,124 @@ class _QuestionsPageState extends State<QuestionsPage> {
     );
   }
 
-  Future<void> showConfirmationDialog(String action, VoidCallback onConfirm) async {
+  void _showSuccessDialog(BuildContext parentContext) {
+    showGeneralDialog(
+      context: parentContext,
+      barrierDismissible: false,
+      transitionDuration: const Duration(milliseconds: 400),
+      pageBuilder: (context, animation, secondaryAnimation) {
+        return BlocProvider.value(
+          value: parentContext.read<QuestionCubit>(),
+          child: ScaleTransition(
+            scale: CurvedAnimation(
+              parent: animation,
+              curve: Curves.easeInOut,
+            ),
+            child: AlertDialog(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(
+                      Icons.check_circle_outline,
+                      size: 48,
+                      color: Theme.of(context).colorScheme.primary,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  const Text(
+                    'أحسنت',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 8),
+                  BlocBuilder<QuestionCubit, QuestionState>(
+                    builder: (context, state) {
+                      return switch (state) {
+                        QuestionSuccess() => Column(
+                            children: [
+                              Text(
+                                'لقد اجبت على ${state.correctAnswers} اجابة صحيحة',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  color: Theme.of(context).colorScheme.outline,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                              Text(
+                                'و ${state.wrongAnswers} اجابة خاطئة',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  color: Theme.of(context).colorScheme.outline,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                              Text(
+                                'نسبة الاجابات الصحيحة ${(state.correctAnswers / state.questions.length * 100).toStringAsFixed(1)}%',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  color: Theme.of(context).colorScheme.outline,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                            ],
+                          ),
+                        _ => const SizedBox(),
+                      };
+                    },
+                  ),
+                  const SizedBox(height: 24),
+                  AnimatedRaisedButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                    text: 'تم',
+                    backgroundColor: Theme.of(context).colorScheme.primary,
+                    shadowColor: getIt<AppTheme>().extendedColors.buttonShadow,
+                    foregroundColor: Theme.of(context).colorScheme.onPrimary,
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Future<void> showConfirmationDialog(bool isReset, String action, VoidCallback onConfirm) async {
     return showDialog(
       context: context,
       builder: (BuildContext context) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         title: Text(
-          'Confirm $action',
+          action,
           style: const TextStyle(fontWeight: FontWeight.bold),
         ),
-        content: Text('Are you sure you want to $action?'),
+        content: Text('هل أنت متأكد أنك تريد $action?'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
             child: Text(
-              'Cancel',
+              'إلغاء',
               style: TextStyle(color: Colors.grey[600]),
             ),
           ),
           AnimatedRaisedButtonWithChild(
             width: 130,
             padding: const EdgeInsets.symmetric(vertical: 16),
-            backgroundColor: action == 'reset' ? Colors.red : widget.subjectColor,
+            backgroundColor: isReset ? Colors.red : widget.subjectColor,
             borderRadius: BorderRadius.circular(10),
             onPressed: () {
               Navigator.pop(context);
@@ -177,7 +273,8 @@ class _QuestionsPageState extends State<QuestionsPage> {
                 ),
                 const SizedBox(width: 8),
                 Text(
-                  action == 'reset' ? 'Reset' : 'Check All',
+                  // action == 'reset' ? 'إعادة تعيين' : 'تحقق ',
+                  isReset ? 'إعادة تعيين' : 'تحقق ',
                   style: TextStyle(
                     color: Colors.white,
                   ),
@@ -587,7 +684,7 @@ class _QuestionsPageState extends State<QuestionsPage> {
                   ),
                 ],
               ],
-              if (question.type == QuestionType.written) ...[
+              if (question.type == QuestionTypeEnum.written) ...[
                 const SizedBox(height: 16),
                 const SizedBox(height: 16),
                 ClipRRect(
@@ -629,19 +726,20 @@ class _QuestionsPageState extends State<QuestionsPage> {
                 ),
               ],
               const SizedBox(height: 20),
-              if (question.type == QuestionType.multipleChoice) _buildMultipleChoiceAnswers(question, questionIndex, state) else _buildAnswer(question, questionIndex),
+              if (question.type == QuestionTypeEnum.multipleChoice) _buildMultipleChoiceAnswers(question, questionIndex, state) else _buildAnswer(question, questionIndex),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  _buildActionButton(
-                    icon: Icons.lightbulb_outline,
-                    color: Color(0xFFFFB347),
-                    onPressed: () => showHintBottomSheet(
-                      context,
-                      questionIndex,
-                      state,
+                  if (state.questions[questionIndex].hint == null || state.questions[questionIndex].hintPhoto == null)
+                    _buildActionButton(
+                      icon: Icons.lightbulb_outline,
+                      color: Color(0xFFFFB347),
+                      onPressed: () => showHintBottomSheet(
+                        context,
+                        questionIndex,
+                        state,
+                      ),
                     ),
-                  ),
                   const SizedBox(width: 8),
                   _buildActionButton(
                     icon: state.isFavorite[questionIndex] == true ? Icons.favorite : Icons.favorite_border,
@@ -664,7 +762,7 @@ class _QuestionsPageState extends State<QuestionsPage> {
                     color: Colors.red,
                     onPressed: () => _showReportOptions(context),
                   ),
-                  if (question.type == QuestionType.multipleChoice) ...[
+                  if (question.type == QuestionTypeEnum.multipleChoice) ...[
                     const SizedBox(width: 8),
                     _buildActionButton(
                       icon: Icons.check,
@@ -790,12 +888,13 @@ class _QuestionsPageState extends State<QuestionsPage> {
   }
 
   Widget _buildMultipleChoiceAnswers(QuestionEntity question, int questionIndex, QuestionSuccess state) {
+    log("right choice for question id ${question.id} is ${question.adjustedRightChoice} , and the index of question is $questionIndex");
     final questionCubit = context.read<QuestionCubit>();
     return Column(
       children: question.choices.map((answer) {
         // log("${userAnswers[index] ?? "this is null"}");
         bool isSelected = question.choices.indexOf(answer) == state.userAnswers[questionIndex];
-        bool isCorrect = question.choices.indexOf(answer) == question.rightChoice;
+        bool isCorrect = question.choices.indexOf(answer) == question.adjustedRightChoice;
         bool isQuestionCorrected = state.isCorrect[questionIndex] != null;
 
         Color shadowColor = Colors.blueGrey.withAlpha(70);
@@ -900,8 +999,14 @@ class _QuestionsPageState extends State<QuestionsPage> {
               padding: const EdgeInsets.symmetric(vertical: 16),
               backgroundColor: widget.subjectColor,
               borderRadius: BorderRadius.circular(16),
-              onLongPressed: () => showConfirmationDialog('check all answers?', context.read<QuestionCubit>().checkAllAnswers),
-              onPressed: () => showConfirmationDialog('check your answers?', context.read<QuestionCubit>().checkUserAnswersOnly),
+              onLongPressed: () => showConfirmationDialog(false, 'التحقق من جميع الأسئلة', () {
+                context.read<QuestionCubit>().checkAllAnswers();
+                _showSuccessDialog(context);
+              }),
+              onPressed: () => showConfirmationDialog(false, 'التحقق من إجاباتك', () {
+                context.read<QuestionCubit>().checkUserAnswersOnly();
+                _showSuccessDialog(context);
+              }),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -911,7 +1016,7 @@ class _QuestionsPageState extends State<QuestionsPage> {
                   ),
                   const SizedBox(width: 8),
                   const Text(
-                    'Check answers',
+                    'تحقق من الأسئلة',
                     style: TextStyle(
                       color: Colors.white,
                     ),
@@ -926,7 +1031,7 @@ class _QuestionsPageState extends State<QuestionsPage> {
               padding: const EdgeInsets.symmetric(vertical: 16),
               backgroundColor: Colors.red,
               borderRadius: BorderRadius.circular(16),
-              onPressed: () => showConfirmationDialog('reset', context.read<QuestionCubit>().resetAnswers),
+              onPressed: () => showConfirmationDialog(true, 'إعادة تعيين الإجابات', context.read<QuestionCubit>().resetAnswers),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -936,7 +1041,7 @@ class _QuestionsPageState extends State<QuestionsPage> {
                   ),
                   const SizedBox(width: 8),
                   const Text(
-                    'Reset',
+                    'إعادة تعيين',
                     style: TextStyle(
                       color: Colors.white,
                     ),
@@ -957,7 +1062,7 @@ class _QuestionsPageState extends State<QuestionsPage> {
   }
 }
 
-enum QuestionType { multipleChoice, written }
+enum QuestionTypeEnum { multipleChoice, written }
 
 // Custom formula embed builder
 class FormulaEmbedBuilder extends EmbedBuilder {

@@ -44,11 +44,11 @@ class _SubscriptionScreenContent extends StatelessWidget {
             case SubscriptionError():
               ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(state.message)));
             case AddCodeFailure():
-              log(state.errMessage);
+              // log(state.errMessage);
               ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(state.errMessage)));
               break;
             case AddCodeLoaded():
-              log(state.codeEntity.code ?? "where is the code");
+              // log(state.codeEntity.code ?? "where is the code");
               ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("تم إضافة الاشتراك")));
               break;
             default:

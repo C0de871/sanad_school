@@ -64,7 +64,7 @@ class Test1Screen extends StatelessWidget {
           }
 
           if (snapshot.hasError) {
-            log("${snapshot.hasError}");
+            // log("${snapshot.hasError}");
             return Center(child: Text('${snapshot.hasError}'));
           }
 
@@ -103,7 +103,7 @@ class Test2Screen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final dbHelper = getIt<SubjectLocalDataSourceImpl>();
+    // final dbHelper = getIt<SubjectLocalDataSourceImpl>();
 
     return Scaffold(
       appBar: AppBar(title: Text('الأسئلة')),

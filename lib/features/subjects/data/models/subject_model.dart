@@ -25,7 +25,7 @@ class SubjectModel extends SubjectEntity {
       numberOfTags: map['number_of_tags'] as int,
       numberOfExams: map['number_of_exams'] as int,
       numberOfQuestions: map['number_of_questions'] as int,
-      isLocked: map['is_locked'] == 1,
+      isLocked: map['is_locked'] ? 1 : 0,
       teacher: map['teacher'] as String,
       description: map['description'] as String,
     );
@@ -41,7 +41,7 @@ class SubjectModel extends SubjectEntity {
       'number_of_tags': numberOfTags,
       'number_of_exams': numberOfExams,
       'number_of_questions': numberOfQuestions,
-      'is_locked': isLocked ? 1 : 0,
+      'is_locked': isLocked,
       'teacher': teacher,
       'description': description,
     };

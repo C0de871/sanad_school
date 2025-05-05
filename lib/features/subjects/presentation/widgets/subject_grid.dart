@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sanad_school/features/subjects/presentation/cubit/subject_cubit.dart';
-import '../../../../main.dart';
+
 import '../../domain/entities/subject_entity.dart';
 import 'subject_card.dart';
 
@@ -29,8 +29,7 @@ class _SubjectsLayoutState extends State<SubjectsLayout> {
 
   late List<bool> isExpanded = [];
   final List<Color> subjectColors = [
-    Color(0xFF4CAF50), // Green
-    Color(0xFF1A1B1F), // Dark color
+    Color(0xFF4CAF50), // Green 
     Color(0xFF2196F3), // Blue
     Color(0xFFFF9800), // Orange
     Color(0xFFE91E63), // Pink

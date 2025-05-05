@@ -2,6 +2,7 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:sanad_school/core/Routes/app_routes.dart';
+import 'package:sanad_school/core/shared/widgets/vibratation_container.dart';
 import 'package:sanad_school/core/utils/services/service_locator.dart';
 import 'package:sanad_school/features/auth/presentation/widgets/animated_raised_button.dart';
 
@@ -26,127 +27,134 @@ class SubjectCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return AnimatedRaisedButtonWithChild(
-      gradient: LinearGradient(
-        begin: Alignment.topLeft,
-        end: Alignment.bottomRight,
-        colors: [
-          color,
-          Color.lerp(color, Theme.of(context).colorScheme.scrim, 0.2) ?? color,
-        ],
-        stops: const [0.3, 1],
-      ),
-      borderRadius: BorderRadius.circular(24),
-      onLongPressed: onLongPress,
-      onPressed: () {
-        log("pressed");
-        final englishFirstCharRegExp = RegExp(r'^[a-zA-Z]');
-
-        TextDirection direction = englishFirstCharRegExp.hasMatch(subject.name) ? TextDirection.ltr : TextDirection.rtl;
-        Navigator.pushNamed(
-        context,
-          AppRoutes.subjectDetails,
-          arguments: {"subject": subject, "color": color, "direction": direction},
-        );
+    return VibrationWidget(
+      condition: () => subject.isLocked == 1,
+      onTap: () {
+        log("tapped");
       },
-      child: Column(
-        children: [
-          Stack(
-            children: [
-              _DecorativeIcon(subject: subject),
-              _SubjectContent(
-                subject: subject,
-                isExpanded: isExpanded,
-                isShrunk: isShrunk,
-              ),
-              const _ProgressIndicator(),
-            ],
-          ),
-          Padding(
-            padding: EdgeInsets.symmetric(
-              horizontal: 20,
+      child: AnimatedRaisedButtonWithChild(
+        padding: EdgeInsets.only(bottom: 8),
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            color,
+            Color.lerp(color, Theme.of(context).colorScheme.scrim, 0.2) ?? color,
+          ],
+          stops: const [0.3, 1],
+        ),
+        borderRadius: BorderRadius.circular(24),
+        onLongPressed: onLongPress,
+        onPressed: () {
+          log("pressed");
+          final englishFirstCharRegExp = RegExp(r'^[a-zA-Z]');
+
+          TextDirection direction = englishFirstCharRegExp.hasMatch(subject.name) ? TextDirection.ltr : TextDirection.rtl;
+          Navigator.pushNamed(
+            context,
+            AppRoutes.subjectDetails,
+            arguments: {"subject": subject, "color": color, "direction": direction},
+          );
+        },
+        child: Column(
+          children: [
+            Stack(
+              children: [
+                _DecorativeIcon(subject: subject),
+                _SubjectContent(
+                  subject: subject,
+                  isExpanded: isExpanded,
+                  isShrunk: isShrunk,
+                ),
+                // const _ProgressIndicator(),
+              ],
             ),
-            child: AnimatedSize(
-              duration: Duration(milliseconds: 300),
-              curve: Curves.easeInOut,
-              child: SizedBox(
-                height: isExpanded ? null : 0,
-                child: Column(
-                  children: [
-                    Divider(
-                      color: getIt<AppTheme>().extendedColors.white,
-                      thickness: 3,
-                      // indent: 20,
-                      // endIndent: 20,
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Column(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            Text(
-                              "عدد الأسئلة: 20",
-                              style: TextStyle(
-                                color: getIt<AppTheme>().extendedColors.white,
-                                fontSize: 14,
-                                height: 1.6,
-                                letterSpacing: 0.3,
+            Padding(
+              padding: EdgeInsets.symmetric(
+                horizontal: 20,
+              ),
+              child: AnimatedSize(
+                duration: Duration(milliseconds: 300),
+                curve: Curves.easeInOut,
+                child: SizedBox(
+                  height: isExpanded ? null : 0,
+                  child: Column(
+                    children: [
+                      Divider(
+                        color: getIt<AppTheme>().extendedColors.white,
+                        thickness: 3,
+                        // indent: 20,
+                        // endIndent: 20,
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Column(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              Text(
+                                "عدد الأسئلة: ${subject.numberOfQuestions}",
+                                style: TextStyle(
+                                  color: getIt<AppTheme>().extendedColors.white,
+                                  fontSize: 14,
+                                  height: 1.6,
+                                  letterSpacing: 0.3,
+                                ),
                               ),
-                            ),
-                            Text(
-                              "عدد الدورات: 20",
-                              style: TextStyle(
-                                color: getIt<AppTheme>().extendedColors.white,
-                                fontSize: 14,
-                                height: 1.6,
-                                letterSpacing: 0.3,
+                              Text(
+                                "عدد الدورات: ${subject.numberOfExams}",
+                                style: TextStyle(
+                                  color: getIt<AppTheme>().extendedColors.white,
+                                  fontSize: 14,
+                                  height: 1.6,
+                                  letterSpacing: 0.3,
+                                ),
                               ),
-                            ),
-                            Text(
-                              "عدد الدروس: 20",
-                              style: TextStyle(
-                                color: getIt<AppTheme>().extendedColors.white,
-                                fontSize: 14,
-                                height: 1.6,
-                                letterSpacing: 0.3,
+                              Text(
+                                "عدد الدروس: ${subject.numberOfLessons}",
+                                style: TextStyle(
+                                  color: getIt<AppTheme>().extendedColors.white,
+                                  fontSize: 14,
+                                  height: 1.6,
+                                  letterSpacing: 0.3,
+                                ),
                               ),
-                            ),
-                          ],
-                        ),
-                        Column(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              "عدد التصنيفات: 20",
-                              style: TextStyle(
-                                color: getIt<AppTheme>().extendedColors.white,
-                                fontSize: 14,
-                                height: 1.6,
-                                letterSpacing: 0.3,
+                            ],
+                          ),
+                          Column(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                "عدد التصنيفات: ${subject.numberOfTags}",
+                                style: TextStyle(
+                                  color: getIt<AppTheme>().extendedColors.white,
+                                  fontSize: 14,
+                                  height: 1.6,
+                                  letterSpacing: 0.3,
+                                ),
                               ),
-                            ),
-                            Text(
-                              "الأستاذ: علاء شحرور",
-                              style: TextStyle(
-                                color: getIt<AppTheme>().extendedColors.white,
-                                fontSize: 14,
-                                height: 1.6,
-                                letterSpacing: 0.3,
+                              Text(
+                                "الأستاذ: ${subject.teacher}",
+                                style: TextStyle(
+                                  color: getIt<AppTheme>().extendedColors.white,
+                                  fontSize: 14,
+                                  height: 1.6,
+                                  letterSpacing: 0.3,
+                                ),
                               ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    )
-                  ],
+                            ],
+                          ),
+                        ],
+                      )
+                    ],
+                  ),
                 ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

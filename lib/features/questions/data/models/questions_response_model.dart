@@ -18,8 +18,8 @@ class QuestionsResponseModel {
   });
 
   factory QuestionsResponseModel.fromMap(Map<String, dynamic> map) {
-    log("map: $map");
-    log("dataKey: ${map[dataKey]}");
+    // log("map: $map");
+    // log("dataKey: ${map[dataKey]}");
     return QuestionsResponseModel(
       questions: (map[dataKey] as List).map((e) => QuestionModel.fromMap(e)).toList(),
       message: map[messageKey],

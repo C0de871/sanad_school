@@ -1,4 +1,3 @@
-import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -21,8 +20,6 @@ import 'package:sanad_school/features/subjects/presentation/cubit/subject_cubit.
 import 'package:sanad_school/features/subjects/presentation/cubit/subject_sync_cubit.dart';
 import 'package:sanad_school/features/subscription/presentation/cubits/subscription_cubit.dart';
 import 'package:sanad_school/features/tags/domain/entities/tag_entity.dart';
-import 'package:sanad_school/features/tags/presentation/cubits/tag_cubit.dart';
-import 'package:sanad_school/main.dart';
 
 import '../../features/Q&A/presentation/questions_and_answers_screen.dart';
 import '../../features/about_sanad/presentation/about_us_screen.dart';
@@ -109,12 +106,12 @@ class AppRouter with CubitProviderMixin {
           settings: settings,
           builder: (context) => MultiBlocProvider(
             providers: [
-              BlocProvider(
-                lazy: false,
-                create: (context) {
-                  return getCubit(() => LessonsCubit());
-                },
-              ),
+              // BlocProvider(
+              //   lazy: false,
+              //   create: (context) {
+              //     return getCubit(() => LessonsCubit());
+              //   },
+              // ),
               BlocProvider(
                 lazy: false,
                 create: (context) {

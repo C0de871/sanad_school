@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../auth/presentation/widgets/animated_raised_button.dart';
 
@@ -82,27 +83,60 @@ class AboutScreen extends StatelessWidget {
                 ),
               ),
               SizedBox(height: 16),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  SocialButton(
-                    icon: FontAwesomeIcons.facebook,
-                    onPressed: () {},
-                    backgroundColor: Color(0xFF1877F2), // Facebook brand blue
-                  ),
-                  SizedBox(width: 24),
-                  SocialButton(
-                    icon: FontAwesomeIcons.whatsapp,
-                    onPressed: () {},
-                    backgroundColor: Color(0xFF25D366), // WhatsApp brand green
-                  ),
-                ],
+              Align(
+                alignment: Alignment.center,
+                child: Wrap(
+                  alignment: WrapAlignment.center,
+                  spacing: 24,
+                  runSpacing: 24,
+                  children: [
+                    SocialButton(
+                      icon: FontAwesomeIcons.facebook,
+                      onPressed: () => _launchURL('https://www.facebook.com/groups/749570869609518/'),
+                      backgroundColor: const Color(0xFF1877F2), // Facebook brand blue
+                      tooltip: 'فيسبوك سند الطالب',
+                    ),
+                    SocialButton(
+                      icon: FontAwesomeIcons.whatsapp,
+                      onPressed: () => _launchURL('https://wa.me/message/your_whatsapp_link'), // Add your WhatsApp link here
+                      backgroundColor: const Color(0xFF25D366), // WhatsApp brand green
+                      tooltip: 'واتساب',
+                    ),
+                    SocialButton(
+                      icon: FontAwesomeIcons.instagram,
+                      onPressed: () => _launchURL('https://www.instagram.com/sanad_educational_team'),
+                      backgroundColor: const Color(0xFFE1306C), // Instagram brand pink
+                      tooltip: 'انستغرام سند الطالب',
+                    ),
+                    SocialButton(
+                      icon: FontAwesomeIcons.telegram,
+                      onPressed: () => _launchURL('https://t.me/SanadAlTaleb_bot'),
+                      backgroundColor: const Color(0xFF0088CC), // Telegram brand blue
+                      tooltip: 'تلغرام سند الطالب',
+                    ),
+                    SocialButton(
+                      icon: FontAwesomeIcons.youtube,
+                      onPressed: () => _launchURL('https://youtube.com/@sanadteam-z8f'),
+                      backgroundColor: const Color(0xFFFF0000), // YouTube brand red
+                      tooltip: 'يوتيوب سند الطالب',
+                    ),
+                  ],
+                ),
               ),
             ],
           ),
         ),
       ),
     );
+  }
+
+  Future<void> _launchURL(String url) async {
+    final Uri uri = Uri.parse(url);
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    } else {
+      throw 'Could not launch $url';
+    }
   }
 }
 
@@ -111,7 +145,8 @@ class ServiceCard extends StatelessWidget {
   final String description;
   final IconData icon;
 
-  const ServiceCard({super.key, 
+  const ServiceCard({
+    super.key,
     required this.title,
     required this.description,
     required this.icon,
@@ -174,28 +209,34 @@ class SocialButton extends StatelessWidget {
   final IconData icon;
   final VoidCallback onPressed;
   final Color backgroundColor;
+  final String tooltip;
 
-  const SocialButton({super.key, 
+  const SocialButton({
+    super.key,
     required this.icon,
     required this.onPressed,
     required this.backgroundColor,
+    required this.tooltip,
   });
 
   @override
   Widget build(BuildContext context) {
-    return AnimatedRaisedButtonWithChild(
-      backgroundColor: backgroundColor,
-      shadowOffset: 3,
-      lerpValue: 0.2,
-      borderWidth: 1.5,
-      onPressed: onPressed,
-      borderRadius: BorderRadius.circular(16),
-      child: Padding(
-        padding: EdgeInsets.all(12),
-        child: Icon(
-          icon,
-          size: 24,
-          color: Colors.white,
+    return Tooltip(
+      message: tooltip,
+      child: AnimatedRaisedButtonWithChild(
+        backgroundColor: backgroundColor,
+        shadowOffset: 3,
+        lerpValue: 0.2,
+        borderWidth: 1.5,
+        onPressed: onPressed,
+        borderRadius: BorderRadius.circular(16),
+        child: Padding(
+          padding: EdgeInsets.all(12),
+          child: Icon(
+            icon,
+            size: 24,
+            color: Colors.white,
+          ),
         ),
       ),
     );

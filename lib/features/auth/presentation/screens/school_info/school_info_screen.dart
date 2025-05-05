@@ -8,7 +8,6 @@ import 'package:sanad_school/features/auth/presentation/screens/school_info/widg
 import 'package:sanad_school/features/auth/presentation/widgets/animated_raised_button.dart';
 import 'package:sanad_school/features/auth/presentation/widgets/form_container.dart';
 
-import '../../../../../core/Routes/app_routes.dart';
 import 'widgets/create_account_button.dart';
 
 class SchoolInfoScreen extends StatefulWidget {
