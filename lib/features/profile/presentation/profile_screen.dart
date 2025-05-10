@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../core/Routes/app_routes.dart';
+import '../../../core/shared/widgets/animated_loading_screen.dart';
 import '../../../core/theme/theme.dart';
 import '../../../core/utils/services/service_locator.dart';
 import 'cubits/profile_cubit.dart';
@@ -47,7 +48,7 @@ class ProfileScreenContent extends StatelessWidget {
       builder: (context, state) {
         if (state is ProfileLoading && !state.isEditing) {
           return const Scaffold(
-            body: Center(child: CircularProgressIndicator()),
+            body: Center(child: CoolLoadingScreen()),
           );
         }
 

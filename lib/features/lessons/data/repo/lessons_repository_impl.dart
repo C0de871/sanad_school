@@ -29,4 +29,40 @@ class LessonsRepositoryImpl extends LessonsRepository {
       return Left(Failure(errMessage: e.toString()));
     }
   }
+
+  @override
+  Future<Either<Failure, List<LessonModel>>> getLessonsWithFavoriteGroups({
+    required LessonsWithFavoriteGroupsParams params,
+  }) async {
+    try {
+      final response = await localDataSource.getLessonsWithFavoriteGroups(params.subjectId);
+      return Right(response.lessons);
+    } catch (e) {
+      return Left(Failure(errMessage: e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, List<LessonModel>>> getLessonsWithIncorrectAnswerGroups({
+    required LessonsWithIncorrectAnswerGroupsParams params,
+  }) async {
+    try {
+      final response = await localDataSource.getLessonsWithIncorrectAnswerGroups(params.subjectId);
+      return Right(response.lessons);
+    } catch (e) {
+      return Left(Failure(errMessage: e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, List<LessonModel>>> getLessonsWithEditedQuestions({
+    required LessonsWithEditedQuestionsParams params,
+  }) async {
+    try {
+      final response = await localDataSource.getLessonsWithEditedQuestions(params.subjectId);
+      return Right(response.lessons);
+    } catch (e) {
+      return Left(Failure(errMessage: e.toString()));
+    }
+  }
 }

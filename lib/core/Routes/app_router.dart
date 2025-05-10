@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sanad_school/core/utils/services/qr_service/qr_result.dart';
@@ -26,6 +25,7 @@ import '../../features/about_sanad/presentation/about_us_screen.dart';
 import '../../features/auth/presentation/cubit/auth_cubit/auth_cubit.dart';
 import '../../features/auth/presentation/screens/login/login_screen.dart';
 import '../../features/lessons/domain/entities/lesson_with_one_type_entity.dart';
+import '../../features/lessons/presentation/cubit/lessons_state.dart';
 import '../../features/testing/repo.dart';
 import '../helper/cubit_helper.dart';
 import '../shared/widgets/slide_transion_page_route_builder.dart';
@@ -36,6 +36,8 @@ import '../../features/profile/presentation/profile_screen.dart';
 // import '../../features/randomize/presentation/screens/quiz_selection/quiz_selection_screen.dart';
 import '../../features/subjects/subjects_screen.dart';
 import '../../features/subscription/presentation/subscription_screen.dart';
+import '../utils/services/device_info_service.dart';
+import '../utils/services/service_locator.dart';
 import 'app_routes.dart';
 
 class AppRouter with CubitProviderMixin {
@@ -49,9 +51,10 @@ class AppRouter with CubitProviderMixin {
       //! login screen:
       case AppRoutes.splash:
         return MaterialPageRoute(
+          settings: settings,
           builder: (_) => BlocProvider(
             create: (context) => getCubit(() => AuthCubit()..checkToken()),
-            child: SplashScreen(),
+            child: getIt<DeviceInfoService>().isSamsung() ? const SamsungSplashScreen() : const NonSamsungSplashScreen(),
           ),
         );
 
@@ -106,12 +109,6 @@ class AppRouter with CubitProviderMixin {
           settings: settings,
           builder: (context) => MultiBlocProvider(
             providers: [
-              // BlocProvider(
-              //   lazy: false,
-              //   create: (context) {
-              //     return getCubit(() => LessonsCubit());
-              //   },
-              // ),
               BlocProvider(
                 lazy: false,
                 create: (context) {
@@ -136,18 +133,61 @@ class AppRouter with CubitProviderMixin {
             final SubjectEntity subject = arg["subject"];
             final Color subjectColor = arg["color"];
             final TextDirection textDirection = arg["direction"];
-            return BlocProvider(
-              create: (context) => getCubit(() => QuestionCubit())
-                ..getQuestionsByLessonAndType(
-                  lessonId: lessonWithOneTypeEntity.id,
-                  typeId: lessonWithOneTypeEntity.questionType.id,
-                ),
-              child: QuestionsPage(
-                subjectColor: subjectColor,
-                lessonName: lessonWithOneTypeEntity.title,
-                textDirection: textDirection,
-              ),
-            );
+            final ScreenType screenType = arg["screenType"];
+            switch (screenType) {
+              case ScreenType.regularLessons:
+                return BlocProvider(
+                  create: (context) => getCubit(() => QuestionCubit())
+                    ..getQuestionsByLessonAndType(
+                      lessonId: lessonWithOneTypeEntity.id,
+                      typeId: lessonWithOneTypeEntity.questionType.id,
+                    ),
+                  child: QuestionsPage(
+                    subjectColor: subjectColor,
+                    lessonName: lessonWithOneTypeEntity.title,
+                    textDirection: textDirection,
+                  ),
+                );
+              case ScreenType.favLessons:
+                return BlocProvider(
+                  create: (context) => getCubit(() => QuestionCubit())
+                    ..getFavoriteGroupsQuestions(
+                      lessonId: lessonWithOneTypeEntity.id,
+                      typeId: lessonWithOneTypeEntity.questionType.id,
+                    ),
+                  child: QuestionsPage(
+                    subjectColor: subjectColor,
+                    lessonName: lessonWithOneTypeEntity.title,
+                    textDirection: textDirection,
+                  ),
+                );
+              case ScreenType.editedLessons:
+                return BlocProvider(
+                  create: (context) => getCubit(() => QuestionCubit())
+                    ..getEditedQuestionsByLesson(
+                      lessonId: lessonWithOneTypeEntity.id,
+                      typeId: lessonWithOneTypeEntity.questionType.id,
+                    ),
+                  child: QuestionsPage(
+                    subjectColor: subjectColor,
+                    lessonName: lessonWithOneTypeEntity.title,
+                    textDirection: textDirection,
+                  ),
+                );
+              case ScreenType.incorrectLessons:
+                return BlocProvider(
+                  create: (context) => getCubit(() => QuestionCubit())
+                    ..getIncorrectAnswerGroupsQuestions(
+                      lessonId: lessonWithOneTypeEntity.id,
+                      typeId: lessonWithOneTypeEntity.questionType.id,
+                    ),
+                  child: QuestionsPage(
+                    subjectColor: subjectColor,
+                    lessonName: lessonWithOneTypeEntity.title,
+                    textDirection: textDirection,
+                  ),
+                );
+            }
           },
         );
       case AppRoutes.questionsFromTag:

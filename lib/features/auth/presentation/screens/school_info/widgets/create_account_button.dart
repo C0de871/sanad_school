@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../../../../core/shared/widgets/animated_loading_screen.dart';
 import '../../../../../../core/theme/theme.dart';
 import '../../../../../../core/utils/services/service_locator.dart';
 import '../../../cubit/auth_cubit/auth_cubit.dart';
@@ -34,8 +35,7 @@ class CreateAccountButton extends StatelessWidget {
                   ? SizedBox(
                       width: 20,
                       height: 20,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 2,
+                      child: LoadingDots(
                         color: Theme.of(context).colorScheme.onPrimary,
                       ),
                     )

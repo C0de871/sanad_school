@@ -17,7 +17,7 @@ class AppIcon extends StatelessWidget {
         arguments: 2,
       ),
       child: Image.asset(
-        "assets/app_icon/sanad_icon.png",
+        "assets/icons/sanad_altaleb_white.png",
         height: 40,
         width: 40,
       ),

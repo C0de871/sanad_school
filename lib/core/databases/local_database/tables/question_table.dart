@@ -13,6 +13,9 @@ class QuestionTable {
   static const String idTypeQuestion = "type_id";
   static const String questionPhoto = "question_photo";
   static const String hintPhoto = "hint_photo";
+  static const String note = "note";
+  static const String downloadedHintPhoto = "downloaded_hint_photo";
+  static const String downloadedQuestionPhoto = "downloaded_question_photo";
 
   static const String tableName = "questions";
 
@@ -33,6 +36,9 @@ class QuestionTable {
       $displayOrder INTEGER,
       $idTypeQuestion INTEGER NOT NULL,
       $questionPhoto TEXT,
+      $note TEXT,
+      $downloadedHintPhoto BLOB,
+      $downloadedQuestionPhoto BLOB,
       FOREIGN KEY ($questionGroupId) REFERENCES question_groups(id) ON DELETE CASCADE,
       FOREIGN KEY ($idTypeQuestion) REFERENCES ${TypeQuestionTable.tableName} (${TypeQuestionTable.id}) ON DELETE CASCADE
     )

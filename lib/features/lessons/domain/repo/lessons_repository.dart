@@ -6,4 +6,16 @@ import '../entities/lesson_entity.dart';
 
 abstract class LessonsRepository {
   Future<Either<Failure, List<LessonEntity>>> getLessons(LessonsParams params);
+
+  Future<Either<Failure, List<LessonEntity>>> getLessonsWithFavoriteGroups({
+    required LessonsWithFavoriteGroupsParams params,
+  });
+
+  Future<Either<Failure, List<LessonEntity>>> getLessonsWithIncorrectAnswerGroups({
+    required LessonsWithIncorrectAnswerGroupsParams params,
+  });
+
+  Future<Either<Failure, List<LessonEntity>>> getLessonsWithEditedQuestions({
+    required LessonsWithEditedQuestionsParams params,
+  });
 }

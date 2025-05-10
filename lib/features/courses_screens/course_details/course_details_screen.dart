@@ -1,9 +1,10 @@
-
+import 'dart:math';
 
 import 'package:flutter/material.dart';
-import 'package:../courses/courses_screen.dart';
-import 'package:../video_player/video_download_service.dart';
-import 'package:../video_player/video_player_screen.dart';
+import '../../../core/shared/widgets/animated_loading_screen.dart';
+import '../courses/courses_screen.dart';
+import '../../../core/utils/services/video_download_service.dart';
+import '../video_player/video_player_screen.dart';
 
 class CourseDetailsScreen extends StatefulWidget {
   final int courseId;
@@ -110,8 +111,7 @@ class _CourseDetailsScreenState extends State<CourseDetailsScreen> {
                 'name': 'الفيديو ${videoIndex + 1}',
                 'isLocked': !course!.isRegistered,
                 'period': '${DateTime.now().minute}:${DateTime.now().second}',
-                "url":
-                    "https://file-examples.com/storage/fe07feb1a26815fd492794e/2017/04/file_example_MP4_640_3MG.mp4",
+                "url": "https://file-examples.com/storage/fe07feb1a26815fd492794e/2017/04/file_example_MP4_640_3MG.mp4",
               },
             ),
           },
@@ -183,65 +183,61 @@ class _CourseDetailsScreenState extends State<CourseDetailsScreen> {
       initialIndex: 0,
       child: Scaffold(
         appBar: _buildAppBar(),
-        body:
-            isLoading
-                ? const Center(child: CircularProgressIndicator())
-                : Column(
-                  children: [
-                    _buildTabBar(scheme),
-                    Expanded(
-                      child: TabBarView(
-                        children:
-                            units
-                                .map(
-                                  (unit) => LessonTile(
-                                    unit: unit,
-                                    isLocked: !course!.isRegistered,
-                                  ),
-                                )
-                                .toList(),
-                      ),
+        body: isLoading
+            ? const Center(child: CoolLoadingScreen())
+            : Column(
+                children: [
+                  _buildTabBar(scheme),
+                  Expanded(
+                    child: TabBarView(
+                      children: units
+                          .map(
+                            (unit) => LessonTile(
+                              unit: unit,
+                              isLocked: !course!.isRegistered,
+                            ),
+                          )
+                          .toList(),
                     ),
-                  ],
+                  ),
+                ],
+              ),
+        floatingActionButton: (course!.isRegistered)
+            ? null
+            : Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 16,
                 ),
-
-        floatingActionButton:
-            (course!.isRegistered)
-                ? null
-                : Padding(
+                child: MaterialButton(
                   padding: const EdgeInsets.symmetric(
                     horizontal: 16,
                     vertical: 16,
                   ),
-                  child: MaterialButton(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 16,
-                    ),
-                    onPressed: () {
-                      setState(() {
-                        course = Course(
-                          id: course!.id,
-                          title: course!.title,
-                          isRegistered: true,
-                        );
-                      });
-                    },
-                    color: scheme.primary,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(24),
-                    ),
-                    minWidth: double.infinity,
-                    child: Text(
-                      StringsManager.register,
-                      style: TextStyle(
-                        color: scheme.onPrimary,
-                        fontSize: 22,
-                        fontWeight: FontWeight.bold,
-                      ),
+                  onPressed: () {
+                    setState(() {
+                      course = Course(
+                        id: course!.id,
+                        title: course!.title,
+                        isRegistered: true,
+                      );
+                    });
+                  },
+                  color: scheme.primary,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(24),
+                  ),
+                  minWidth: double.infinity,
+                  child: Text(
+                    StringsManager.register,
+                    style: TextStyle(
+                      color: scheme.onPrimary,
+                      fontSize: 22,
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
                 ),
+              ),
         floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       ),
     );
@@ -366,8 +362,7 @@ class _LessonTileState extends State<LessonTile> {
           clipBehavior: Clip.none,
           child: Column(
             children: [
-              for (int i = 0; i < lessons.length; i++)
-                _buildLessonTile(lessons[i]),
+              for (int i = 0; i < lessons.length; i++) _buildLessonTile(lessons[i]),
             ],
           ),
         ),
@@ -421,10 +416,8 @@ class LessonTitle extends StatelessWidget {
     final borderRadius = BorderRadius.only(
       topLeft: const Radius.circular(24),
       topRight: const Radius.circular(24),
-      bottomLeft:
-          controller.isExpanded ? Radius.zero : const Radius.circular(24),
-      bottomRight:
-          controller.isExpanded ? Radius.zero : const Radius.circular(24),
+      bottomLeft: controller.isExpanded ? Radius.zero : const Radius.circular(24),
+      bottomRight: controller.isExpanded ? Radius.zero : const Radius.circular(24),
     );
     final staticBorderRadius = BorderRadius.circular(24);
 
@@ -614,8 +607,7 @@ class _LessonDetailsState extends State<LessonDetails> {
           child: Column(
             children: [
               ...widget.videos.map(
-                (video) =>
-                    _buildLessonItem(video, scheme, context, widget.isLocked),
+                (video) => _buildLessonItem(video, scheme, context, widget.isLocked),
               ),
               Icon(Icons.chevron_left, color: scheme.onPrimaryContainer),
             ],
@@ -683,7 +675,7 @@ class _LessonDetailsState extends State<LessonDetails> {
                   ),
                 );
               }
-              
+
               // Refresh status to ensure UI is consistent
               _refreshDownloadStatusForAllVideos();
             }
@@ -732,7 +724,7 @@ class _LessonDetailsState extends State<LessonDetails> {
         }
         downloadProgress.remove(videoId);
         downloadError.remove(videoId);
-        
+
         _refreshDownloadStatusForAllVideos();
       });
 
@@ -796,45 +788,44 @@ class _LessonDetailsState extends State<LessonDetails> {
               ),
               isLocked
                   ? Icon(
-                    Icons.lock_outline_rounded,
-                    color: scheme.onPrimaryContainer,
-                    size: 30,
-                  )
+                      Icons.lock_outline_rounded,
+                      color: scheme.onPrimaryContainer,
+                      size: 30,
+                    )
                   : Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      IconButton(
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder:
-                                  (context) => VideoPlayerScreen(
-                                    videoUrl: video.tempUrl,
-                                    videoId: videoId,
-                                    className: widget.className,
-                                    subjectName: widget.subjectName,
-                                    teacherName: widget.teacherName,
-                                    unit: widget.unit,
-                                    isDownloaded: video.isDownloaded,
-                                  ),
-                            ),
-                          );
-                        },
-                        icon: Icon(
-                          Icons.remove_red_eye_outlined,
-                          color: scheme.onPrimaryContainer,
-                          size: 30,
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        IconButton(
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => VideoPlayerScreen(
+                                  videoUrl: video.tempUrl,
+                                  videoId: videoId,
+                                  className: widget.className,
+                                  subjectName: widget.subjectName,
+                                  teacherName: widget.teacherName,
+                                  unit: widget.unit,
+                                  isDownloaded: video.isDownloaded,
+                                ),
+                              ),
+                            );
+                          },
+                          icon: Icon(
+                            Icons.remove_red_eye_outlined,
+                            color: scheme.onPrimaryContainer,
+                            size: 30,
+                          ),
                         ),
-                      ),
-                      _buildDownloadActionWidget(
-                        video,
-                        videoId,
-                        scheme,
-                        context,
-                      ),
-                    ],
-                  ),
+                        _buildDownloadActionWidget(
+                          video,
+                          videoId,
+                          scheme,
+                          context,
+                        ),
+                      ],
+                    ),
             ],
           ),
           Flexible(
@@ -876,7 +867,7 @@ class _LessonDetailsState extends State<LessonDetails> {
         icon: Icon(Icons.delete_outline, color: Colors.red, size: 30),
       );
     }
-    
+
     // If download is in progress, show progress indicator
     if (downloadProgress.containsKey(videoId)) {
       final progress = downloadProgress[videoId] ?? 0.0;

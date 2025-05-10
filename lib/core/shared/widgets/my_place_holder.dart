@@ -11,7 +11,7 @@ class MyPlaceHolder extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Construction"),
+        title: const Text("قريبا"),
         centerTitle: true,
       ),
       body: Center(
@@ -33,7 +33,7 @@ class MyPlaceHolder extends StatelessWidget {
             ),
             const SizedBox(height: padding4 * 9),
             const Text(
-              "Construction Site!!",
+              "قادم في المستقبل",
               style: TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.w900,
@@ -41,7 +41,7 @@ class MyPlaceHolder extends StatelessWidget {
             ),
             const SizedBox(height: padding4 * 3),
             const Text(
-              "This page is under construction please go\nout for your safe",
+              "هذه الصفحة قيد التطوير",
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 14,

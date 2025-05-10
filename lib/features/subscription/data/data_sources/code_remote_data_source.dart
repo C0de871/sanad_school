@@ -17,7 +17,7 @@ class CodeRemoteDataSource {
   Future<CheckCodeResponseModel> checkCode(CodeBody params) async {
     final response = await api.post(
       '${EndPoints.baseUrl}${EndPoints.check}',
-      data: params.toMap(),
+      data: params.toJson(),
     );
     return CheckCodeResponseModel.fromMap(response);
   }

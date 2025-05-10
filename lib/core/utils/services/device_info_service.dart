@@ -4,15 +4,37 @@ import 'package:device_info_plus/device_info_plus.dart';
 
 class DeviceInfoService {
   final DeviceInfoPlugin _deviceInfo = DeviceInfoPlugin();
+  late final AndroidDeviceInfo? _androidInfo;
+  late final IosDeviceInfo? _iosInfo;
 
-  Future<String> getDeviceId() async {
+  Future<void> init() async {
     if (Platform.isAndroid) {
-      final androidInfo = await _deviceInfo.androidInfo;
-      return androidInfo.id;
+      _androidInfo = await _deviceInfo.androidInfo;
     } else if (Platform.isIOS) {
-      final iosInfo = await _deviceInfo.iosInfo;
-      return iosInfo.identifierForVendor ?? '';
+      _iosInfo = await _deviceInfo.iosInfo;
+    }
+  }
+
+  String getDeviceId() {
+    if (Platform.isAndroid) {
+      return _androidInfo!.id;
+    } else if (Platform.isIOS) {
+      return _iosInfo!.identifierForVendor ?? '';
     }
     return '';
+  }
+
+  String getDeviceName() {
+    if (Platform.isAndroid) {
+      return _androidInfo!.brand;
+    }
+    return '';
+  }
+
+  bool isSamsung() {
+    if (Platform.isAndroid) {
+      return _androidInfo!.brand == 'samsung';
+    }
+    return false;
   }
 }

@@ -1,8 +1,11 @@
+import 'dart:developer';
+
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:flutter_tex/flutter_tex.dart';
 import 'package:get_it/get_it.dart';
 import 'package:sanad_school/core/utils/services/qr_service/qr_service.dart';
@@ -20,14 +23,29 @@ import 'package:sanad_school/features/lessons/data/data_sources/lessons_local_da
 import 'package:sanad_school/features/lessons/data/data_sources/lessons_remote_data_source.dart';
 import 'package:sanad_school/features/lessons/data/repo/lessons_repository_impl.dart';
 import 'package:sanad_school/features/lessons/domain/repo/lessons_repository.dart';
-import 'package:sanad_school/features/lessons/domain/use_cases/get_lessons_usecase.dart';
+import 'package:sanad_school/features/lessons/domain/usecases/get_lessons_usecase.dart';
+import 'package:sanad_school/features/lessons/domain/usecases/get_lessons_with_edited_questions_usecase.dart';
+import 'package:sanad_school/features/lessons/domain/usecases/get_lessons_with_favorite_groups_usecase.dart';
+import 'package:sanad_school/features/lessons/domain/usecases/get_lessons_with_incorrect_answer_groups_usecase.dart';
 import 'package:sanad_school/features/profile/data/data_sources/profile_remote_data_source.dart';
 import 'package:sanad_school/features/profile/domain/repo/profile_repo.dart';
 import 'package:sanad_school/features/profile/domain/use_cases/get_student_profile_use_case.dart';
 import 'package:sanad_school/features/questions/data/data_sources/question_local_data_source.dart';
 import 'package:sanad_school/features/questions/data/data_sources/question_remote_data_source.dart';
 import 'package:sanad_school/features/questions/domain/repo/question_repository.dart';
-import 'package:sanad_school/features/questions/domain/use_cases/get_questions_in_lesson_by_type_use_case.dart';
+import 'package:sanad_school/features/questions/domain/usecases/get_edited_questions_by_lesson_usecase.dart';
+import 'package:sanad_school/features/questions/domain/usecases/get_favorite_groups_questions_usecase.dart';
+import 'package:sanad_school/features/questions/domain/usecases/get_incorrect_answer_groups_questions_usecase.dart';
+import 'package:sanad_school/features/questions/domain/usecases/get_lesson_questions_by_type_or_all_usecase.dart';
+import 'package:sanad_school/features/questions/domain/usecases/get_question_hint_photo.dart';
+import 'package:sanad_school/features/questions/domain/usecases/get_question_note_usecase.dart';
+import 'package:sanad_school/features/questions/domain/usecases/get_question_photo.dart';
+import 'package:sanad_school/features/questions/domain/usecases/get_questions_in_lesson_by_type_use_case.dart';
+import 'package:sanad_school/features/questions/domain/usecases/get_questions_in_subject_by_tag.dart';
+import 'package:sanad_school/features/questions/domain/usecases/get_subject_questions_by_tag_or_exam_usecase.dart';
+import 'package:sanad_school/features/questions/domain/usecases/save_question_note_usecase.dart';
+import 'package:sanad_school/features/questions/domain/usecases/toggle_question_favorite_usecase.dart';
+import 'package:sanad_school/features/questions/domain/usecases/toggle_question_incorrect_answer_usecase.dart';
 import 'package:sanad_school/features/subject_type/data/data_sources/type_remote_data_source.dart';
 import 'package:sanad_school/features/subject_type/domain/repo/type_repository.dart';
 import 'package:sanad_school/features/subject_type/domain/use_cases/get_types_use_case.dart';
@@ -41,7 +59,7 @@ import 'package:sanad_school/features/tags/domain/use_cases/get_tags_or_exams.da
 import '../../../features/auth/data/repository/auth_repository_imple.dart';
 import '../../../features/profile/data/repo/profile_repo_impl.dart';
 import '../../../features/questions/data/repo/question_repository_impl.dart';
-import '../../../features/questions/domain/use_cases/get_questions_in_subject_by_tag.dart';
+import '../../../features/questions/domain/usecases/get_questions_in_subject_by_tag.dart';
 import '../../../features/subject_type/data/repo/repositories/type_repository_impl.dart';
 import '../../../features/subjects/data/data_sources/subject_local_data_source.dart';
 import '../../../features/subjects/data/repository/subject_repository.dart';
@@ -61,6 +79,7 @@ import '../../databases/connection/network_info.dart';
 import '../../databases/local_database/sql_db.dart';
 import '../../theme/theme.dart';
 import '../../../features/subjects/domain/use_cases/get_subject_sync_use_case.dart';
+import 'video_download_service.dart';
 
 final getIt = GetIt.instance; // Singleton instance of GetIt
 
@@ -78,6 +97,7 @@ void setupServicesLocator() {
   getIt.registerLazySingleton<QrCodeScannerService>(() => QrCodeScannerService());
   getIt.registerLazySingleton<DeviceInfoService>(() => DeviceInfoService());
   getIt.registerLazySingleton<SqlDB>(() => SqlDB());
+  getIt.registerLazySingleton<VideoDownloadService>(() => VideoDownloadService());
 
   //! Data Sources:
   getIt.registerLazySingleton<LessonsRemoteDataSource>(() => LessonsRemoteDataSource(api: getIt()));
@@ -172,6 +192,24 @@ void setupServicesLocator() {
   getIt.registerLazySingleton<GetCodesUseCase>(() => GetCodesUseCase(repository: getIt()));
   getIt.registerLazySingleton<CheckCodeUseCase>(() => CheckCodeUseCase(repository: getIt()));
 
+  // Add missing question use cases
+  getIt.registerLazySingleton<GetEditedQuestionsByLessonUseCase>(() => GetEditedQuestionsByLessonUseCase(getIt()));
+  getIt.registerLazySingleton<GetFavoriteGroupsQuestionsUseCase>(() => GetFavoriteGroupsQuestionsUseCase(getIt()));
+  getIt.registerLazySingleton<GetIncorrectAnswerGroupsQuestionsUseCase>(() => GetIncorrectAnswerGroupsQuestionsUseCase(getIt()));
+  getIt.registerLazySingleton<SaveQuestionNoteUseCase>(() => SaveQuestionNoteUseCase(getIt()));
+  getIt.registerLazySingleton<GetQuestionNoteUseCase>(() => GetQuestionNoteUseCase(getIt()));
+  getIt.registerLazySingleton<ToggleQuestionFavoriteUseCase>(() => ToggleQuestionFavoriteUseCase(getIt()));
+  getIt.registerLazySingleton<ToggleQuestionIncorrectAnswerUseCase>(() => ToggleQuestionIncorrectAnswerUseCase(getIt()));
+  getIt.registerLazySingleton<GetSubjectQuestionsByTagOrExamUseCase>(() => GetSubjectQuestionsByTagOrExamUseCase(getIt()));
+  getIt.registerLazySingleton<GetLessonQuestionsByTypeOrAllUseCase>(() => GetLessonQuestionsByTypeOrAllUseCase(getIt()));
+
+  // Add missing lesson use cases
+  getIt.registerLazySingleton<GetLessonsWithEditedQuestionsUseCase>(() => GetLessonsWithEditedQuestionsUseCase(repository: getIt()));
+  getIt.registerLazySingleton<GetLessonsWithFavoriteGroupsUseCase>(() => GetLessonsWithFavoriteGroupsUseCase(repository: getIt()));
+  getIt.registerLazySingleton<GetLessonsWithIncorrectAnswerGroupsUseCase>(() => GetLessonsWithIncorrectAnswerGroupsUseCase(repository: getIt()));
+  getIt.registerLazySingleton<GetQuestionPhoto>(() => GetQuestionPhoto(repository: getIt()));
+  getIt.registerLazySingleton<GetQuestionHintPhoto>(() => GetQuestionHintPhoto(repository: getIt()));
+
   //! Interceptors:
   getIt.registerLazySingleton<AuthInterceptor>(() => AuthInterceptor(retrieveAccessTokenUseCase: getIt()));
 }
@@ -185,6 +223,13 @@ Future<void> initApp() async {
   }
   await dotenv.load(fileName: ".env");
   setupServicesLocator();
+
+  final videoDownloadService = getIt<VideoDownloadService>();
+  await videoDownloadService.initializeDownloader();
+
+  final deviceInfoService = getIt<DeviceInfoService>();
+  await deviceInfoService.init();
+
   final SqlDB sqlDb = getIt<SqlDB>();
   // await sqlDb.deleteDB();
   await sqlDb.initialDb();

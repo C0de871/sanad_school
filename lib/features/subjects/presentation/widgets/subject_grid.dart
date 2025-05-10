@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sanad_school/features/subjects/presentation/cubit/subject_cubit.dart';
 
+import '../../../../core/shared/widgets/animated_loading_screen.dart';
 import '../../domain/entities/subject_entity.dart';
 import 'subject_card.dart';
 
@@ -29,7 +30,7 @@ class _SubjectsLayoutState extends State<SubjectsLayout> {
 
   late List<bool> isExpanded = [];
   final List<Color> subjectColors = [
-    Color(0xFF4CAF50), // Green 
+    Color(0xFF4CAF50), // Green
     Color(0xFF2196F3), // Blue
     Color(0xFFFF9800), // Orange
     Color(0xFFE91E63), // Pink
@@ -54,14 +55,19 @@ class _SubjectsLayoutState extends State<SubjectsLayout> {
             return switch (state) {
               SubjectInitial() => SizedBox(),
               SubjectLoading() => Center(
-                  child: CircularProgressIndicator(),
+                  child: CoolLoadingScreen(),
                 ),
-              SubjectSuccess() => ListView.builder(
-                  padding: const EdgeInsets.all(16),
-                  itemCount: state.subjects.length,
-                  itemBuilder: (context, index) {
-                    return _card(index, state.subjects);
+              SubjectSuccess() => RefreshIndicator(
+                  onRefresh: () async {
+                    await context.read<SubjectCubit>().getSubjects(isRefresh: true);
                   },
+                  child: ListView.builder(
+                    padding: const EdgeInsets.all(16),
+                    itemCount: state.subjects.length,
+                    itemBuilder: (context, index) {
+                      return _card(index, state.subjects);
+                    },
+                  ),
                 ),
               SubjectFailure() => Center(
                   child: Text(state.message),

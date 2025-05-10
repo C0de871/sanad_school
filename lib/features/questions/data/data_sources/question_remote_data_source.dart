@@ -1,3 +1,7 @@
+import 'dart:typed_data';
+
+import 'package:dio/dio.dart';
+
 import '../../../../core/databases/api/api_consumer.dart';
 import '../../../../core/databases/api/end_points.dart';
 import '../../../../core/databases/params/params.dart';
@@ -24,5 +28,15 @@ class QuestionRemoteDataSource {
       EndPoints.questionInSubjectbByTag(params: params),
     );
     return QuestionsResponseModel.fromMap(response);
+  }
+
+  Future<Uint8List> downloadQuestionPhoto({
+    required QuestionPhotoParams params,
+  }) async {
+    final response = await api.get(
+      params.questionUrl,
+      responseType: ResponseType.bytes,
+    );
+    return response;
   }
 }

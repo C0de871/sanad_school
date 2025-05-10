@@ -11,39 +11,13 @@ class SubjectSyncInitial extends SubjectSyncState {}
 
 class SubjectSyncLoading extends SubjectSyncState {}
 
-class LessonsSuccess extends SubjectSyncState {
-  final List<LessonEntity> lessons;
+class SubjectSyncSuccess extends SubjectSyncState {
+  final bool isSynced;
 
-  const LessonsSuccess({required this.lessons});
-
-  @override
-  List<Object> get props => [lessons];
-}
-
-class SubjectSyncSucessAndFetchLessonsSuccess extends LessonsSuccess {
-  final SubjectSyncEntity subjectSync;
-  final String message;
-
-  const SubjectSyncSucessAndFetchLessonsSuccess(
-    this.subjectSync, {
-    required super.lessons,
-    required this.message,
-  });
+  const SubjectSyncSuccess(this.isSynced);
 
   @override
-  List<Object> get props => [...super.props, subjectSync, message];
-}
-
-class SubjectSyncFailedAndFetchLessonsSuccess extends LessonsSuccess {
-  final String message;
-
-  const SubjectSyncFailedAndFetchLessonsSuccess({
-    required super.lessons,
-    required this.message,
-  });
-
-  @override
-  List<Object> get props => [...super.props, message];
+  List<Object> get props => [isSynced];
 }
 
 class SubjectSyncFailure extends SubjectSyncState {

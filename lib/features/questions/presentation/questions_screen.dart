@@ -13,6 +13,7 @@ import 'package:sanad_school/features/questions/presentation/cubit/question_stat
 import 'package:url_launcher/url_launcher.dart';
 import 'dart:async';
 
+import '../../../core/shared/widgets/animated_loading_screen.dart';
 import '../../../core/theme/theme.dart';
 import '../../../core/utils/constants/app_numbers.dart';
 import '../../../core/utils/constants/constant.dart';
@@ -49,93 +50,122 @@ class _QuestionsPageState extends State<QuestionsPage> {
     return '${hours.toString().padLeft(2, '0')}:${minutes.toString().padLeft(2, '0')}:${remainingSeconds.toString().padLeft(2, '0')}';
   }
 
-  void showHintBottomSheet(BuildContext context, int questionIndex, QuestionSuccess state) {
-    final questionCubit = context.read<QuestionCubit>();
+  void showHintBottomSheet(BuildContext parentContext, int questionIndex, QuestionSuccess state) {
+    final questionCubit = parentContext.read<QuestionCubit>();
     showModalBottomSheet(
-      context: context,
+      context: parentContext,
       backgroundColor: Colors.transparent,
       isScrollControlled: true,
-      builder: (context) => Container(
-        decoration: BoxDecoration(
-          color: Theme.of(context).colorScheme.surface,
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
-        ),
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              width: 40,
-              height: 4,
-              margin: const EdgeInsets.only(bottom: 20),
-              decoration: BoxDecoration(
-                color: Colors.grey[400],
-                borderRadius: BorderRadius.circular(2),
-              ),
-            ),
-            Row(
-              children: [
-                Icon(Icons.lightbulb, color: widget.subjectColor),
-                const SizedBox(width: 12),
-                Text(
-                  'Hint',
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    color: widget.subjectColor,
-                  ),
+      builder: (context) => BlocProvider.value(
+        value: questionCubit,
+        child: Container(
+          decoration: BoxDecoration(
+            color: Theme.of(context).colorScheme.surface,
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+          ),
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 40,
+                height: 4,
+                margin: const EdgeInsets.only(bottom: 20),
+                decoration: BoxDecoration(
+                  color: Colors.grey[400],
+                  borderRadius: BorderRadius.circular(2),
                 ),
-              ],
-            ),
-            const SizedBox(height: 16),
-            // Text(
-            //   hint,
-            //   style: const TextStyle(fontSize: 16, height: 1.5),
-            // ),
-            QuillEditor(
-              focusNode: questionCubit.getHintFocusNode(questionIndex),
-              controller: questionCubit.getHintController(questionIndex),
-              scrollController: questionCubit.getHintScrollController(questionIndex),
-              config: QuillEditorConfig(
-                scrollable: false,
-                requestKeyboardFocusOnCheckListChanged: false,
-                showCursor: false,
-                autoFocus: false,
-                padding: EdgeInsets.zero,
-                embedBuilders: [
-                  FormulaEmbedBuilder(),
-                ],
               ),
-              // question.textQuestion,
-              // style: const TextStyle(
-              //   fontSize: 16,
-              //   fontWeight: FontWeight.bold,
-              //   height: 1.4,
-              // ),
-            ),
-            const SizedBox(height: 16),
-            if (state.questions[questionIndex].hintPhoto != null)
-              ClipRRect(
-                borderRadius: BorderRadius.circular(16),
-                child: CachedNetworkImage(
-                  imageUrl: state.questions[questionIndex].hintPhoto!,
-                  placeholder: (context, url) => Container(
-                    height: 200,
-                    color: Colors.grey[200],
-                    child: const Center(child: CircularProgressIndicator()),
-                  ),
-                  errorWidget: (context, url, error) => Container(
-                    height: 200,
-                    color: Colors.grey[200],
-                    child: const Center(
-                      child: Icon(Icons.error_outline, size: 40, color: Colors.grey),
+              Row(
+                children: [
+                  Icon(Icons.lightbulb, color: widget.subjectColor),
+                  const SizedBox(width: 12),
+                  Text(
+                    'Hint',
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: widget.subjectColor,
                     ),
                   ),
-                  fit: BoxFit.cover,
-                ),
+                ],
               ),
-            const SizedBox(height: 24),
-          ],
+              const SizedBox(height: 16),
+              // Text(
+              //   hint,
+              //   style: const TextStyle(fontSize: 16, height: 1.5),
+              // ),
+              QuillEditor(
+                focusNode: questionCubit.getHintFocusNode(questionIndex),
+                controller: questionCubit.getHintController(questionIndex),
+                scrollController: questionCubit.getHintScrollController(questionIndex),
+                config: QuillEditorConfig(
+                  scrollable: false,
+                  requestKeyboardFocusOnCheckListChanged: false,
+                  showCursor: false,
+                  autoFocus: false,
+                  padding: EdgeInsets.zero,
+                  embedBuilders: [
+                    FormulaEmbedBuilder(),
+                  ],
+                ),
+                // question.textQuestion,
+                // style: const TextStyle(
+                //   fontSize: 16,
+                //   fontWeight: FontWeight.bold,
+                //   height: 1.4,
+                // ),
+              ),
+              const SizedBox(height: 16),
+              if (state.questions[questionIndex].hintPhoto != null)
+                BlocBuilder<QuestionCubit, QuestionState>(
+                  // buildWhen: (previous, current) {
+                  // if (current is QuestionSuccess && previous is QuestionSuccess) {
+                  //   return previous.questions[questionIndex].downloadedHintPhoto != current.questions[questionIndex].downloadedHintPhoto;
+                  // }
+                  // return false;
+                  // },
+                  builder: (context, state) {
+                    switch (state) {
+                      case QuestionSuccess():
+                        if (state.questions[questionIndex].downloadedHintPhoto != null) {
+                          return ClipRRect(
+                            borderRadius: BorderRadius.circular(16),
+                            child: Image.memory(
+                              state.questions[questionIndex].downloadedHintPhoto!,
+                              // imageUrl: state.questions[questionIndex].hintPhoto!,
+                              // placeholder: (context, url) => Container(
+                              //   height: 200,
+                              //   color: Colors.grey[200],
+                              //   child: const Center(child: CoolLoadingScreen()),
+                              // ),
+                              // errorWidget: (context, url, error) => Container(
+                              //   height: 200,
+                              //   color: Colors.grey[200],
+                              //   child: const Center(
+                              //     child: Icon(Icons.error_outline, size: 40, color: Colors.grey),
+                              //   ),
+                              // ),
+                              fit: BoxFit.cover,
+                            ),
+                          );
+                        } else if (state.questions[questionIndex].hintPhoto != null) {
+                          return const Center(child: CoolLoadingScreen());
+                        } else {
+                          return const SizedBox();
+                        }
+                      case QuestionInitial():
+                        return const SizedBox();
+                      case QuestionLoading():
+                        return const Center(child: CoolLoadingScreen());
+                      case QuestionFailure():
+                        return const SizedBox();
+                    }
+                  },
+                ),
+              const SizedBox(height: 24),
+            ],
+          ),
         ),
       ),
     );
@@ -189,7 +219,15 @@ class _QuestionsPageState extends State<QuestionsPage> {
                         QuestionSuccess() => Column(
                             children: [
                               Text(
-                                'لقد اجبت على ${state.correctAnswers} اجابة صحيحة',
+                                'لقد اجبت على',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  color: Theme.of(context).colorScheme.outline,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                              Text(
+                                '${state.correctAnswers} اجابة صحيحة',
                                 style: TextStyle(
                                   fontSize: 16,
                                   color: Theme.of(context).colorScheme.outline,
@@ -273,7 +311,6 @@ class _QuestionsPageState extends State<QuestionsPage> {
                 ),
                 const SizedBox(width: 8),
                 Text(
-                  // action == 'reset' ? 'إعادة تعيين' : 'تحقق ',
                   isReset ? 'إعادة تعيين' : 'تحقق ',
                   style: TextStyle(
                     color: Colors.white,
@@ -287,134 +324,129 @@ class _QuestionsPageState extends State<QuestionsPage> {
     );
   }
 
-  void showNoteBottomSheet(BuildContext context, int questionIndex, Map<int, String>? userNotes) {
-    final questionCubit = context.read<QuestionCubit>();
-    questionCubit.noteController.text = userNotes?[questionIndex] ?? '';
+  void showNoteBottomSheet(BuildContext parentContext, int questionIndex, QuestionEntity question, String? note) {
+    final questionCubit = parentContext.read<QuestionCubit>();
+    questionCubit.noteController.text = note ?? '';
 
     showModalBottomSheet(
-      context: context,
+      context: parentContext,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (context) => StatefulBuilder(
-        builder: (context, setState) => Padding(
-          padding: EdgeInsets.only(
-            bottom: MediaQuery.of(context).viewInsets.bottom,
-          ),
-          child: Container(
-            decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.surface,
-              borderRadius: const BorderRadius.vertical(
-                top: Radius.circular(20),
-              ),
+      builder: (context) => BlocProvider.value(
+        value: questionCubit,
+        child: StatefulBuilder(
+          builder: (context, setState) => Padding(
+            padding: EdgeInsets.only(
+              bottom: MediaQuery.of(context).viewInsets.bottom,
             ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Container(
-                  width: 40,
-                  height: 4,
-                  margin: const EdgeInsets.only(top: 12),
-                  decoration: BoxDecoration(
-                    color: Colors.grey[400],
-                    borderRadius: BorderRadius.circular(2),
-                  ),
+            child: Container(
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.surface,
+                borderRadius: const BorderRadius.vertical(
+                  top: Radius.circular(20),
                 ),
-                Padding(
-                  padding: const EdgeInsets.all(20),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          Icon(Icons.note_add, color: widget.subjectColor),
-                          const SizedBox(width: 12),
-                          Text(
-                            'Question ${questionIndex + 1} Notes',
-                            style: TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                              color: widget.subjectColor,
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 20),
-                      Container(
-                        decoration: BoxDecoration(
-                          color: Theme.of(context).colorScheme.surfaceContainerHighest,
-                          borderRadius: BorderRadius.circular(16),
-                          border: Border.all(
-                            color: widget.subjectColor.withOpacity(0.2),
-                          ),
-                        ),
-                        child: TextField(
-                          controller: questionCubit.noteController,
-                          focusNode: questionCubit.noteFocusNode,
-                          maxLines: 5,
-                          style: const TextStyle(fontSize: 16),
-                          decoration: InputDecoration(
-                            hintText: 'Add your notes here...',
-                            hintStyle: TextStyle(color: Colors.grey[500]),
-                            contentPadding: const EdgeInsets.all(16),
-                            border: InputBorder.none,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 20),
-                      Row(
-                        children: [
-                          Expanded(
-                            child: FilledButton.icon(
-                              style: FilledButton.styleFrom(
-                                backgroundColor: widget.subjectColor,
-                                padding: const EdgeInsets.symmetric(vertical: 16),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                              ),
-                              icon: const Icon(Icons.save),
-                              label: const Text('Save Note'),
-                              onPressed: () {
-                                if (questionCubit.noteController.text.trim().isNotEmpty) {
-                                  this.setState(() {
-                                    userNotes?[questionIndex] = questionCubit.noteController.text.trim();
-                                  });
-                                } else {
-                                  this.setState(() {
-                                    userNotes?.remove(questionIndex);
-                                  });
-                                }
-                                Navigator.pop(context);
-                              },
-                            ),
-                          ),
-                          if (userNotes?.containsKey(questionIndex) ?? false) ...[
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    width: 40,
+                    height: 4,
+                    margin: const EdgeInsets.only(top: 12),
+                    decoration: BoxDecoration(
+                      color: Colors.grey[400],
+                      borderRadius: BorderRadius.circular(2),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(20),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Icon(Icons.note_add, color: widget.subjectColor),
                             const SizedBox(width: 12),
-                            FilledButton.icon(
-                              style: FilledButton.styleFrom(
-                                backgroundColor: Colors.red,
-                                padding: const EdgeInsets.symmetric(vertical: 16),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
+                            Text(
+                              'ملاحظات السؤال ${questionIndex + 1}',
+                              style: TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                                color: widget.subjectColor,
                               ),
-                              icon: const Icon(Icons.delete),
-                              label: const Text('Delete'),
-                              onPressed: () {
-                                this.setState(() {
-                                  userNotes?.remove(questionIndex);
-                                  questionCubit.noteController.clear();
-                                });
-                                Navigator.pop(context);
-                              },
                             ),
                           ],
-                        ],
-                      ),
-                    ],
+                        ),
+                        const SizedBox(height: 20),
+                        Container(
+                          decoration: BoxDecoration(
+                            color: Theme.of(context).colorScheme.surfaceContainerHighest,
+                            borderRadius: BorderRadius.circular(16),
+                            border: Border.all(
+                              color: widget.subjectColor.withOpacity(0.2),
+                            ),
+                          ),
+                          child: TextField(
+                            controller: questionCubit.noteController,
+                            focusNode: questionCubit.noteFocusNode,
+                            maxLines: 5,
+                            style: const TextStyle(fontSize: 16),
+                            decoration: InputDecoration(
+                              hintText: 'أضف ملاحظاتك هنا...',
+                              hintStyle: TextStyle(color: Colors.grey[500]),
+                              contentPadding: const EdgeInsets.all(16),
+                              border: InputBorder.none,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 20),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: FilledButton.icon(
+                                style: FilledButton.styleFrom(
+                                  backgroundColor: widget.subjectColor,
+                                  padding: const EdgeInsets.symmetric(vertical: 16),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                ),
+                                icon: const Icon(Icons.save),
+                                label: const Text('حفظ الملاحظة'),
+                                onPressed: () {
+                                  if (questionCubit.noteController.text.trim().isNotEmpty) {
+                                    questionCubit.saveQuestionNote(questionId: question.id, note: questionCubit.noteController.text.trim());
+                                  } else {
+                                    questionCubit.saveQuestionNote(questionId: question.id, note: '');
+                                  }
+                                  Navigator.pop(context);
+                                },
+                              ),
+                            ),
+                            if (question.note != null && question.note!.trim().isNotEmpty) ...[
+                              const SizedBox(width: 12),
+                              FilledButton(
+                                style: FilledButton.styleFrom(
+                                  backgroundColor: Colors.red,
+                                  padding: const EdgeInsets.symmetric(vertical: 16),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                ),
+                                child: Icon(Icons.delete, color: Colors.white),
+                                onPressed: () {
+                                  questionCubit.saveQuestionNote(questionId: question.id, note: '');
+                                  Navigator.pop(context);
+                                },
+                              ),
+                            ],
+                          ],
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ),
@@ -539,7 +571,7 @@ class _QuestionsPageState extends State<QuestionsPage> {
                     ),
                   ],
                 ),
-              _ => const Center(child: CircularProgressIndicator()),
+              _ => const Center(child: CoolLoadingScreen()),
             };
           },
         ),
@@ -581,6 +613,8 @@ class _QuestionsPageState extends State<QuestionsPage> {
   }
 
   Widget _buildQuestionCard(QuestionEntity question, int questionIndex, QuestionSuccess state) {
+    log("expanded state is ${state.expandedImages[questionIndex]}");
+    log("question photo state is ${question.downloadedQuestionPhoto != null}");
     final questionCubit = context.read<QuestionCubit>();
     return AnimatedContainer(
       duration: const Duration(milliseconds: 300),
@@ -618,13 +652,12 @@ class _QuestionsPageState extends State<QuestionsPage> {
                   ),
                   const SizedBox(width: 16),
                   Expanded(
-                    //todo: quill editor go here
                     child: QuillEditor(
                       focusNode: questionCubit.getQuestionFocusNode(questionIndex),
                       controller: questionCubit.getQuestionController(questionIndex),
                       scrollController: questionCubit.getQuestionScrollController(questionIndex),
                       config: QuillEditorConfig(
-                        scrollable: false,
+                        scrollable: true, // Disable QuillEditor's internal scrolling
                         requestKeyboardFocusOnCheckListChanged: false,
                         showCursor: false,
                         autoFocus: false,
@@ -633,14 +666,8 @@ class _QuestionsPageState extends State<QuestionsPage> {
                           FormulaEmbedBuilder(),
                         ],
                       ),
-                      // question.textQuestion,
-                      // style: const TextStyle(
-                      //   fontSize: 16,
-                      //   fontWeight: FontWeight.bold,
-                      //   height: 1.4,
-                      // ),
                     ),
-                  ),
+                  )
                 ],
               ),
               if (question.questionPhoto != null) ...[
@@ -663,23 +690,34 @@ class _QuestionsPageState extends State<QuestionsPage> {
                 ),
                 if (state.expandedImages[questionIndex] == true) ...[
                   const SizedBox(height: 16),
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(16),
-                    child: CachedNetworkImage(
-                      imageUrl: question.questionPhoto ?? '',
-                      placeholder: (context, url) => Container(
-                        height: 200,
-                        color: Colors.grey[200],
-                        child: const Center(child: CircularProgressIndicator()),
-                      ),
-                      errorWidget: (context, url, error) => Container(
-                        height: 200,
-                        color: Colors.grey[200],
-                        child: const Center(
-                          child: Icon(Icons.error_outline, size: 40, color: Colors.grey),
-                        ),
-                      ),
-                      fit: BoxFit.cover,
+                  Center(
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(16),
+                      child: question.downloadedQuestionPhoto != null
+                          ? Image.memory(
+                              question.downloadedQuestionPhoto!,
+                              height: 350,
+                              // imageUrl: question.questionPhoto ?? '',
+                              // placeholder: (context, url) => Container(
+                              //   height: 200,
+                              //   color: Colors.grey[200],
+                              //   child: const Center(child: CoolLoadingScreen()),
+                              // ),
+                              // errorWidget: (context, url, error) => Container(
+                              //   height: 200,
+                              //   color: Colors.grey[200],
+                              //   child: const Center(
+                              //     child: Icon(Icons.error_outline, size: 40, color: Colors.grey),
+                              //   ),
+                              // ),
+                              fit: BoxFit.contain,
+                            )
+                          : Container(
+                              height: 200,
+                              width: double.infinity,
+                              color: Colors.grey[200],
+                              child: const Center(child: CoolLoadingScreen()),
+                            ),
                     ),
                   ),
                 ],
@@ -687,16 +725,16 @@ class _QuestionsPageState extends State<QuestionsPage> {
               if (question.type == QuestionTypeEnum.written) ...[
                 const SizedBox(height: 16),
                 const SizedBox(height: 16),
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(16),
-                  child: Container(
-                    color: Colors.grey[200],
-                    child: Padding(
-                      padding: EdgeInsets.all(padding4),
-                      child: GestureDetector(
-                        onTap: () {
-                          context.read<QuestionCubit>().toggleExpandedAnswer(questionIndex);
-                        },
+                GestureDetector(
+                  onTap: () {
+                    context.read<QuestionCubit>().toggleExpandedAnswer(questionIndex);
+                  },
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(16),
+                    child: Container(
+                      color: Colors.grey[200],
+                      child: Padding(
+                        padding: EdgeInsets.all(padding4 * 4),
                         child: Center(
                           child: state.expandedAnswers[questionIndex] == true
                               ? QuillEditor(
@@ -715,9 +753,19 @@ class _QuestionsPageState extends State<QuestionsPage> {
                                   ),
                                   // question.answers[0], //todo: here the quill editor go
                                 )
-                              : Icon(
-                                  state.expandedAnswers[questionIndex] == true ? Icons.visibility_off : Icons.question_answer_outlined,
-                                  color: widget.subjectColor,
+                              : Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Icon(
+                                      state.expandedAnswers[questionIndex] == true ? Icons.visibility_off : Icons.question_answer_outlined,
+                                      color: widget.subjectColor,
+                                    ),
+                                    const SizedBox(width: 16),
+                                    Text(
+                                      'عرض الاجابة',
+                                      style: TextStyle(color: widget.subjectColor),
+                                    ),
+                                  ],
                                 ),
                         ),
                       ),
@@ -730,31 +778,34 @@ class _QuestionsPageState extends State<QuestionsPage> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  if (state.questions[questionIndex].hint == null || state.questions[questionIndex].hintPhoto == null)
+                  if (state.questions[questionIndex].hint != null || state.questions[questionIndex].hintPhoto != null)
                     _buildActionButton(
                       icon: Icons.lightbulb_outline,
                       color: Color(0xFFFFB347),
-                      onPressed: () => showHintBottomSheet(
-                        context,
-                        questionIndex,
-                        state,
-                      ),
+                      onPressed: () {
+                        if (state.questions[questionIndex].downloadedHintPhoto == null) {
+                          questionCubit.getQuestionHintPhoto(state.questions[questionIndex].id, state.questions[questionIndex].hintPhoto!);
+                        }
+                        showHintBottomSheet(
+                          context,
+                          questionIndex,
+                          state,
+                        );
+                      },
                     ),
                   const SizedBox(width: 8),
                   _buildActionButton(
-                    icon: state.isFavorite[questionIndex] == true ? Icons.favorite : Icons.favorite_border,
+                    icon: question.isFavorite ? Icons.favorite : Icons.favorite_border,
                     color: Colors.red,
                     onPressed: () {
-                      setState(() {
-                        state.isFavorite[questionIndex] = !(state.isFavorite[questionIndex] ?? false);
-                      });
+                      context.read<QuestionCubit>().toggleQuestionFavorite(questionId: question.id, isFavorite: !question.isFavorite);
                     },
                   ),
                   const SizedBox(width: 8),
                   _buildActionButton(
-                    icon: state.userNotes.containsKey(questionIndex) ? Icons.note : Icons.note_add,
+                    icon: question.note != null && question.note!.trim().isNotEmpty ? Icons.note : Icons.note_add,
                     color: widget.subjectColor,
-                    onPressed: () => showNoteBottomSheet(context, questionIndex, state.userNotes),
+                    onPressed: () => showNoteBottomSheet(context, questionIndex, question, question.note),
                   ),
                   const SizedBox(width: 8),
                   _buildActionButton(
@@ -946,30 +997,28 @@ class _QuestionsPageState extends State<QuestionsPage> {
                     });
                   },
             child: Center(
-              child: IgnorePointer(
-                child: QuillEditor(
-                  focusNode: questionCubit.getAnswerFocusNode(questionIndex, question.choices.indexOf(answer)),
-                  controller: questionCubit.getAnswerController(questionIndex, question.choices.indexOf(answer)),
-                  scrollController: questionCubit.getAnswerScrollController(questionIndex, question.choices.indexOf(answer)),
-                  config: QuillEditorConfig(
-                    scrollable: false,
-                    requestKeyboardFocusOnCheckListChanged: false,
-                    showCursor: false,
-                    autoFocus: false,
-                    padding: EdgeInsets.zero,
-                    enableInteractiveSelection: false,
-                    embedBuilders: [
-                      FormulaEmbedBuilder(),
-                    ],
-                  ),
-                  // answer, //todo: here the quill editor go
-                  // style: TextStyle(
-                  //   fontSize: 14,
-                  //   color: textColor,
-                  //   fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                  // ),
-                  // textAlign: TextAlign.center,
+              child: QuillEditor(
+                focusNode: questionCubit.getAnswerFocusNode(questionIndex, question.choices.indexOf(answer)),
+                controller: questionCubit.getAnswerController(questionIndex, question.choices.indexOf(answer)),
+                scrollController: questionCubit.getAnswerScrollController(questionIndex, question.choices.indexOf(answer)),
+                config: QuillEditorConfig(
+                  scrollable: false,
+                  requestKeyboardFocusOnCheckListChanged: false,
+                  showCursor: false,
+                  autoFocus: false,
+                  padding: EdgeInsets.zero,
+                  enableInteractiveSelection: false,
+                  embedBuilders: [
+                    FormulaEmbedBuilder(),
+                  ],
                 ),
+                // answer, //todo: here the quill editor go
+                // style: TextStyle(
+                //   fontSize: 14,
+                //   color: textColor,
+                //   fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                // ),
+                // textAlign: TextAlign.center,
               ),
             ),
           ),
@@ -1076,14 +1125,17 @@ class FormulaEmbedBuilder extends EmbedBuilder {
   ) {
     final formula = embedContext.node.value.data;
 
-    return Container(
-      padding: EdgeInsets.symmetric(vertical: 8),
-      child: Directionality(
-        textDirection: TextDirection.ltr,
-        child: Math.tex(
-          formula,
-          textStyle: embedContext.textStyle,
-          mathStyle: MathStyle.display,
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      child: Container(
+        padding: EdgeInsets.symmetric(vertical: 8),
+        child: Directionality(
+          textDirection: TextDirection.ltr,
+          child: Math.tex(
+            formula,
+            textStyle: embedContext.textStyle,
+            mathStyle: MathStyle.display,
+          ),
         ),
       ),
     );

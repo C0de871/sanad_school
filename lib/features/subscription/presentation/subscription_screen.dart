@@ -8,6 +8,7 @@ import 'package:sanad_school/core/utils/services/qr_service/qr_result.dart';
 import 'package:sanad_school/features/subscription/presentation/cubits/subscription_cubit.dart';
 import 'package:sanad_school/features/subscription/presentation/cubits/subscription_state.dart';
 
+import '../../../core/shared/widgets/animated_loading_screen.dart';
 import '../../../core/theme/theme.dart';
 import '../../../core/utils/services/service_locator.dart';
 import '../../auth/presentation/widgets/animated_raised_button.dart';
@@ -57,7 +58,7 @@ class _SubscriptionScreenContent extends StatelessWidget {
         },
         builder: (context, state) {
           if (state is SubscriptionLoading) {
-            return Center(child: CircularProgressIndicator());
+            return Center(child: CoolLoadingScreen());
           } else if (state is SubscriptionError) {
             return Center(child: Text(state.message));
           } else if (state is SubscriptionLoaded) {
@@ -282,7 +283,7 @@ class _SubscriptionScreenContent extends StatelessWidget {
                               foregroundColor: Theme.of(context).colorScheme.onPrimary,
                               shadowColor: getIt<AppTheme>().extendedColors.buttonShadow,
                               child: state is AddCodeLoading
-                                  ? CircularProgressIndicator()
+                                  ? CoolLoadingScreen()
                                   : Align(
                                       alignment: Alignment.center,
                                       child: Text(

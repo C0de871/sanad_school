@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 
 import '../../core/Routes/app_routes.dart';
+import '../../core/shared/widgets/animated_loading_screen.dart';
 import '../../core/utils/services/service_locator.dart';
 import '../subjects/data/data_sources/subject_local_data_source.dart';
 
@@ -60,7 +61,7 @@ class Test1Screen extends StatelessWidget {
         future: lessonRepo.getLessonsWithTypes(subjectId),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(child: CircularProgressIndicator());
+            return Center(child: CoolLoadingScreen());
           }
 
           if (snapshot.hasError) {

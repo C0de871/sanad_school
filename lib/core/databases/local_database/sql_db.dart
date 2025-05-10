@@ -33,7 +33,7 @@ class SqlDB {
     Database myDb = await openDatabase(
       path,
       onCreate: _onCreate,
-      version: 11,
+      version: 15,
       onUpgrade: _onUpgrade,
     );
     return myDb;
@@ -92,9 +92,9 @@ class SqlDB {
     return response;
   }
 
-  Future<int> sqlUpdataData(String sql) async {
+  Future<int> sqlUpdateData(String sql, [List<Object?>? values]) async {
     Database? myDB = await db;
-    int response = await myDB!.rawUpdate(sql);
+    int response = await myDB!.rawUpdate(sql, values);
     return response;
   }
 
@@ -104,9 +104,12 @@ class SqlDB {
     return response;
   }
 
-  Future<List<Map<String, dynamic>>> readData(String table) async {
+  Future<List<Map<String, dynamic>>> readData(
+    String table, {
+    String? where,
+  }) async {
     Database? myDB = await db;
-    List<Map<String, dynamic>> response = await myDB!.query(table);
+    List<Map<String, dynamic>> response = await myDB!.query(table, where: where);
     return response;
   }
 

@@ -82,7 +82,9 @@ class SubjectDetailLocalDataSource {
 
   /// Syncs a subject with the local database
   Future<void> _syncSubject(SubjectModel subject, Transaction txn) async {
+    // subject.isSynced = 1;
     final subjectMap = subject.toMap();
+    subjectMap['is_synced'] = 1;
 
     // Check if subject exists
     final existingSubject = await txn.query(

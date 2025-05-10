@@ -2,6 +2,7 @@
 import 'package:equatable/equatable.dart';
 import '../../domain/entities/lesson_entity.dart';
 
+//!base state
 sealed class LessonsState extends Equatable {
   const LessonsState();
 
@@ -9,11 +10,14 @@ sealed class LessonsState extends Equatable {
   List<Object> get props => [];
 }
 
-final class LessonsInitial extends LessonsState {}
+//! regular lessons state
+final class LessonsInitial extends LessonsState {
+  const LessonsInitial();
+}
 
-final class LessonsLoading extends LessonsState {}
+final class LessonsLoading extends LessonsInitial {}
 
-final class LessonsLoaded extends LessonsState {
+final class LessonsLoaded extends LessonsInitial {
   final List<LessonEntity> lessons;
 
   const LessonsLoaded(this.lessons);
@@ -22,11 +26,18 @@ final class LessonsLoaded extends LessonsState {
   List<Object> get props => [lessons];
 }
 
-final class LessonsError extends LessonsState {
+final class LessonsError extends LessonsInitial {
   final String message;
 
   const LessonsError(this.message);
 
   @override
   List<Object> get props => [message];
+}
+
+enum ScreenType {
+  regularLessons,
+  favLessons,
+  editedLessons,
+  incorrectLessons,
 }

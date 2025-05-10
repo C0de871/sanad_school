@@ -1,7 +1,6 @@
 // ignore_for_file: constant_identifier_names
 
 import "package:flutter/material.dart";
-import "package:google_fonts/google_fonts.dart";
 
 class AppTheme {
   // final TextTheme textTheme;
@@ -371,7 +370,8 @@ class AppTheme {
         // ),
         scaffoldBackgroundColor: colorScheme.surface,
         canvasColor: colorScheme.surface,
-        fontFamily: GoogleFonts.cairo().fontFamily,
+        // fontFamily: GoogleFonts.cairo().fontFamily,
+        fontFamily: 'Cairo',
         inputDecorationTheme: InputDecorationTheme(
           filled: true,
           // fillColor: Colors.grey[50],

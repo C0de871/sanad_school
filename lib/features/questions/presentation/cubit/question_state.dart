@@ -23,10 +23,10 @@ class QuestionSuccess extends QuestionState {
   final bool isTimerRunning;
   final List<int?> userAnswers;
   final List<bool?> isCorrect;
-  final Map<int, bool> isFavorite;
-  final Map<int, String> userNotes;
-  final Map<int, bool> expandedImages;  
+  final Map<int, bool> expandedImages;
   final Map<int, bool> expandedAnswers;
+  final int unAnsweredQuestions;
+
 
   const QuestionSuccess({
     required this.questions,
@@ -36,10 +36,9 @@ class QuestionSuccess extends QuestionState {
     this.isTimerRunning = false,
     this.userAnswers = const [],
     this.isCorrect = const [],
-    this.isFavorite = const {},
-    this.userNotes = const {},
     this.expandedImages = const {},
     this.expandedAnswers = const {},
+    this.unAnsweredQuestions = 0,
   });
 
   @override
@@ -51,8 +50,6 @@ class QuestionSuccess extends QuestionState {
         isTimerRunning,
         userAnswers,
         isCorrect,
-        isFavorite,
-        userNotes,
         expandedImages,
         expandedAnswers,
       ];
@@ -66,10 +63,9 @@ class QuestionSuccess extends QuestionState {
     bool? isInitialized,
     List<int?>? userAnswers,
     List<bool?>? isCorrect,
-    Map<int, bool>? isFavorite,
-    Map<int, String>? userNotes,
     Map<int, bool>? expandedImages,
     Map<int, bool>? expandedAnswers,
+    int? unAnsweredQuestions,
   }) {
     return QuestionSuccess(
       questions: questions ?? this.questions,
@@ -79,10 +75,9 @@ class QuestionSuccess extends QuestionState {
       isTimerRunning: isTimerRunning ?? this.isTimerRunning,
       userAnswers: userAnswers ?? this.userAnswers,
       isCorrect: isCorrect ?? this.isCorrect,
-      isFavorite: isFavorite ?? this.isFavorite,
-      userNotes: userNotes ?? this.userNotes,
       expandedImages: expandedImages ?? this.expandedImages,
       expandedAnswers: expandedAnswers ?? this.expandedAnswers,
+      unAnsweredQuestions: unAnsweredQuestions ?? this.unAnsweredQuestions,
     );
   }
 }

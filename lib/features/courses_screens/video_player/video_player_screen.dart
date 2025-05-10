@@ -3,8 +3,10 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:video_player/video_player.dart';
-import 'package:../video_player/video_download_service.dart';
 import 'dart:io';
+
+import '../../../core/shared/widgets/animated_loading_screen.dart';
+import '../../../core/utils/services/video_download_service.dart';
 
 /// Stateful widget to fetch and then display video content.
 class VideoPlayerScreen extends StatefulWidget {
@@ -171,27 +173,23 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
         position.dx + size.width,
         position.dy + size.height,
       ),
-      items:
-          _playbackSpeeds.map((speed) {
-            return PopupMenuItem(
-              value: speed,
-              height: 36,
-              child: Opacity(
-                opacity: 0.75,
-                child: Text(
-                  '${speed}x',
-                  style: TextStyle(
-                    color: _playbackSpeed == speed ? Colors.blue : Colors.white,
-                    fontWeight:
-                        _playbackSpeed == speed
-                            ? FontWeight.bold
-                            : FontWeight.normal,
-                    fontSize: 14,
-                  ),
-                ),
+      items: _playbackSpeeds.map((speed) {
+        return PopupMenuItem(
+          value: speed,
+          height: 36,
+          child: Opacity(
+            opacity: 0.75,
+            child: Text(
+              '${speed}x',
+              style: TextStyle(
+                color: _playbackSpeed == speed ? Colors.blue : Colors.white,
+                fontWeight: _playbackSpeed == speed ? FontWeight.bold : FontWeight.normal,
+                fontSize: 14,
               ),
-            );
-          }).toList(),
+            ),
+          ),
+        );
+      }).toList(),
       color: Colors.black87,
       elevation: 8,
       constraints: BoxConstraints(
@@ -276,7 +274,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
         home: Scaffold(
           backgroundColor: Colors.black,
           body: Center(
-            child: CircularProgressIndicator(color: Colors.blue),
+            child: CoolLoadingScreen(),
           ),
         ),
       );
@@ -292,10 +290,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
             children: [
               Center(
                 child: AspectRatio(
-                  aspectRatio: _isFullScreen
-                      ? MediaQuery.of(context).size.width /
-                          MediaQuery.of(context).size.height
-                      : _controller!.value.aspectRatio,
+                  aspectRatio: _isFullScreen ? MediaQuery.of(context).size.width / MediaQuery.of(context).size.height : _controller!.value.aspectRatio,
                   child: VideoPlayer(_controller!),
                 ),
               ),

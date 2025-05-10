@@ -42,9 +42,119 @@ class CodeBody {
 
   CodeBody({required this.code});
 
-  Map<String, dynamic> toMap() {
+  Map<String, dynamic> toJson() {
     return {
       codeKey: code,
     };
   }
+}
+
+class FavoriteGroupsQuestionsParams {
+  final int lessonId;
+  final int? typeId;
+
+  FavoriteGroupsQuestionsParams({
+    required this.lessonId,
+    required this.typeId,
+  });
+}
+
+class IncorrectAnswerGroupsQuestionsParams {
+  final int lessonId;
+  final int? typeId;
+
+  IncorrectAnswerGroupsQuestionsParams({
+    required this.lessonId,
+    required this.typeId,
+  });
+}
+
+class EditedQuestionsByLessonParams {
+  final int lessonId;
+  final int? typeId;
+
+  EditedQuestionsByLessonParams({
+    required this.lessonId,
+    this.typeId,
+  });
+}
+
+class ToggleQuestionFavoriteParams {
+  final int questionId;
+  final bool isFavorite;
+
+  ToggleQuestionFavoriteParams({
+    required this.questionId,
+    required this.isFavorite,
+  });
+}
+
+class ToggleQuestionIncorrectAnswerParams {
+  final int questionId;
+  final bool answerStatus;
+
+  ToggleQuestionIncorrectAnswerParams({
+    required this.questionId,
+    required this.answerStatus,
+  });
+}
+
+class SaveQuestionNoteParams {
+  final int questionId;
+  final String note;
+
+  SaveQuestionNoteParams({
+    required this.questionId,
+    required this.note,
+  });
+}
+
+class GetQuestionNoteParams {
+  final int questionId;
+
+  GetQuestionNoteParams({
+    required this.questionId,
+  });
+}
+
+class LessonsWithFavoriteGroupsParams {
+  final int subjectId;
+
+  LessonsWithFavoriteGroupsParams({
+    required this.subjectId,
+  });
+}
+
+class LessonsWithIncorrectAnswerGroupsParams {
+  final int subjectId;
+
+  LessonsWithIncorrectAnswerGroupsParams({
+    required this.subjectId,
+  });
+}
+
+class LessonsWithEditedQuestionsParams {
+  final int subjectId;
+
+  LessonsWithEditedQuestionsParams({
+    required this.subjectId,
+  });
+}
+
+class CheckSubjectSyncParams {
+  final int subjectId;
+
+  CheckSubjectSyncParams({
+    required this.subjectId,
+  });
+}
+
+class QuestionPhotoParams {
+  final String questionUrl;
+  final int questionId;
+
+  QuestionPhotoParams({
+    required this.questionUrl,
+    required this.questionId,
+  });
 }

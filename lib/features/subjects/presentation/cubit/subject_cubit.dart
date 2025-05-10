@@ -15,9 +15,9 @@ class SubjectCubit extends Cubit<SubjectState> {
       : getSubjectsUseCase = getIt(),
         super(SubjectInitial());
 
-  Future<void> getSubjects() async {
+  Future<void> getSubjects({bool isRefresh = false}) async {
     emit(SubjectLoading());
-    final result = await getSubjectsUseCase();
+    final result = await getSubjectsUseCase(isRefresh: isRefresh);
     result.fold(
       (failure) => emit(SubjectFailure(failure.errMessage)),
       (subjects) => emit(SubjectSuccess(subjects)),

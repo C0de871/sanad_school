@@ -12,6 +12,7 @@ class SubjectEntity extends Equatable {
   final int isLocked;
   final String teacher;
   final String description;
+  final int? isSynced;
 
   const SubjectEntity({
     required this.id,
@@ -25,6 +26,7 @@ class SubjectEntity extends Equatable {
     required this.isLocked,
     required this.teacher,
     required this.description,
+    this.isSynced,
   });
 
   @override
@@ -40,5 +42,6 @@ class SubjectEntity extends Equatable {
         isLocked,
         teacher,
         description,
+        isSynced,
       ];
 }

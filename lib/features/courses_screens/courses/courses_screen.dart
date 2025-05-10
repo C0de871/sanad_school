@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:../course_details/course_details_screen.dart';
+import '../../../core/shared/widgets/animated_loading_screen.dart';
+import '../course_details/course_details_screen.dart';
 
 final class StringsManager {
   static const String chooseTeacher = "اختر الاستاذ الذي تريد";
@@ -47,8 +48,7 @@ class _CoursesScreenState extends State<CoursesScreen> {
       details: " تفاصيل قليلة مشان التيست",
       time: "10:00",
       price: "100000 ل.س",
-      imageUrl:
-          'https://miro.medium.com/v2/resize:fit:1100/format:webp/1*DVZpduGGdESDwbcT4dQyVA.png',
+      imageUrl: 'https://miro.medium.com/v2/resize:fit:1100/format:webp/1*DVZpduGGdESDwbcT4dQyVA.png',
       isExpanded: false,
       isLocked: true,
     ),
@@ -171,8 +171,7 @@ class ImageAndTitle extends StatelessWidget {
           duration: animationDuration,
           height: 320,
           decoration: BoxDecoration(
-            borderRadius:
-                isExpanded ? null : BorderRadius.circular(cornerRadius),
+            borderRadius: isExpanded ? null : BorderRadius.circular(cornerRadius),
             boxShadow: [
               BoxShadow(
                 color: scheme.primaryContainer.withOpacity(0.5),
@@ -211,7 +210,7 @@ class ImageAndTitle extends StatelessWidget {
                     if (loadingProgress == null) {
                       return child;
                     }
-                    return Center(child: CircularProgressIndicator());
+                    return Center(child: CoolLoadingScreen());
                   },
                 ),
               ),
@@ -297,17 +296,15 @@ class DetailsContainer extends StatelessWidget {
             Align(
               alignment: Alignment.centerLeft,
               child: ElevatedButton(
-                onPressed:
-                    () => Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder:
-                            (context) => CourseDetailsScreen(
-                              courseId: course.id,
-                              courseTitle: course.title,
-                            ),
-                      ),
+                onPressed: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => CourseDetailsScreen(
+                      courseId: course.id,
+                      courseTitle: course.title,
                     ),
+                  ),
+                ),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: scheme.primary,
                   foregroundColor: scheme.onPrimary,

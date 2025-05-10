@@ -13,6 +13,7 @@ class SubjectModel extends SubjectEntity {
     required super.isLocked,
     required super.teacher,
     required super.description,
+    super.isSynced,
   });
 
   factory SubjectModel.fromMap(Map<String, dynamic> map) {
@@ -28,6 +29,7 @@ class SubjectModel extends SubjectEntity {
       isLocked: map['is_locked'] ? 1 : 0,
       teacher: map['teacher'] as String,
       description: map['description'] as String,
+      isSynced: map['is_synced'] as int?,
     );
   }
 
@@ -44,6 +46,7 @@ class SubjectModel extends SubjectEntity {
       'is_locked': isLocked,
       'teacher': teacher,
       'description': description,
+      'is_synced': isSynced,
     };
   }
 }

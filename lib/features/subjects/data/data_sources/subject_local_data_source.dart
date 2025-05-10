@@ -19,6 +19,15 @@ class SubjectLocalDataSource {
     // await _db.logAllTables();
   }
 
+  /// Checks if a specific subject is synced by checking its sync status column
+  Future<bool> isSubjectSynced(int subjectId) async {
+    final result = await _db.readData(SubjectTable.tableName, where: '${SubjectTable.id} = $subjectId');
+
+    if (result.isEmpty) return false;
+
+    return result.first[SubjectTable.isSynced] == 1;
+  }
+
   /// Syncs subjects with the local database
   /// Updates existing subjects, inserts new subjects, and removes subjects not in the list
   Future<void> _syncSubjects(List<SubjectModel> subjects) async {

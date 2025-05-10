@@ -1,42 +1,50 @@
 import 'dart:developer';
 import 'dart:io';
-import 'dart:isolate';
-import 'dart:ui';
 import 'package:path_provider/path_provider.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'dart:async';
 
+@pragma('vm:entry-point')
+void downloadCallback(String id, int status, int progress) {
+  log('Download task ($id) is in status: ${DownloadTaskStatus.values[status]} and process: $progress');
+}
+
 class VideoDownloadService {
-  static final VideoDownloadService _instance = VideoDownloadService._internal();
-  factory VideoDownloadService() => _instance;
-  
+  // static final VideoDownloadService _instance = VideoDownloadService._internal();
+  VideoDownloadService();
+
   // A simpler approach: use a polling timer to check download status
   final Map<String, Timer> _progressTimers = {};
   final Map<String, Function(double)> _progressCallbacks = {};
   final Map<String, String> _videoIdToTaskId = {}; // Map video IDs to task IDs
 
-  VideoDownloadService._internal() {
-    _initializeDownloader();
-  }
+  // VideoDownloadService._internal() {
+  //   _initializeDownloader();
+  // }
 
   // Track download status
   final Map<String, bool> _downloadStatus = {};
 
-  void _initializeDownloader() async {
+  Future<void> initializeDownloader() async {
+    // Register download callback
     try {
       log('Initializing download service');
-      await FlutterDownloader.initialize(debug: true);
-      
+      await FlutterDownloader.initialize(
+        debug: true, ignoreSsl: true, // Add this if you're downloading from HTTPS
+      );
+
+      FlutterDownloader.registerCallback(downloadCallback);
+
       // Cleanup any incomplete tasks on startup
       _cleanupIncompleteTasks();
-      
+
       log('Download service initialized successfully');
     } catch (e) {
       log('Error initializing downloader: $e');
     }
   }
-  
+
   // Clean up any incomplete tasks from previous sessions
   Future<void> _cleanupIncompleteTasks() async {
     try {
@@ -44,10 +52,7 @@ class VideoDownloadService {
       if (tasks != null) {
         for (var task in tasks) {
           if (task.status != DownloadTaskStatus.complete) {
-            await FlutterDownloader.remove(
-              taskId: task.taskId, 
-              shouldDeleteContent: true
-            );
+            await FlutterDownloader.remove(taskId: task.taskId, shouldDeleteContent: true);
             log('Removed incomplete task: ${task.taskId}');
           }
         }
@@ -113,7 +118,7 @@ class VideoDownloadService {
       );
       final file = File(path);
       final exists = await file.exists();
-      
+
       // Double check file size to make sure it's not empty
       if (exists) {
         final fileSize = await file.length();
@@ -139,9 +144,7 @@ class VideoDownloadService {
         await Permission.videos.request();
       }
       // Check if any are still denied
-      if (await Permission.storage.isGranted ||
-          await Permission.manageExternalStorage.isGranted ||
-          await Permission.videos.isGranted) {
+      if (await Permission.storage.isGranted || await Permission.manageExternalStorage.isGranted || await Permission.videos.isGranted) {
         return true;
       }
       return false;
@@ -149,12 +152,12 @@ class VideoDownloadService {
     // For iOS or other platforms, return true (or handle accordingly)
     return true;
   }
-  
+
   // Start a timer to poll download status
   void _startProgressTracker(String videoId, String taskId, Function(double) onProgressUpdate) {
     // Cancel any existing timer
     _stopProgressTracker(videoId);
-    
+
     // Create a new timer that polls every 500ms
     _progressTimers[videoId] = Timer.periodic(Duration(milliseconds: 500), (timer) async {
       try {
@@ -162,13 +165,10 @@ class VideoDownloadService {
         if (tasks == null) {
           return;
         }
-        
+
         // Find the task
-        final task = tasks.firstWhere(
-          (t) => t.taskId == taskId,
-          orElse: () => null as DownloadTask
-        );
-        
+        final task = tasks.firstWhere((t) => t.taskId == taskId, orElse: () => null as DownloadTask);
+
         if (task == null) {
           // Task not found - maybe was removed
           log('Task not found: $taskId');
@@ -176,13 +176,13 @@ class VideoDownloadService {
           _stopProgressTracker(videoId);
           return;
         }
-        
+
         switch (task.status) {
           case DownloadTaskStatus.running:
             // Task is running - update progress
             onProgressUpdate(task.progress / 100);
             break;
-            
+
           case DownloadTaskStatus.complete:
             // Task is complete - update progress and stop tracker
             onProgressUpdate(1.0);
@@ -190,7 +190,7 @@ class VideoDownloadService {
             _stopProgressTracker(videoId);
             log('Download completed: $videoId');
             break;
-            
+
           case DownloadTaskStatus.failed:
           case DownloadTaskStatus.canceled:
             // Task failed or was canceled - send 0 progress and stop tracker
@@ -198,7 +198,7 @@ class VideoDownloadService {
             _stopProgressTracker(videoId);
             log('Download failed or canceled: $videoId');
             break;
-            
+
           default:
             // Other states (enqueued, paused) - just update progress
             onProgressUpdate(task.progress / 100);
@@ -212,7 +212,7 @@ class VideoDownloadService {
       }
     });
   }
-  
+
   // Stop tracking progress for a video
   void _stopProgressTracker(String videoId) {
     final timer = _progressTimers[videoId];
@@ -223,18 +223,18 @@ class VideoDownloadService {
     _progressCallbacks.remove(videoId);
     _videoIdToTaskId.remove(videoId);
   }
-  
+
   // Cancel all active downloads for a video ID
   Future<void> _cancelPreviousDownloads(String videoId) async {
     try {
       // Stop the progress tracker
       _stopProgressTracker(videoId);
-      
+
       // Cancel any tasks in progress
       if (_videoIdToTaskId.containsKey(videoId)) {
         await FlutterDownloader.cancel(taskId: _videoIdToTaskId[videoId]!);
       }
-      
+
       // Also check for any other tasks that might be downloading this video
       final tasks = await FlutterDownloader.loadTasks();
       if (tasks != null) {
@@ -261,15 +261,15 @@ class VideoDownloadService {
     try {
       // Cancel any previous downloads
       await _cancelPreviousDownloads(videoId);
-      
+
       // Store callback if provided
       if (onProgressUpdate != null) {
         _progressCallbacks[videoId] = onProgressUpdate;
-        
+
         // Send initial progress update
         onProgressUpdate(0.01);
       }
-      
+
       // Check if video already exists
       final isAlreadyDownloaded = await isVideoDownloaded(
         videoId: videoId,
@@ -278,7 +278,7 @@ class VideoDownloadService {
         teacherName: teacherName,
         unit: unit,
       );
-      
+
       if (isAlreadyDownloaded) {
         log('Video already downloaded: $videoId');
         if (onProgressUpdate != null) {
@@ -330,17 +330,16 @@ class VideoDownloadService {
         onProgressUpdate?.call(0.0);
         throw Exception('Failed to create download task');
       }
-      
+
       // Store task ID
       _videoIdToTaskId[videoId] = taskId;
-      
+
       // Start tracking progress
       if (onProgressUpdate != null) {
         _startProgressTracker(videoId, taskId, onProgressUpdate);
       }
-      
-      log('Download started: videoId=$videoId, taskId=$taskId');
 
+      log('Download started: videoId=$videoId, taskId=$taskId');
     } catch (e) {
       log('Download error: $e');
       if (onProgressUpdate != null) {
@@ -360,7 +359,7 @@ class VideoDownloadService {
     try {
       // Cancel any ongoing downloads first
       await _cancelPreviousDownloads(videoId);
-      
+
       final path = await getVideoPath(
         videoId: videoId,
         className: className,
@@ -379,7 +378,7 @@ class VideoDownloadService {
       throw Exception('Failed to delete video: $e');
     }
   }
-  
+
   // Call this method when disposing the service to clean up resources
   void dispose() {
     try {
@@ -394,4 +393,4 @@ class VideoDownloadService {
       log('Error disposing download service: $e');
     }
   }
-} 
+}

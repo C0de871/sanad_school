@@ -1,4 +1,3 @@
-
 import 'package:dio/dio.dart';
 
 import '../errors/expentions.dart';
@@ -58,12 +57,14 @@ class DioConsumer extends ApiConsumer {
     Map<String, dynamic>? headers,
     Map<String, dynamic>? queryParameters,
     Map<String, dynamic>? extra,
+    ResponseType? responseType,
   }) async {
     try {
       var res = await dio.get(
         options: Options(
           headers: headers,
           extra: extra,
+          responseType: responseType,
         ),
         path,
         data: data,
@@ -72,7 +73,7 @@ class DioConsumer extends ApiConsumer {
       return res.data;
     } on DioException catch (e) {
       handleDioException(e);
-    } 
+    }
   }
 
 //!DELETE
@@ -97,7 +98,7 @@ class DioConsumer extends ApiConsumer {
       return res.data;
     } on DioException catch (e) {
       handleDioException(e);
-    } 
+    }
   }
 
 //!PATCH
@@ -123,7 +124,7 @@ class DioConsumer extends ApiConsumer {
       return res.data;
     } on DioException catch (e) {
       handleDioException(e);
-    } 
+    }
   }
 
   @override
@@ -141,6 +142,6 @@ class DioConsumer extends ApiConsumer {
       return res.data;
     } on DioException catch (e) {
       handleDioException(e);
-    } 
+    }
   }
 }

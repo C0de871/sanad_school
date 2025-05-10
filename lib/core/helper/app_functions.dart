@@ -1,9 +1,11 @@
 import 'dart:developer';
+import 'dart:io';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:path_provider/path_provider.dart';
 
 //! get System Ui Overlay Style:
 SystemUiOverlayStyle getSystemUiOverlayStyle(Brightness currentBrightness, BuildContext context) {
@@ -67,4 +69,16 @@ bool isRtl(BuildContext context) {
   return isRtl;
 }
 
+class Utils {
+  static Future<String> getFileUrl(String fileName) async {
+    final directory = await getApplicationDocumentsDirectory();
+    return "${directory.path}/$fileName";
+  }
 
+  static Future saveAssetVideoToFile(String filePath, String fileName) async {
+    var content = await rootBundle.load(filePath);
+    final directory = await getApplicationDocumentsDirectory();
+    var file = File("${directory.path}/$fileName");
+    file.writeAsBytesSync(content.buffer.asUint8List());
+  }
+}

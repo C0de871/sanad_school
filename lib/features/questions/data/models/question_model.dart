@@ -1,4 +1,5 @@
 import 'dart:developer';
+import 'dart:typed_data';
 
 import '../../domain/entities/question_entity.dart';
 
@@ -16,6 +17,11 @@ class QuestionModel extends QuestionEntity {
   static const String hintKey = 'hint';
   static const String hintPhotoKey = 'hint_photo';
   static const String opsKey = 'ops';
+  static const String isFavoriteKey = 'is_favorite';
+  static const String answerStatusKey = 'answer_status';
+  static const String noteKey = 'note';
+  static const String downloadedHintPhotoKey = 'downloaded_hint_photo';
+  static const String downloadedQuestionPhotoKey = 'downloaded_question_photo';
 
   const QuestionModel({
     required super.id,
@@ -30,11 +36,16 @@ class QuestionModel extends QuestionEntity {
     required super.isEdited,
     super.hint,
     super.hintPhoto,
+    super.isFavorite,
+    super.answerStatus,
+    super.note,
+    super.downloadedHintPhoto,
+    super.downloadedQuestionPhoto,
   });
 
   factory QuestionModel.fromMap(Map<String, dynamic> map) {
     // log("question model map: $map");
-    log("right choice for question id ${map[idKey]} is: ${map[rightChoiceKey]}");
+    log("is favorite for question id ${map[idKey]} is: ${map[isFavoriteKey]}");
     return QuestionModel(
       id: map[idKey] as int,
       uuid: map[uuidKey] as String,
@@ -50,6 +61,11 @@ class QuestionModel extends QuestionEntity {
       isEdited: map[isEditedKey] as int,
       hint: (map[hintKey] != null && map[hintKey][opsKey] != null) ? List<Map<String, dynamic>>.from(map[hintKey][opsKey]) : null,
       hintPhoto: map[hintPhotoKey] as String?,
+      isFavorite: map[isFavoriteKey] as bool? ?? false,
+      answerStatus: map[answerStatusKey] as bool? ?? false,
+      note: map[noteKey] as String?,
+      downloadedHintPhoto: map[downloadedHintPhotoKey] as Uint8List?,
+      downloadedQuestionPhoto: map[downloadedQuestionPhotoKey] as Uint8List?,
     );
   }
 
@@ -67,6 +83,11 @@ class QuestionModel extends QuestionEntity {
       isEditedKey: isEdited,
       hintKey: hint != null ? {opsKey: hint} : null,
       hintPhotoKey: hintPhoto,
+      isFavoriteKey: isFavorite ? 1 : 0,
+      answerStatusKey: answerStatus ? 1 : 0,
+      noteKey: note,
+      downloadedHintPhotoKey: downloadedHintPhoto,
+      downloadedQuestionPhotoKey: downloadedQuestionPhoto,
     };
   }
 }

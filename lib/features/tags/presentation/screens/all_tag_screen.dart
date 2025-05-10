@@ -10,6 +10,8 @@ import 'package:sanad_school/features/tags/presentation/cubits/tag_cubit.dart';
 
 import '../../../../../core/theme/theme.dart';
 import '../../../../../core/utils/services/service_locator.dart';
+import '../../../../core/shared/widgets/animated_empty_screen.dart';
+import '../../../../core/shared/widgets/animated_loading_screen.dart';
 import '../../../auth/presentation/widgets/animated_raised_button.dart';
 
 class AllTagsTab extends StatelessWidget {
@@ -31,10 +33,19 @@ class AllTagsTab extends StatelessWidget {
             log("");
             switch (state) {
               case TagLoading():
-                return const Center(child: CircularProgressIndicator());
+                return const Center(child: CoolLoadingScreen());
               case TagError():
                 return Center(child: Text(state.message));
               case TagLoaded():
+                if (state.tags.isEmpty) {
+                  return EmptyStateScreen(
+                    iconColor: color.withOpacity(0.5),
+                    textColor: color.withOpacity(0.5),
+                    icon: Icons.inbox_rounded,
+                    title: "الدورات والتصنيفات فارغة",
+                    message: "لا يوجد دورات أو تصنيفات لهده المادة",
+                  );
+                }
                 return GridView.builder(
                   padding: const EdgeInsets.all(16),
                   gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(

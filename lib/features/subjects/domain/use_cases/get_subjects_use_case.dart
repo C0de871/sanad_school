@@ -9,7 +9,7 @@ class GetSubjectsUseCase {
 
   GetSubjectsUseCase({required this.repository});
 
-  Future<Either<Failure, List<SubjectEntity>>> call() async {
-    return await repository.getSubjects();
+  Future<Either<Failure, List<SubjectEntity>>> call({bool isRefresh = false}) async {
+    return await repository.getSubjects(isRefresh: isRefresh);
   }
 }
