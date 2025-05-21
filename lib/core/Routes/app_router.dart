@@ -53,7 +53,7 @@ class AppRouter with CubitProviderMixin {
           settings: settings,
           builder: (_) => BlocProvider(
             create: (context) => getCubit(() => AuthCubit()..checkToken()),
-            child: getIt<DeviceInfoService>().isSamsung() ? const SamsungSplashScreen() : const NonSamsungSplashScreen(),
+            child: getIt<DeviceInfoService>().isSamsung() ? const SamsungSplashScreen() : const SamsungSplashScreen(),
           ),
         );
 
