@@ -18,8 +18,10 @@ class TagCubit extends Cubit<TagState> {
       : getTagsOrExams = getIt(),
         super(TagInitial());
 
-  Future<void> fetchTagsOrExams({required int subjectId, required bool isExam}) async {
-    emit(TagLoading());
+  Future<void> fetchTagsOrExams({required int subjectId, required bool isExam, bool isRefresh = false}) async {
+    if (!isRefresh) {
+      emit(TagLoading());
+    }
 
     final params = TagParams(subjectId: subjectId, isExam: isExam);
     final Either<Failure, List<TagEntity>> result = await getTagsOrExams(params);

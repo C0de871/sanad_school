@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:dartz/dartz.dart';
 
 import '../../../../../core/databases/connection/network_info.dart';
@@ -23,6 +25,7 @@ class TypeRepositoryImpl implements TypeRepository {
         final response = await remoteDataSource.getTypes();
         return Right(response.types);
       } on ServerException catch (e) {
+        log("exception occured -----------------==============");
         return Left(Failure(errMessage: e.errorModel.errorMessage));
       }
     } else {

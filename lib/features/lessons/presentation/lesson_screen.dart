@@ -18,6 +18,7 @@ import '../../../core/shared/widgets/animated_loading_screen.dart';
 import '../../../core/theme/theme.dart';
 import '../../../core/utils/services/service_locator.dart';
 import '../../auth/presentation/widgets/animated_raised_button.dart';
+import '../../quiz/presentation/screens/arg/screen_arg.dart';
 import '../../subjects/domain/entities/subject_entity.dart';
 
 class SubjectDetailsScreen extends StatefulWidget {
@@ -54,22 +55,22 @@ class _SubjectDetailsScreenState extends State<SubjectDetailsScreen> with Single
     _tabController = TabController(length: _tabs.length, vsync: this);
     _tabController.addListener(() {
       if (_tabController.index == 0) {
-        regularLessonsCubit.getRegularLessons(widget.subject.id);
+        regularLessonsCubit.getRegularLessons(widget.subject.id, isRefresh: true);
       } else if (_tabController.index == 1) {
         // incorrect
-        incorrectLessonsCubit.getIncorrectLessons(widget.subject.id);
+        incorrectLessonsCubit.getIncorrectLessons(widget.subject.id, isRefresh: true);
       } else if (_tabController.index == 2) {
         // fav
-        favLessonsCubit.getFavLessons(widget.subject.id);
+        favLessonsCubit.getFavLessons(widget.subject.id, isRefresh: true);
       } else if (_tabController.index == 3) {
         // tags
-        tagCubit.fetchTagsOrExams(subjectId: widget.subject.id, isExam: false);
+        tagCubit.fetchTagsOrExams(subjectId: widget.subject.id, isExam: false, isRefresh: true);
       } else if (_tabController.index == 4) {
         // exams
-        examCubit.fetchTagsOrExams(subjectId: widget.subject.id, isExam: true);
+        examCubit.fetchTagsOrExams(subjectId: widget.subject.id, isExam: true, isRefresh: true);
       } else if (_tabController.index == 5) {
         // edited
-        editedLessonsCubit.getEditedLessons(widget.subject.id);
+        editedLessonsCubit.getEditedLessons(widget.subject.id, isRefresh: true);
       }
     });
   }
@@ -95,6 +96,11 @@ class _SubjectDetailsScreenState extends State<SubjectDetailsScreen> with Single
           Navigator.pushNamed(
             context,
             AppRoutes.quizSelection,
+            arguments: QuizScreenArgs(
+              subjectId: widget.subject.id,
+              textDirection: widget.textDirection,
+              subjectColor: subjectColor,
+            ),
           );
         },
         label: Icon(Icons.shuffle),
@@ -121,7 +127,10 @@ class _SubjectDetailsScreenState extends State<SubjectDetailsScreen> with Single
                   return SizedBox();
                 case SubjectSyncLoading():
                   return Center(
-                    child: CoolLoadingScreen(),
+                    child: CoolLoadingScreen(
+                      primaryColor: subjectColor,
+                      secondaryColor: subjectColor.withAlpha(100),
+                    ),
                   );
                 case SubjectSyncSuccess():
                   return Column(
@@ -358,7 +367,10 @@ class _LessonsGridViewState extends State<LessonsGridView> {
         switch (state) {
           case LessonsLoading():
             return Center(
-              child: CoolLoadingScreen(),
+              child: CoolLoadingScreen(
+                primaryColor: widget.subjectColor,
+                secondaryColor: widget.subjectColor.withAlpha(100),
+              ),
             );
 
           case LessonsLoaded():

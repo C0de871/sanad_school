@@ -7,7 +7,6 @@ import 'package:sanad_school/core/utils/services/qr_service/qr_overlay.dart';
 import 'package:sanad_school/core/utils/services/qr_service/qr_state.dart';
 import 'package:sanad_school/core/utils/services/qr_service/scanner_cubit.dart';
 
-import '../../../shared/widgets/animated_loading_screen.dart';
 
 class QrScannerScreen extends StatelessWidget {
   const QrScannerScreen({super.key});
@@ -108,7 +107,7 @@ class _QrScannerViewState extends State<_QrScannerView> with SingleTickerProvide
             children: [
               Expanded(
                 flex: 3,
-                child: state.isLoading ? const Center(child: CoolLoadingScreen()) : _buildScannerView(context, state, cubit),
+                child: state.isLoading ? const Center(child: CircularProgressIndicator()) : _buildScannerView(context, state, cubit),
               ),
               Expanded(
                 flex: 1,

@@ -8,11 +8,13 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/databases/errors/failure.dart';
 import '../../../../core/databases/params/params.dart';
 import '../../../../core/utils/services/service_locator.dart';
+import '../../../quiz/domain/usecases/get_quiz_questions.dart';
 import '../../domain/usecases/get_question_hint_photo.dart';
 import '../../domain/usecases/get_question_photo.dart';
 import '../../domain/usecases/get_questions_in_lesson_by_type_use_case.dart';
 import '../../domain/usecases/get_questions_in_subject_by_tag.dart';
 import '../../domain/usecases/question_usecases.dart';
+import '../arg/question_from_quiz_arg.dart';
 import '../questions_screen.dart';
 import 'question_state.dart';
 import 'package:flutter_quill/flutter_quill.dart';
@@ -29,6 +31,7 @@ class QuestionCubit extends Cubit<QuestionState> {
   final ToggleQuestionIncorrectAnswerUseCase _toggleQuestionCorrectUseCase;
   final GetQuestionPhoto _getQuestionPhotoUseCase;
   final GetQuestionHintPhoto _getQuestionHintPhotoUseCase;
+  final GetQuizQuestionsUsecase _getQuizQuestionsUseCase;
   Timer? timer;
   TextEditingController noteController = TextEditingController();
   FocusNode noteFocusNode = FocusNode();
@@ -50,6 +53,7 @@ class QuestionCubit extends Cubit<QuestionState> {
         _toggleQuestionCorrectUseCase = getIt(),
         _getQuestionPhotoUseCase = getIt(),
         _getQuestionHintPhotoUseCase = getIt(),
+        _getQuizQuestionsUseCase = getIt(),
         super(QuestionInitial());
 
   FocusNode getQuestionFocusNode(int questionIndex) {
@@ -346,7 +350,6 @@ class QuestionCubit extends Cubit<QuestionState> {
 
   Future<Either<Failure, Uint8List?>> _getQuestionPhoto(int questionId, String questionUrl) async {
     if (state is QuestionSuccess) {
-      final currentState = state as QuestionSuccess;
       QuestionPhotoParams params = QuestionPhotoParams(questionId: questionId, questionUrl: questionUrl);
       final result = await _getQuestionPhotoUseCase.call(params);
       log("done ===========================================");
@@ -363,7 +366,7 @@ class QuestionCubit extends Cubit<QuestionState> {
 
       result.fold(
         (failure) {},
-        (photo) => emit(QuestionSuccess(
+        (photo) => emit(currentState.copyWith(
           questions: currentState.questions.map((question) => question.id == questionId ? question.copyWith(downloadedHintPhoto: photo) : question).toList(),
         )),
       );
@@ -385,7 +388,7 @@ class QuestionCubit extends Cubit<QuestionState> {
           final response = await _getQuestionPhoto(currentState.questions[index].id, currentState.questions[index].questionPhoto!);
           response.fold(
             (failure) {},
-            (photo) => emit(QuestionSuccess(
+            (photo) => emit(currentState.copyWith(
               expandedImages: updatedExpandedImages,
               questions: currentState.questions.map((question) => question.id == currentState.questions[index].id ? question.copyWith(downloadedQuestionPhoto: photo) : question).toList(),
             )),
@@ -558,6 +561,51 @@ class QuestionCubit extends Cubit<QuestionState> {
         }
       },
     );
+  }
+
+  Future<void> startQuiz({
+    required QuestionFromQuizArg arg,
+  }) async {
+    emit(QuestionLoading());
+    final result = await _getQuizQuestionsUseCase.call(QuizFilterParams(
+      subjectId: arg.subjectId,
+      lessonIds: arg.lessonIds,
+      typeIds: arg.typeIds,
+      tagIds: arg.tagIds,
+    ));
+    // log("result: $result");
+    _shuffleQuestions(result, arg.questionCount);
+
+    // _initializeControllers(result);
+  }
+
+  void _shuffleQuestions(List<QuestionEntity> result, int questionCount) {
+    log("result in shuffle questions method: $result");
+    Set<int> groupIds = {};
+    Map<int, List<QuestionEntity>> groupedQuestions = {};
+    int currentQuestionCount = 0;
+    for (var question in result) {
+      log("question group id: ${question.questionGroupId}");
+      //? add the group id to the set
+      groupIds.add(question.questionGroupId!);
+      //? add each question to the list of questions in the same group
+      groupedQuestions[question.questionGroupId!] = [...groupedQuestions[question.questionGroupId!] ?? [], question];
+    }
+    log("groupedQuestions: $groupedQuestions");
+    log("groupIds: $groupIds");
+
+    //? shuffle the group ids
+    List<int> shuffledGroupIds = groupIds.toList()..shuffle();
+
+    List<QuestionEntity> shuffledQuestions = [];
+    for (int groupId in shuffledGroupIds) {
+      shuffledQuestions.addAll(groupedQuestions[groupId]!);
+      currentQuestionCount += groupedQuestions[groupId]!.length;
+      if (currentQuestionCount >= questionCount) {
+        break;
+      }
+    }
+    _initializeControllers(shuffledQuestions);
   }
 
   @override

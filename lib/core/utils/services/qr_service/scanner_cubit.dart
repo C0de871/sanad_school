@@ -18,7 +18,6 @@ class QrScannerCubit extends Cubit<QrScannerState> {
   QrScannerCubit()
       : _scannerService = getIt(),
         super(const QrScannerState()) {
-    // Initialize controller
     controller = _scannerService.initializeController();
     controller.addListener(() {
       log("controller state is changed");

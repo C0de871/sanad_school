@@ -34,12 +34,8 @@ class SignInButton extends StatelessWidget {
           shadowColor: getIt<AppTheme>().extendedColors.buttonShadow,
           child: Center(
             child: isLoading
-                ? SizedBox(
-                    height: 20,
-                    width: 20,
-                    child: LoadingDots(
-                      color: Theme.of(context).colorScheme.onPrimary,
-                    ),
+                ? LoadingDots(
+                    color: Theme.of(context).colorScheme.onPrimary,
                   )
                 : const Text(
                     'تسجيل الدخول',

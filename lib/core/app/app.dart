@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:sanad_school/core/shared/widgets/my_place_holder.dart';
 import '../Routes/app_router.dart';
-import '../Routes/app_routes.dart';
 import '../helper/app_functions.dart';
+import 'package:secure_application/secure_application.dart';
+
 import '../theme/theme.dart';
 import '../utils/services/service_locator.dart';
 
@@ -31,6 +31,19 @@ class MyApp extends StatelessWidget {
       theme: getIt<AppTheme>().light(),
       darkTheme: getIt<AppTheme>().dark(),
       themeMode: ThemeMode.light,
+      builder: (context, child) {
+        return SecureApplication(
+          nativeRemoveDelay: 100,
+          onNeedUnlock: (secureApplicationController) async {
+            return SecureApplicationAuthenticationStatus.SUCCESS;
+          },
+          child: SecureGate(
+            blurr: 20,
+            opacity: 0.6,
+            child: child ?? SizedBox(),
+          ),
+        );
+      },
 
       // initialRoute: AppRoutes.login,
       // initialRoute: AppRoutes.profile,
@@ -40,9 +53,8 @@ class MyApp extends StatelessWidget {
       // initialRoute: AppRoutes.quizSelection,
       // initialRoute: AppRoutes.splash,
       onGenerateRoute: AppRouter().generateRoute,
-      // home: 
+      // home:
       // home: BeautifulEquations(),
     );
   }
 }
-

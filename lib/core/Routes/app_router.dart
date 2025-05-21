@@ -6,7 +6,6 @@ import 'package:sanad_school/features/about_developers/presentation/about_develo
 import 'package:sanad_school/features/auth/presentation/cubit/obscure_cubit/obsecure_cubit.dart';
 import 'package:sanad_school/features/auth/presentation/screens/personal_info/personal_info_screen.dart';
 import 'package:sanad_school/features/auth/presentation/screens/school_info/school_info_screen.dart';
-import 'package:sanad_school/features/lessons/presentation/cubit/lessons_cubit.dart';
 import 'package:sanad_school/features/profile/presentation/cubits/profile_cubit.dart';
 import 'package:sanad_school/features/questions/presentation/cubit/question_cubit.dart';
 import 'package:sanad_school/features/questions/presentation/questions_screen.dart';
@@ -26,14 +25,14 @@ import '../../features/auth/presentation/cubit/auth_cubit/auth_cubit.dart';
 import '../../features/auth/presentation/screens/login/login_screen.dart';
 import '../../features/lessons/domain/entities/lesson_with_one_type_entity.dart';
 import '../../features/lessons/presentation/cubit/lessons_state.dart';
-import '../../features/testing/repo.dart';
+import '../../features/questions/presentation/arg/question_from_quiz_arg.dart';
+import '../../features/quiz/presentation/cubits/quiz_selection_cubit.dart';
+import '../../features/quiz/presentation/screens/arg/screen_arg.dart';
+import '../../features/quiz/presentation/screens/quiz_selection/quiz_selection_screen.dart';
 import '../helper/cubit_helper.dart';
 import '../shared/widgets/slide_transion_page_route_builder.dart';
 import '../../features/lessons/presentation/lesson_screen.dart';
 import '../../features/profile/presentation/profile_screen.dart';
-// import '../../features/randomize/data/mock_repository.dart';
-// import '../../features/randomize/presentation/cubits/quiz_selection_cubit.dart';
-// import '../../features/randomize/presentation/screens/quiz_selection/quiz_selection_screen.dart';
 import '../../features/subjects/subjects_screen.dart';
 import '../../features/subscription/presentation/subscription_screen.dart';
 import '../utils/services/device_info_service.dart';
@@ -130,7 +129,7 @@ class AppRouter with CubitProviderMixin {
           builder: (context) {
             final arg = settings.arguments as Map;
             final LessonWithOneTypeEntity lessonWithOneTypeEntity = arg["lesson"];
-            final SubjectEntity subject = arg["subject"];
+            // final SubjectEntity subject = arg["subject"];
             final Color subjectColor = arg["color"];
             final TextDirection textDirection = arg["direction"];
             final ScreenType screenType = arg["screenType"];
@@ -266,28 +265,29 @@ class AppRouter with CubitProviderMixin {
           settings: settings,
           builder: (context) => QrScannerScreen(),
         );
-      // case AppRoutes.quizSelection:
-      //   return SlidingPageRouteBuilder(
-      //     builder: (context) => BlocProvider(
-      //       lazy: false,
-      //       create: (context) => QuizSelectionCubit(
-      //         questionRepository: MockQuestionRepository(),
-      //       ),
-      //       child: const QuizSelectionScreen(),
-      //     ),
-      //     settings: settings,
-      //   );
-      case AppRoutes.test1:
+      case AppRoutes.quizSelection:
+        final arg = settings.arguments as QuizScreenArgs;
         return SlidingPageRouteBuilder(
           settings: settings,
-          builder: (context) => Test1Screen(subjectId: settings.arguments as int),
-        );
-      case AppRoutes.test2:
-        return SlidingPageRouteBuilder(
-          settings: settings,
-          builder: (context) => Test2Screen(lessonId: settings.arguments as int),
+          builder: (context) => BlocProvider(
+            create: (context) => getCubit(() => QuizSelectionCubit(quizScreenArgs: arg)),
+            child: QuizSelectionScreen(),
+          ),
         );
 
+      case AppRoutes.questionsFromQuiz:
+        final arg = settings.arguments as QuestionFromQuizArg;
+        return SlidingPageRouteBuilder(
+          settings: settings,
+          builder: (context) => BlocProvider(
+            create: (context) => getCubit(() => QuestionCubit())..startQuiz(arg: arg),
+            child: QuestionsPage(
+              lessonName: "اختبار عشوائي",
+              subjectColor: arg.subjectColor,
+              textDirection: arg.textDirection,
+            ),
+          ),
+        );
       //!default route:
       default:
         return MaterialPageRoute(

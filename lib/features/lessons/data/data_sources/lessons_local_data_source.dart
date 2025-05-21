@@ -4,7 +4,6 @@ import '../../../../core/databases/local_database/tables/type_question_table.dar
 import 'package:sanad_school/core/databases/local_database/tables/question_table.dart';
 import 'package:sanad_school/core/databases/local_database/tables/bridge_tables/question_groups_table.dart';
 
-import 'dart:developer';
 
 import '../../../subject_type/data/models/type_model.dart';
 import '../models/lesson_model.dart';

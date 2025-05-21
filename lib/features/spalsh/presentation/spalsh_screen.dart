@@ -1,6 +1,6 @@
+
 import 'package:awesome_video_player/awesome_video_player.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../core/Routes/app_routes.dart';
@@ -49,8 +49,21 @@ class _SamsungSplashScreenState extends State<SamsungSplashScreen> {
       betterPlayerDataSource: betterPlayerDataSource,
     );
 
-    _betterPlayerController!.addEventsListener((BetterPlayerEvent event) {
+    _betterPlayerController!.addEventsListener((BetterPlayerEvent event) async {
       if (event.betterPlayerEventType == BetterPlayerEventType.finished) {
+        // await Future.delayed(const Duration(seconds: 3));
+        // final dir = await getApplicationDocumentsDirectory();
+        // final path = '${dir.path}/debug_log.txt';
+        // final params = ShareParams(
+        //   text: 'Great picture',
+        //   files: [XFile(path)],
+        // );
+
+        // final result = await SharePlus.instance.share(params);
+
+        // if (result.status == ShareResultStatus.success) {
+        //   log('Thank you for sharing the picture!');
+        // }
         setState(() {
           _isVideoComplete = true;
         });
@@ -63,10 +76,23 @@ class _SamsungSplashScreenState extends State<SamsungSplashScreen> {
     });
   }
 
-  void _navigateBasedOnAuthState() {
+  void _navigateBasedOnAuthState() async {
     if (!context.mounted) return;
 
     final authState = context.read<AuthCubit>().state;
+    // await Future.delayed(const Duration(seconds: 3));
+    // final dir = await getApplicationDocumentsDirectory();
+    // final path = '${dir.path}/debug_log.txt';
+    // final params = ShareParams(
+    //   text: 'Great picture',
+    //   files: [XFile(path)],
+    // );
+
+    // final result = await SharePlus.instance.share(params);
+
+    // if (result.status == ShareResultStatus.success) {
+    //   log('Thank you for sharing the picture!');
+    // }
     if (authState is PreviouslyAuthentecated) {
       Navigator.pushReplacementNamed(context, AppRoutes.home);
     } else if (authState is UnAuthentecated) {
@@ -82,7 +108,6 @@ class _SamsungSplashScreenState extends State<SamsungSplashScreen> {
 
   @override
   Widget build(BuildContext context) {
-
     return BlocListener<AuthCubit, AuthState>(
       listener: (context, state) {
         if (_isVideoComplete) {

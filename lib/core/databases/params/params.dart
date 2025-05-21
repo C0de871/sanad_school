@@ -158,3 +158,54 @@ class QuestionPhotoParams {
     required this.questionId,
   });
 }
+
+class QuizFilterParams {
+  final int subjectId;
+  final List<int> lessonIds;
+  final List<int> typeIds;
+  final List<int> tagIds;
+
+  QuizFilterParams({
+    required this.subjectId,
+    required this.lessonIds,
+    required this.typeIds,
+    required this.tagIds,
+  });
+}
+
+//getAvailableTypes params
+class GetAvailableTypesParams {
+  final int subjectId;
+  final List<int> selectedLessonIds;
+  final List<int> selectedTagIds;
+
+  GetAvailableTypesParams({
+    required this.subjectId,
+    required this.selectedLessonIds,
+    required this.selectedTagIds,
+  });
+}
+
+class GetAvailableTagsParams {
+  final int subjectId;
+  final List<int> selectedLessonIds;
+  final List<int> selectedTypeIds;
+
+  GetAvailableTagsParams({
+    required this.subjectId,
+    required this.selectedLessonIds,
+    required this.selectedTypeIds,
+  });
+}
+
+class GetAvailableLessonsParams {
+  final int subjectId;
+  final List<int> selectedTypeIds;
+  final List<int> selectedTagIds;
+
+  GetAvailableLessonsParams({
+    required this.subjectId,
+    required this.selectedTypeIds,
+    required this.selectedTagIds,
+  });
+}

@@ -15,7 +15,8 @@ class QuestionLocalDataSource {
   QuestionLocalDataSource({required this.database});
 
   // Get questions inside the lesson by type
-  Future<QuestionsResponseModel> getQuestionsByLessonAndType(int lessonId, int? typeId) async {
+  Future<QuestionsResponseModel> getQuestionsByLessonAndType(
+      int lessonId, int? typeId) async {
     String query = '';
     if (typeId != null) {
       query = '''
@@ -30,13 +31,14 @@ class QuestionLocalDataSource {
                q.${QuestionTable.hintPhoto} as hint_photo,
                q.${QuestionTable.note} as note,
                qg.${QuestionGroupsTable.isFavorite} as is_favorite,
-               qg.${QuestionGroupsTable.answerStatus} as answer_status
+               qg.${QuestionGroupsTable.answerStatus} as answer_status,
+               qg.${QuestionGroupsTable.displayOrder} as group_display_order
 
         FROM ${QuestionTable.tableName} q
         JOIN ${QuestionGroupsTable.tableName} qg ON q.${QuestionTable.questionGroupId} = qg.${QuestionGroupsTable.id}
         WHERE qg.${QuestionGroupsTable.lessonId} = $lessonId 
         AND q.${QuestionTable.idTypeQuestion} = $typeId
-        ORDER BY q.${QuestionTable.questionGroupId}, q.${QuestionTable.displayOrder}
+        ORDER BY qg.${QuestionGroupsTable.displayOrder}, q.${QuestionTable.displayOrder}
       ''';
     } else {
       query = '''
@@ -51,22 +53,24 @@ class QuestionLocalDataSource {
                q.${QuestionTable.hintPhoto} as hint_photo,
                q.${QuestionTable.note} as note,
                qg.${QuestionGroupsTable.isFavorite} as is_favorite,
-               qg.${QuestionGroupsTable.answerStatus} as answer_status
+               qg.${QuestionGroupsTable.answerStatus} as answer_status,
+               qg.${QuestionGroupsTable.displayOrder} as group_display_order
         FROM ${QuestionTable.tableName} q
         JOIN ${QuestionGroupsTable.tableName} qg ON q.${QuestionTable.questionGroupId} = qg.${QuestionGroupsTable.id}
         WHERE qg.${QuestionGroupsTable.lessonId} = $lessonId
-        ORDER BY q.${QuestionTable.questionGroupId}, q.${QuestionTable.displayOrder}
+        ORDER BY qg.${QuestionGroupsTable.displayOrder}, q.${QuestionTable.displayOrder}
       ''';
     }
 
     List<Map> questions = await database.sqlReadData(query);
-    log("questions: $questions");
+    // log("questions: $questions");
     List<Map<String, dynamic>> formattedQuestions = _formatQuestions(questions);
-    // log("formattedQuestions: $formattedQuestions");
+    log("formattedQuestions: $formattedQuestions");
 
     final response = {
       QuestionsResponseModel.dataKey: formattedQuestions,
-      QuestionsResponseModel.messageKey: 'Questions in Lesson $lessonId with Type $typeId',
+      QuestionsResponseModel.messageKey:
+          'Questions in Lesson $lessonId with Type $typeId',
       QuestionsResponseModel.statusKey: 200,
     };
     return QuestionsResponseModel.fromMap(response);
@@ -74,25 +78,32 @@ class QuestionLocalDataSource {
 
   List<Map<String, dynamic>> _formatQuestions(List<Map> questions) {
     return questions.map((q) {
-      // log("choices: ${q['choices']}");
-      // log("text_question: ${q['text_question']}");
-      // log("hint: ${q['hint']}");
       return {
         QuestionModel.idKey: q[QuestionTable.id],
         QuestionModel.uuidKey: q[QuestionTable.uuid],
         QuestionTable.questionGroupId: q[QuestionTable.questionGroupId],
         QuestionTable.displayOrder: q[QuestionTable.displayOrder],
         QuestionModel.typeIdKey: q[QuestionTable.idTypeQuestion],
-        QuestionModel.textQuestionKey: q[QuestionTable.textQuestion] != null ? {"ops": jsonDecode(q[QuestionTable.textQuestion])} : null,
+        QuestionModel.textQuestionKey: q[QuestionTable.textQuestion] != null
+            ? {"ops": jsonDecode(q[QuestionTable.textQuestion])}
+            : null,
         QuestionModel.questionPhotoKey: q[QuestionTable.questionPhoto],
-        QuestionModel.choicesKey: q[QuestionTable.choices] != null ? jsonDecode(q[QuestionTable.choices]).map((item) => {"ops": item}).toList() : null,
+        QuestionModel.choicesKey: q[QuestionTable.choices] != null
+            ? jsonDecode(q[QuestionTable.choices])
+                .map((item) => {"ops": item})
+                .toList()
+            : null,
         QuestionModel.rightChoiceKey: q[QuestionTable.rightChoice],
         QuestionModel.isEditedKey: q[QuestionTable.isEdited],
-        QuestionModel.hintKey: q[QuestionTable.hint] != null ? {"ops": jsonDecode(q[QuestionTable.hint])} : null,
+        QuestionModel.hintKey: q[QuestionTable.hint] != null
+            ? {"ops": jsonDecode(q[QuestionTable.hint])}
+            : null,
         QuestionModel.hintPhotoKey: q[QuestionTable.hintPhoto],
         QuestionModel.noteKey: q[QuestionTable.note],
-        QuestionModel.isFavoriteKey: q[QuestionGroupsTable.isFavorite] == 1 ? true : false,
-        QuestionModel.answerStatusKey: q[QuestionGroupsTable.answerStatus] == 1 ? true : false,
+        QuestionModel.isFavoriteKey:
+            q[QuestionGroupsTable.isFavorite] == 1 ? true : false,
+        QuestionModel.answerStatusKey:
+            q[QuestionGroupsTable.answerStatus] == 1 ? true : false,
       };
     }).toList();
   }
@@ -132,7 +143,8 @@ class QuestionLocalDataSource {
   }
 
 // Method to get questions from favorite groups by lesson ID and type
-  Future<QuestionsResponseModel> getFavoriteGroupsQuestions(int lessonId, int? typeId) async {
+  Future<QuestionsResponseModel> getFavoriteGroupsQuestions(
+      int lessonId, int? typeId) async {
     String query = '';
     if (typeId != null) {
       query = '''
@@ -180,14 +192,16 @@ class QuestionLocalDataSource {
 
     final response = {
       QuestionsResponseModel.dataKey: formattedQuestions,
-      QuestionsResponseModel.messageKey: 'Questions from favorite groups in Lesson $lessonId${typeId != null ? ' with Type $typeId' : ''}',
+      QuestionsResponseModel.messageKey:
+          'Questions from favorite groups in Lesson $lessonId${typeId != null ? ' with Type $typeId' : ''}',
       QuestionsResponseModel.statusKey: 200,
     };
     return QuestionsResponseModel.fromMap(response);
   }
 
 // Method to get questions from favorite groups by lesson ID and type
-  Future<QuestionsResponseModel> getIncorrectAnswerGroupsQuestions(int lessonId, int? typeId) async {
+  Future<QuestionsResponseModel> getIncorrectAnswerGroupsQuestions(
+      int lessonId, int? typeId) async {
     String query = '';
     if (typeId != null) {
       query = '''
@@ -235,14 +249,16 @@ class QuestionLocalDataSource {
 
     final response = {
       QuestionsResponseModel.dataKey: formattedQuestions,
-      QuestionsResponseModel.messageKey: 'Questions from favorite groups in Lesson $lessonId${typeId != null ? ' with Type $typeId' : ''}',
+      QuestionsResponseModel.messageKey:
+          'Questions from favorite groups in Lesson $lessonId${typeId != null ? ' with Type $typeId' : ''}',
       QuestionsResponseModel.statusKey: 200,
     };
     return QuestionsResponseModel.fromMap(response);
   }
 
 // Method to get edited questions by lesson ID and type
-  Future<QuestionsResponseModel> getEditedQuestionsByLesson(int lessonId, int? typeId) async {
+  Future<QuestionsResponseModel> getEditedQuestionsByLesson(
+      int lessonId, int? typeId) async {
     String query = '';
     if (typeId != null) {
       query = '''
@@ -292,7 +308,8 @@ class QuestionLocalDataSource {
 
     final response = {
       QuestionsResponseModel.dataKey: formattedQuestions,
-      QuestionsResponseModel.messageKey: 'Edited Questions in Lesson $lessonId${typeId != null ? ' with Type $typeId' : ''}',
+      QuestionsResponseModel.messageKey:
+          'Edited Questions in Lesson $lessonId${typeId != null ? ' with Type $typeId' : ''}',
       QuestionsResponseModel.statusKey: 200,
     };
     return QuestionsResponseModel.fromMap(response);
@@ -328,7 +345,8 @@ class QuestionLocalDataSource {
     }
   }
 
-  Future<bool> toggleQuestionIncorrectAnswer(int questionId, bool answerStatus) async {
+  Future<bool> toggleQuestionIncorrectAnswer(
+      int questionId, bool answerStatus) async {
     try {
       // Get the question group ID
       String getGroupIdQuery = '''

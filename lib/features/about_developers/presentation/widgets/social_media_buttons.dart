@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
-import '../../../about_sanad/presentation/about_us_screen.dart';
 
 class SocialMediaButtons extends StatelessWidget {
   const SocialMediaButtons({super.key});

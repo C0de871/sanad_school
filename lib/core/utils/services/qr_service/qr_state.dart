@@ -41,5 +41,13 @@ class QrScannerState extends Equatable {
   }
 
   @override
-  List<Object?> get props => [hasPermission, scanResult, isLoading, errorMessage, isTorchOn, isFrontCamera, isDetected];
+  List<Object?> get props => [
+        hasPermission,
+        scanResult,
+        isLoading,
+        errorMessage,
+        isTorchOn,
+        isFrontCamera,
+        isDetected
+      ];
 }

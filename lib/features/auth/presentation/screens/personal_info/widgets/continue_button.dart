@@ -34,12 +34,8 @@ class ContinueButton extends StatelessWidget {
             foregroundColor: Theme.of(context).colorScheme.onPrimary,
             child: Center(
               child: isLoading
-                  ? SizedBox(
-                      height: 24,
-                      width: 24,
-                      child: LoadingDots(
-                        color: Theme.of(context).colorScheme.onPrimary,
-                      ),
+                  ? LoadingDots(
+                      color: Theme.of(context).colorScheme.onPrimary,
                     )
                   : const Text(
                       'المتابعة',

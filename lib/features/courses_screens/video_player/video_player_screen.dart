@@ -116,7 +116,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
         }
       });
     } catch (e) {
-      print('Video initialization error: $e');
+      log('Video initialization error: $e');
       if (mounted) {
         setState(() {
           _hasError = true;
@@ -299,7 +299,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
                 duration: const Duration(milliseconds: 300),
                 child: IgnorePointer(
                   ignoring: !_showControls,
-                  child: Container(
+                  child: SizedBox(
                     width: double.infinity,
                     height: double.infinity,
                     child: Stack(

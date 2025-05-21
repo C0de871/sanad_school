@@ -2,7 +2,6 @@
 
 import 'dart:developer';
 
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_math_fork/flutter_math.dart';
@@ -10,6 +9,7 @@ import 'package:flutter_quill/flutter_quill.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:sanad_school/features/questions/presentation/cubit/question_cubit.dart';
 import 'package:sanad_school/features/questions/presentation/cubit/question_state.dart';
+import 'package:secure_application/secure_application.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'dart:async';
 
@@ -50,7 +50,8 @@ class _QuestionsPageState extends State<QuestionsPage> {
     return '${hours.toString().padLeft(2, '0')}:${minutes.toString().padLeft(2, '0')}:${remainingSeconds.toString().padLeft(2, '0')}';
   }
 
-  void showHintBottomSheet(BuildContext parentContext, int questionIndex, QuestionSuccess state) {
+  void showHintBottomSheet(
+      BuildContext parentContext, int questionIndex, QuestionSuccess state) {
     final questionCubit = parentContext.read<QuestionCubit>();
     showModalBottomSheet(
       context: parentContext,
@@ -98,13 +99,15 @@ class _QuestionsPageState extends State<QuestionsPage> {
               QuillEditor(
                 focusNode: questionCubit.getHintFocusNode(questionIndex),
                 controller: questionCubit.getHintController(questionIndex),
-                scrollController: questionCubit.getHintScrollController(questionIndex),
+                scrollController:
+                    questionCubit.getHintScrollController(questionIndex),
                 config: QuillEditorConfig(
                   scrollable: false,
                   requestKeyboardFocusOnCheckListChanged: false,
                   showCursor: false,
                   autoFocus: false,
                   padding: EdgeInsets.zero,
+                  unknownEmbedBuilder: FallbackEmbedBuilder(),
                   embedBuilders: [
                     FormulaEmbedBuilder(),
                   ],
@@ -128,36 +131,40 @@ class _QuestionsPageState extends State<QuestionsPage> {
                   builder: (context, state) {
                     switch (state) {
                       case QuestionSuccess():
-                        if (state.questions[questionIndex].downloadedHintPhoto != null) {
+                        if (state
+                                .questions[questionIndex].downloadedHintPhoto !=
+                            null) {
                           return ClipRRect(
                             borderRadius: BorderRadius.circular(16),
-                            child: Image.memory(
-                              state.questions[questionIndex].downloadedHintPhoto!,
-                              // imageUrl: state.questions[questionIndex].hintPhoto!,
-                              // placeholder: (context, url) => Container(
-                              //   height: 200,
-                              //   color: Colors.grey[200],
-                              //   child: const Center(child: CoolLoadingScreen()),
-                              // ),
-                              // errorWidget: (context, url, error) => Container(
-                              //   height: 200,
-                              //   color: Colors.grey[200],
-                              //   child: const Center(
-                              //     child: Icon(Icons.error_outline, size: 40, color: Colors.grey),
-                              //   ),
-                              // ),
-                              fit: BoxFit.cover,
+                            child: ConstrainedBox(
+                              constraints: BoxConstraints(
+                                maxHeight: 350,
+                              ),
+                              child: Image.memory(
+                                state.questions[questionIndex]
+                                    .downloadedHintPhoto!,
+                                fit: BoxFit.cover,
+                              ),
                             ),
                           );
-                        } else if (state.questions[questionIndex].hintPhoto != null) {
-                          return const Center(child: CoolLoadingScreen());
+                        } else if (state.questions[questionIndex].hintPhoto !=
+                            null) {
+                          return Center(
+                              child: CoolLoadingScreen(
+                            primaryColor: widget.subjectColor,
+                            secondaryColor: widget.subjectColor.withAlpha(100),
+                          ));
                         } else {
                           return const SizedBox();
                         }
                       case QuestionInitial():
                         return const SizedBox();
                       case QuestionLoading():
-                        return const Center(child: CoolLoadingScreen());
+                        return Center(
+                            child: CoolLoadingScreen(
+                          primaryColor: widget.subjectColor,
+                          secondaryColor: widget.subjectColor.withAlpha(100),
+                        ));
                       case QuestionFailure():
                         return const SizedBox();
                     }
@@ -194,7 +201,10 @@ class _QuestionsPageState extends State<QuestionsPage> {
                   Container(
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
+                      color: Theme.of(context)
+                          .colorScheme
+                          .primary
+                          .withValues(alpha: 0.1),
                       shape: BoxShape.circle,
                     ),
                     child: Icon(
@@ -275,7 +285,8 @@ class _QuestionsPageState extends State<QuestionsPage> {
     );
   }
 
-  Future<void> showConfirmationDialog(bool isReset, String action, VoidCallback onConfirm) async {
+  Future<void> showConfirmationDialog(
+      bool isReset, String action, VoidCallback onConfirm) async {
     return showDialog(
       context: context,
       builder: (BuildContext context) => AlertDialog(
@@ -324,7 +335,8 @@ class _QuestionsPageState extends State<QuestionsPage> {
     );
   }
 
-  void showNoteBottomSheet(BuildContext parentContext, int questionIndex, QuestionEntity question, String? note) {
+  void showNoteBottomSheet(BuildContext parentContext, int questionIndex,
+      QuestionEntity question, String? note) {
     final questionCubit = parentContext.read<QuestionCubit>();
     questionCubit.noteController.text = note ?? '';
 
@@ -380,7 +392,9 @@ class _QuestionsPageState extends State<QuestionsPage> {
                         const SizedBox(height: 20),
                         Container(
                           decoration: BoxDecoration(
-                            color: Theme.of(context).colorScheme.surfaceContainerHighest,
+                            color: Theme.of(context)
+                                .colorScheme
+                                .surfaceContainerHighest,
                             borderRadius: BorderRadius.circular(16),
                             border: Border.all(
                               color: widget.subjectColor.withOpacity(0.2),
@@ -406,7 +420,8 @@ class _QuestionsPageState extends State<QuestionsPage> {
                               child: FilledButton.icon(
                                 style: FilledButton.styleFrom(
                                   backgroundColor: widget.subjectColor,
-                                  padding: const EdgeInsets.symmetric(vertical: 16),
+                                  padding:
+                                      const EdgeInsets.symmetric(vertical: 16),
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(12),
                                   ),
@@ -414,28 +429,37 @@ class _QuestionsPageState extends State<QuestionsPage> {
                                 icon: const Icon(Icons.save),
                                 label: const Text('حفظ الملاحظة'),
                                 onPressed: () {
-                                  if (questionCubit.noteController.text.trim().isNotEmpty) {
-                                    questionCubit.saveQuestionNote(questionId: question.id, note: questionCubit.noteController.text.trim());
+                                  if (questionCubit.noteController.text
+                                      .trim()
+                                      .isNotEmpty) {
+                                    questionCubit.saveQuestionNote(
+                                        questionId: question.id,
+                                        note: questionCubit.noteController.text
+                                            .trim());
                                   } else {
-                                    questionCubit.saveQuestionNote(questionId: question.id, note: '');
+                                    questionCubit.saveQuestionNote(
+                                        questionId: question.id, note: '');
                                   }
                                   Navigator.pop(context);
                                 },
                               ),
                             ),
-                            if (question.note != null && question.note!.trim().isNotEmpty) ...[
+                            if (question.note != null &&
+                                question.note!.trim().isNotEmpty) ...[
                               const SizedBox(width: 12),
                               FilledButton(
                                 style: FilledButton.styleFrom(
                                   backgroundColor: Colors.red,
-                                  padding: const EdgeInsets.symmetric(vertical: 16),
+                                  padding:
+                                      const EdgeInsets.symmetric(vertical: 16),
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(12),
                                   ),
                                 ),
                                 child: Icon(Icons.delete, color: Colors.white),
                                 onPressed: () {
-                                  questionCubit.saveQuestionNote(questionId: question.id, note: '');
+                                  questionCubit.saveQuestionNote(
+                                      questionId: question.id, note: '');
                                   Navigator.pop(context);
                                 },
                               ),
@@ -457,129 +481,145 @@ class _QuestionsPageState extends State<QuestionsPage> {
   @override
   Widget build(BuildContext context) {
     final questionCubit = context.read<QuestionCubit>();
-    return Directionality(
-      textDirection: widget.textDirection,
-      child: Scaffold(
-        appBar: AppBar(
-          title: Text(widget.lessonName),
-          bottom: PreferredSize(
-            preferredSize: Size.fromHeight(58),
-            child: Container(
-              padding: EdgeInsets.only(bottom: padding4 * 2),
-              decoration: BoxDecoration(
-                // color: Colors.grey[100],
-                borderRadius: BorderRadius.circular(12),
+    return SecureApplication(
+      nativeRemoveDelay: 100,
+      onNeedUnlock: (secureApplicationController) async {
+        return SecureApplicationAuthenticationStatus.SUCCESS;
+      },
+      child: SecureGate(
+        blurr: 20,
+        opacity: 0.6,
+        child: Directionality(
+          textDirection: widget.textDirection,
+          child: Scaffold(
+            appBar: AppBar(
+              title: Text(widget.lessonName),
+              bottom: PreferredSize(
+                preferredSize: Size.fromHeight(58),
+                child: Container(
+                  padding: EdgeInsets.only(bottom: padding4 * 2),
+                  decoration: BoxDecoration(
+                    // color: Colors.grey[100],
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: BlocBuilder<QuestionCubit, QuestionState>(
+                    builder: (context, state) {
+                      return switch (state) {
+                        QuestionSuccess() => Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: [
+                              _buildEnhancedStatCard(
+                                'Total Questions',
+                                state.questions.length.toString(),
+                                Icons.quiz,
+                                Color(0xFF84D6FD),
+                              ),
+                              _buildEnhancedStatCard(
+                                'Correct',
+                                state.correctAnswers.toString(),
+                                Icons.check_circle,
+                                Color.fromARGB(255, 121, 193, 69),
+                              ),
+                              _buildEnhancedStatCard(
+                                'Wrong',
+                                state.wrongAnswers.toString(),
+                                Icons.cancel,
+                                Color.fromARGB(255, 254, 117, 117),
+                              ),
+                            ],
+                          ),
+                        _ => SizedBox(),
+                      };
+                    },
+                  ),
+                ),
               ),
-              child: BlocBuilder<QuestionCubit, QuestionState>(
-                builder: (context, state) {
-                  return switch (state) {
-                    QuestionSuccess() => Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          _buildEnhancedStatCard(
-                            'Total Questions',
-                            state.questions.length.toString(),
-                            Icons.quiz,
-                            Color(0xFF84D6FD),
-                          ),
-                          _buildEnhancedStatCard(
-                            'Correct',
-                            state.correctAnswers.toString(),
-                            Icons.check_circle,
-                            Color(0xFFA7EF75),
-                          ),
-                          _buildEnhancedStatCard(
-                            'Wrong',
-                            state.wrongAnswers.toString(),
-                            Icons.cancel,
-                            Color.fromARGB(255, 254, 117, 117),
-                          ),
-                        ],
-                      ),
-                    _ => SizedBox(),
-                  };
-                },
-              ),
-            ),
-          ),
-          actions: [
-            BlocBuilder<QuestionCubit, QuestionState>(
-              builder: (context, state) {
-                return switch (state) {
-                  QuestionSuccess() => GestureDetector(
-                      onLongPress: () {
-                        questionCubit.resetTimer();
-                      },
-                      child: IconButton(
-                        icon: const Icon(Icons.timer),
-                        onPressed: () {
-                          if (state.isTimerRunning) {
-                            questionCubit.stopTimer();
-                          } else {
-                            questionCubit.startTimer();
-                          }
-                        },
-                      ),
-                    ),
-                  _ => SizedBox(),
-                };
-              },
-            ),
-            BlocBuilder<QuestionCubit, QuestionState>(
-              builder: (context, state) {
-                return switch (state) {
-                  QuestionSuccess() => Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                      child: Center(
-                        child: Text(
-                          formatTime(state.seconds),
-                          style: const TextStyle(fontSize: 16),
-                        ),
-                      ),
-                    ),
-                  _ => SizedBox(),
-                };
-              },
-            ),
-          ],
-        ),
-        body: BlocBuilder<QuestionCubit, QuestionState>(
-          builder: (context, state) {
-            return switch (state) {
-              QuestionSuccess() => Stack(
-                  children: [
-                    Column(
-                      children: [
-                        Expanded(
-                          child: ListView.builder(
-                            padding: const EdgeInsets.all(16),
-                            itemCount: state.questions.length,
-                            itemBuilder: (context, index) {
-                              final question = state.questions[index];
-                              return _buildQuestionCard(question, index, state);
+              actions: [
+                BlocBuilder<QuestionCubit, QuestionState>(
+                  builder: (context, state) {
+                    return switch (state) {
+                      QuestionSuccess() => GestureDetector(
+                          onLongPress: () {
+                            questionCubit.resetTimer();
+                          },
+                          child: IconButton(
+                            icon: const Icon(Icons.timer),
+                            onPressed: () {
+                              if (state.isTimerRunning) {
+                                questionCubit.stopTimer();
+                              } else {
+                                questionCubit.startTimer();
+                              }
                             },
                           ),
                         ),
-                        SizedBox(height: 64),
+                      _ => SizedBox(),
+                    };
+                  },
+                ),
+                BlocBuilder<QuestionCubit, QuestionState>(
+                  builder: (context, state) {
+                    return switch (state) {
+                      QuestionSuccess() => Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                          child: Center(
+                            child: Text(
+                              formatTime(state.seconds),
+                              style: const TextStyle(fontSize: 16),
+                            ),
+                          ),
+                        ),
+                      _ => SizedBox(),
+                    };
+                  },
+                ),
+              ],
+            ),
+            body: BlocBuilder<QuestionCubit, QuestionState>(
+              builder: (context, state) {
+                return switch (state) {
+                  QuestionSuccess() => Stack(
+                      children: [
+                        Column(
+                          children: [
+                            Expanded(
+                              child: ListView.builder(
+                                padding: const EdgeInsets.all(16),
+                                itemCount: state.questions.length,
+                                itemBuilder: (context, index) {
+                                  final question = state.questions[index];
+                                  return _buildQuestionCard(
+                                      question, index, state);
+                                },
+                              ),
+                            ),
+                            SizedBox(height: 64),
+                          ],
+                        ),
+                        Positioned(
+                          bottom: 0,
+                          left: 0,
+                          right: 0,
+                          child: _buildBottomActionBar(),
+                        ),
                       ],
                     ),
-                    Positioned(
-                      bottom: 0,
-                      left: 0,
-                      right: 0,
-                      child: _buildBottomActionBar(),
-                    ),
-                  ],
-                ),
-              _ => const Center(child: CoolLoadingScreen()),
-            };
-          },
+                  _ => Center(
+                        child: CoolLoadingScreen(
+                      primaryColor: widget.subjectColor,
+                      secondaryColor: widget.subjectColor.withAlpha(100),
+                    )),
+                };
+              },
+            ),
+          ),
         ),
       ),
     );
   }
 
-  Widget _buildEnhancedStatCard(String title, String value, IconData icon, Color color) {
+  Widget _buildEnhancedStatCard(
+      String title, String value, IconData icon, Color color) {
     return SizedBox(
       // width: 100,
       child: Column(
@@ -612,7 +652,8 @@ class _QuestionsPageState extends State<QuestionsPage> {
     );
   }
 
-  Widget _buildQuestionCard(QuestionEntity question, int questionIndex, QuestionSuccess state) {
+  Widget _buildQuestionCard(
+      QuestionEntity question, int questionIndex, QuestionSuccess state) {
     log("expanded state is ${state.expandedImages[questionIndex]}");
     log("question photo state is ${question.downloadedQuestionPhoto != null}");
     final questionCubit = context.read<QuestionCubit>();
@@ -653,15 +694,20 @@ class _QuestionsPageState extends State<QuestionsPage> {
                   const SizedBox(width: 16),
                   Expanded(
                     child: QuillEditor(
-                      focusNode: questionCubit.getQuestionFocusNode(questionIndex),
-                      controller: questionCubit.getQuestionController(questionIndex),
-                      scrollController: questionCubit.getQuestionScrollController(questionIndex),
+                      focusNode:
+                          questionCubit.getQuestionFocusNode(questionIndex),
+                      controller:
+                          questionCubit.getQuestionController(questionIndex),
+                      scrollController: questionCubit
+                          .getQuestionScrollController(questionIndex),
                       config: QuillEditorConfig(
-                        scrollable: true, // Disable QuillEditor's internal scrolling
+                        scrollable:
+                            true, // Disable QuillEditor's internal scrolling
                         requestKeyboardFocusOnCheckListChanged: false,
                         showCursor: false,
                         autoFocus: false,
                         padding: EdgeInsets.zero,
+                        unknownEmbedBuilder: FallbackEmbedBuilder(),
                         embedBuilders: [
                           FormulaEmbedBuilder(),
                         ],
@@ -679,11 +725,15 @@ class _QuestionsPageState extends State<QuestionsPage> {
                         backgroundColor: widget.subjectColor.withOpacity(0.1),
                       ),
                       icon: Icon(
-                        state.expandedImages[questionIndex] == true ? Icons.visibility_off : Icons.image,
+                        state.expandedImages[questionIndex] == true
+                            ? Icons.visibility_off
+                            : Icons.image,
                         color: widget.subjectColor,
                       ),
                       onPressed: () {
-                        context.read<QuestionCubit>().toggleExpandedImage(questionIndex);
+                        context
+                            .read<QuestionCubit>()
+                            .toggleExpandedImage(questionIndex);
                       },
                     ),
                   ],
@@ -694,29 +744,24 @@ class _QuestionsPageState extends State<QuestionsPage> {
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(16),
                       child: question.downloadedQuestionPhoto != null
-                          ? Image.memory(
-                              question.downloadedQuestionPhoto!,
-                              height: 350,
-                              // imageUrl: question.questionPhoto ?? '',
-                              // placeholder: (context, url) => Container(
-                              //   height: 200,
-                              //   color: Colors.grey[200],
-                              //   child: const Center(child: CoolLoadingScreen()),
-                              // ),
-                              // errorWidget: (context, url, error) => Container(
-                              //   height: 200,
-                              //   color: Colors.grey[200],
-                              //   child: const Center(
-                              //     child: Icon(Icons.error_outline, size: 40, color: Colors.grey),
-                              //   ),
-                              // ),
-                              fit: BoxFit.contain,
+                          ? ConstrainedBox(
+                              constraints: BoxConstraints(
+                                maxHeight: 350,
+                              ),
+                              child: Image.memory(
+                                question.downloadedQuestionPhoto!,
+                                fit: BoxFit.contain,
+                              ),
                             )
                           : Container(
-                              height: 200,
                               width: double.infinity,
                               color: Colors.grey[200],
-                              child: const Center(child: CoolLoadingScreen()),
+                              child: Center(
+                                  child: CoolLoadingScreen(
+                                primaryColor: widget.subjectColor,
+                                secondaryColor:
+                                    widget.subjectColor.withAlpha(100),
+                              )),
                             ),
                     ),
                   ),
@@ -727,7 +772,9 @@ class _QuestionsPageState extends State<QuestionsPage> {
                 const SizedBox(height: 16),
                 GestureDetector(
                   onTap: () {
-                    context.read<QuestionCubit>().toggleExpandedAnswer(questionIndex);
+                    context
+                        .read<QuestionCubit>()
+                        .toggleExpandedAnswer(questionIndex);
                   },
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(16),
@@ -738,15 +785,21 @@ class _QuestionsPageState extends State<QuestionsPage> {
                         child: Center(
                           child: state.expandedAnswers[questionIndex] == true
                               ? QuillEditor(
-                                  focusNode: questionCubit.getAnswerFocusNode(questionIndex, 0),
-                                  controller: questionCubit.getAnswerController(questionIndex, 0),
-                                  scrollController: questionCubit.getAnswerScrollController(questionIndex, 0),
+                                  focusNode: questionCubit.getAnswerFocusNode(
+                                      questionIndex, 0),
+                                  controller: questionCubit.getAnswerController(
+                                      questionIndex, 0),
+                                  scrollController:
+                                      questionCubit.getAnswerScrollController(
+                                          questionIndex, 0),
                                   config: QuillEditorConfig(
                                     scrollable: false,
                                     showCursor: false,
                                     autoFocus: false,
-                                    requestKeyboardFocusOnCheckListChanged: false,
+                                    requestKeyboardFocusOnCheckListChanged:
+                                        false,
                                     padding: EdgeInsets.zero,
+                                    unknownEmbedBuilder: FallbackEmbedBuilder(),
                                     embedBuilders: [
                                       FormulaEmbedBuilder(),
                                     ],
@@ -757,13 +810,17 @@ class _QuestionsPageState extends State<QuestionsPage> {
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
                                     Icon(
-                                      state.expandedAnswers[questionIndex] == true ? Icons.visibility_off : Icons.question_answer_outlined,
+                                      state.expandedAnswers[questionIndex] ==
+                                              true
+                                          ? Icons.visibility_off
+                                          : Icons.question_answer_outlined,
                                       color: widget.subjectColor,
                                     ),
                                     const SizedBox(width: 16),
                                     Text(
                                       'عرض الاجابة',
-                                      style: TextStyle(color: widget.subjectColor),
+                                      style:
+                                          TextStyle(color: widget.subjectColor),
                                     ),
                                   ],
                                 ),
@@ -774,17 +831,26 @@ class _QuestionsPageState extends State<QuestionsPage> {
                 ),
               ],
               const SizedBox(height: 20),
-              if (question.type == QuestionTypeEnum.multipleChoice) _buildMultipleChoiceAnswers(question, questionIndex, state) else _buildAnswer(question, questionIndex),
+              if (question.type == QuestionTypeEnum.multipleChoice)
+                _buildMultipleChoiceAnswers(question, questionIndex, state)
+              else
+                _buildAnswer(question, questionIndex),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  if (state.questions[questionIndex].hint != null || state.questions[questionIndex].hintPhoto != null)
+                  if (state.questions[questionIndex].hint != null ||
+                      state.questions[questionIndex].hintPhoto != null)
                     _buildActionButton(
                       icon: Icons.lightbulb_outline,
                       color: Color(0xFFFFB347),
                       onPressed: () {
-                        if (state.questions[questionIndex].downloadedHintPhoto == null) {
-                          questionCubit.getQuestionHintPhoto(state.questions[questionIndex].id, state.questions[questionIndex].hintPhoto!);
+                        if (state.questions[questionIndex].hintPhoto != null &&
+                            state.questions[questionIndex]
+                                    .downloadedHintPhoto ==
+                                null) {
+                          questionCubit.getQuestionHintPhoto(
+                              state.questions[questionIndex].id,
+                              state.questions[questionIndex].hintPhoto!);
                         }
                         showHintBottomSheet(
                           context,
@@ -795,43 +861,57 @@ class _QuestionsPageState extends State<QuestionsPage> {
                     ),
                   const SizedBox(width: 8),
                   _buildActionButton(
-                    icon: question.isFavorite ? Icons.favorite : Icons.favorite_border,
+                    icon: question.isFavorite
+                        ? Icons.favorite
+                        : Icons.favorite_border,
                     color: Colors.red,
                     onPressed: () {
-                      context.read<QuestionCubit>().toggleQuestionFavorite(questionId: question.id, isFavorite: !question.isFavorite);
+                      context.read<QuestionCubit>().toggleQuestionFavorite(
+                          questionId: question.id,
+                          isFavorite: !question.isFavorite);
                     },
                   ),
                   const SizedBox(width: 8),
                   _buildActionButton(
-                    icon: question.note != null && question.note!.trim().isNotEmpty ? Icons.note : Icons.note_add,
+                    icon: question.note != null &&
+                            question.note!.trim().isNotEmpty
+                        ? Icons.note
+                        : Icons.note_add,
                     color: widget.subjectColor,
-                    onPressed: () => showNoteBottomSheet(context, questionIndex, question, question.note),
+                    onPressed: () => showNoteBottomSheet(
+                        context, questionIndex, question, question.note),
                   ),
                   const SizedBox(width: 8),
                   _buildActionButton(
                     icon: Icons.campaign_outlined,
                     color: Colors.red,
-                    onPressed: () => _showReportOptions(context),
+                    onPressed: () => _showReportOptions(context, question),
                   ),
                   if (question.type == QuestionTypeEnum.multipleChoice) ...[
                     const SizedBox(width: 8),
                     _buildActionButton(
                       icon: Icons.check,
                       color: Colors.green,
-                      onPressed: () => context.read<QuestionCubit>().checkMultipleChoiceAnswer(questionIndex),
+                      onPressed: () => context
+                          .read<QuestionCubit>()
+                          .checkMultipleChoiceAnswer(questionIndex),
                     ),
                   ] else ...[
                     const SizedBox(width: 8),
                     _buildActionButton(
                       icon: Icons.check,
                       color: Colors.green,
-                      onPressed: () => context.read<QuestionCubit>().checkWrittenAnswer(questionIndex, true),
+                      onPressed: () => context
+                          .read<QuestionCubit>()
+                          .checkWrittenAnswer(questionIndex, true),
                     ),
                     const SizedBox(width: 8),
                     _buildActionButton(
                       icon: Icons.close,
                       color: Colors.red,
-                      onPressed: () => context.read<QuestionCubit>().checkWrittenAnswer(questionIndex, false),
+                      onPressed: () => context
+                          .read<QuestionCubit>()
+                          .checkWrittenAnswer(questionIndex, false),
                     ),
                   ],
                 ],
@@ -843,7 +923,7 @@ class _QuestionsPageState extends State<QuestionsPage> {
     );
   }
 
-  void _showReportOptions(BuildContext context) {
+  void _showReportOptions(BuildContext context, QuestionEntity question) {
     showModalBottomSheet(
       context: context,
       builder: (BuildContext bc) {
@@ -851,19 +931,20 @@ class _QuestionsPageState extends State<QuestionsPage> {
           child: Wrap(
             children: <Widget>[
               ListTile(
-                leading: const Icon(FontAwesomeIcons.whatsapp, color: Colors.green),
-                title: const Text('Report via WhatsApp'),
+                leading:
+                    const Icon(FontAwesomeIcons.whatsapp, color: Colors.green),
+                title: const Text('أبلغ عن السؤال عبر الواتساب'),
                 onTap: () {
                   Navigator.pop(context);
-                  _launchWhatsApp();
+                  _launchWhatsApp(question.uuid);
                 },
               ),
               ListTile(
                 leading: const Icon(Icons.telegram, color: Colors.blue),
-                title: const Text('Report via Telegram'),
+                title: const Text('أبلغ عن السؤال عبر التليغرام'),
                 onTap: () {
                   Navigator.pop(context);
-                  _launchTelegram();
+                  _launchTelegram(question.uuid);
                 },
               ),
             ],
@@ -873,18 +954,21 @@ class _QuestionsPageState extends State<QuestionsPage> {
     );
   }
 
-  void _launchWhatsApp() async {
+  void _launchWhatsApp(String uuid) async {
     // Make sure the phone number includes country code and no special characters
     String formattedNumber = Constant.whatsappNumber;
+    String message =
+        "أريد أن أبلغ عن مشكلة في السؤال sanadaltaleb.com/q/$uuid/report";
 
     // Try direct WhatsApp app URI first
-    final whatsappUri = Uri.parse('whatsapp://send?phone=$formattedNumber&text=I want to report an issue');
+    final whatsappUri =
+        Uri.parse('whatsapp://send?phone=$formattedNumber&text=$message');
 
     if (await canLaunchUrl(whatsappUri)) {
       await launchUrl(whatsappUri);
     } else {
       // Fallback to web URL
-      final webUri = Uri.parse('https://wa.me/$formattedNumber?text=I want to report an issue');
+      final webUri = Uri.parse('https://wa.me/$formattedNumber?text=$message');
       if (await canLaunchUrl(webUri)) {
         await launchUrl(webUri, mode: LaunchMode.externalApplication);
       } else {
@@ -893,20 +977,21 @@ class _QuestionsPageState extends State<QuestionsPage> {
     }
   }
 
-  void _launchTelegram() async {
-    // Try direct Telegram app URI first
-    final telegramUri = Uri.parse('tg://resolve?domain=${Constant.telegramUsername}');
+  void _launchTelegram(String uuid) async {
+    String message =
+        "أريد أن أبلغ عن مشكلة في السؤال sanadaltaleb.com/q/$uuid/report";
 
-    if (await canLaunchUrl(telegramUri)) {
-      await launchUrl(telegramUri);
+    // // Try direct Telegram app URI first
+    // final telegramUri = Uri.parse(
+    //     'https://t.me/${Constant.telegramUsername}?start&text=$message');
+
+    // Fallback to web URL
+    final webUri = Uri.parse(
+        'https://t.me/${Constant.telegramUsername}?start&text=$message');
+    if (await canLaunchUrl(webUri)) {
+      await launchUrl(webUri, mode: LaunchMode.externalApplication);
     } else {
-      // Fallback to web URL
-      final webUri = Uri.parse('https://t.me/${Constant.telegramUsername}');
-      if (await canLaunchUrl(webUri)) {
-        await launchUrl(webUri, mode: LaunchMode.externalApplication);
-      } else {
-        debugPrint('Could not launch Telegram');
-      }
+      debugPrint('Could not launch Telegram');
     }
   }
 
@@ -938,18 +1023,22 @@ class _QuestionsPageState extends State<QuestionsPage> {
     );
   }
 
-  Widget _buildMultipleChoiceAnswers(QuestionEntity question, int questionIndex, QuestionSuccess state) {
+  Widget _buildMultipleChoiceAnswers(
+      QuestionEntity question, int questionIndex, QuestionSuccess state) {
     log("right choice for question id ${question.id} is ${question.adjustedRightChoice} , and the index of question is $questionIndex");
     final questionCubit = context.read<QuestionCubit>();
     return Column(
       children: question.choices.map((answer) {
         // log("${userAnswers[index] ?? "this is null"}");
-        bool isSelected = question.choices.indexOf(answer) == state.userAnswers[questionIndex];
-        bool isCorrect = question.choices.indexOf(answer) == question.adjustedRightChoice;
+        bool isSelected = question.choices.indexOf(answer) ==
+            state.userAnswers[questionIndex];
+        bool isCorrect =
+            question.choices.indexOf(answer) == question.adjustedRightChoice;
         bool isQuestionCorrected = state.isCorrect[questionIndex] != null;
 
         Color shadowColor = Colors.blueGrey.withAlpha(70);
-        Color backgroundColor = Theme.of(context).colorScheme.surfaceContainerLow;
+        Color backgroundColor =
+            Theme.of(context).colorScheme.surfaceContainerLow;
         Color textColor = Colors.blueGrey;
 
         if (isQuestionCorrected) {
@@ -993,14 +1082,18 @@ class _QuestionsPageState extends State<QuestionsPage> {
                 ? null
                 : () {
                     setState(() {
-                      state.userAnswers[questionIndex] = question.choices.indexOf(answer);
+                      state.userAnswers[questionIndex] =
+                          question.choices.indexOf(answer);
                     });
                   },
             child: Center(
               child: QuillEditor(
-                focusNode: questionCubit.getAnswerFocusNode(questionIndex, question.choices.indexOf(answer)),
-                controller: questionCubit.getAnswerController(questionIndex, question.choices.indexOf(answer)),
-                scrollController: questionCubit.getAnswerScrollController(questionIndex, question.choices.indexOf(answer)),
+                focusNode: questionCubit.getAnswerFocusNode(
+                    questionIndex, question.choices.indexOf(answer)),
+                controller: questionCubit.getAnswerController(
+                    questionIndex, question.choices.indexOf(answer)),
+                scrollController: questionCubit.getAnswerScrollController(
+                    questionIndex, question.choices.indexOf(answer)),
                 config: QuillEditorConfig(
                   scrollable: false,
                   requestKeyboardFocusOnCheckListChanged: false,
@@ -1008,6 +1101,7 @@ class _QuestionsPageState extends State<QuestionsPage> {
                   autoFocus: false,
                   padding: EdgeInsets.zero,
                   enableInteractiveSelection: false,
+                  unknownEmbedBuilder: FallbackEmbedBuilder(),
                   embedBuilders: [
                     FormulaEmbedBuilder(),
                   ],
@@ -1048,11 +1142,13 @@ class _QuestionsPageState extends State<QuestionsPage> {
               padding: const EdgeInsets.symmetric(vertical: 16),
               backgroundColor: widget.subjectColor,
               borderRadius: BorderRadius.circular(16),
-              onLongPressed: () => showConfirmationDialog(false, 'التحقق من جميع الأسئلة', () {
+              onLongPressed: () =>
+                  showConfirmationDialog(false, 'التحقق من جميع الأسئلة', () {
                 context.read<QuestionCubit>().checkAllAnswers();
                 _showSuccessDialog(context);
               }),
-              onPressed: () => showConfirmationDialog(false, 'التحقق من إجاباتك', () {
+              onPressed: () =>
+                  showConfirmationDialog(false, 'التحقق من إجاباتك', () {
                 context.read<QuestionCubit>().checkUserAnswersOnly();
                 _showSuccessDialog(context);
               }),
@@ -1080,7 +1176,10 @@ class _QuestionsPageState extends State<QuestionsPage> {
               padding: const EdgeInsets.symmetric(vertical: 16),
               backgroundColor: Colors.red,
               borderRadius: BorderRadius.circular(16),
-              onPressed: () => showConfirmationDialog(true, 'إعادة تعيين الإجابات', context.read<QuestionCubit>().resetAnswers),
+              onPressed: () => showConfirmationDialog(
+                  true,
+                  'إعادة تعيين الإجابات',
+                  context.read<QuestionCubit>().resetAnswers),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -1139,5 +1238,25 @@ class FormulaEmbedBuilder extends EmbedBuilder {
         ),
       ),
     );
+  }
+}
+
+// Fallback embed builder to handle unknown embeds
+class FallbackEmbedBuilder extends EmbedBuilder {
+  // A unique key for this builder
+  @override
+  String get key => 'fallback';
+
+  @override
+  bool get expanded => false;
+
+  @override
+  Widget build(
+    BuildContext context,
+    EmbedContext embedContext,
+  ) {
+    log('Skipping unhandled embed type: ${embedContext.node.value.type}');
+
+    return SizedBox(width: 0, height: 0);
   }
 }

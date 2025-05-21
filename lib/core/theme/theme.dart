@@ -370,6 +370,13 @@ class AppTheme {
         // ),
         scaffoldBackgroundColor: colorScheme.surface,
         canvasColor: colorScheme.surface,
+        // textTheme: TextTheme(
+        //   bodyLarge: TextStyle(
+        //     color: colorScheme.onSurface,
+        //     fontSize: 16,
+        //     fontWeight: FontWeight.w400,
+        //   ),
+        // ),
         // fontFamily: GoogleFonts.cairo().fontFamily,
         fontFamily: 'Cairo',
         inputDecorationTheme: InputDecorationTheme(

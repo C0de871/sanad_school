@@ -16,7 +16,8 @@ class LoginScreen extends StatefulWidget {
   State<LoginScreen> createState() => _LoginScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin {
+class _LoginScreenState extends State<LoginScreen>
+    with TickerProviderStateMixin {
   final _formKey = GlobalKey<FormState>();
 
   late AnimationController _fadeController;
@@ -62,7 +63,8 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
                   content: Text(state.errMessage),
-                  duration: Duration(seconds: 2), // Optional: how long the snackbar stays
+                  duration: Duration(
+                      seconds: 2), // Optional: how long the snackbar stays
                 ),
               );
             }
@@ -94,7 +96,7 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
                       const SizedBox(height: 16),
                       _createAccountTextAndButton(context),
                       const SizedBox(height: 8),
-                      _resetPasswordTextAndButton(context),
+                      // _resetPasswordTextAndButton(context),
                     ],
                   ),
                 ),
@@ -203,7 +205,9 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
             ),
             suffixIcon: IconButton(
               icon: Icon(
-                state ? Icons.visibility_off_outlined : Icons.visibility_outlined,
+                state
+                    ? Icons.visibility_off_outlined
+                    : Icons.visibility_outlined,
                 color: Theme.of(context).colorScheme.outline,
               ),
               onPressed: () {

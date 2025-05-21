@@ -24,40 +24,56 @@ class LessonsCubit extends Cubit<LessonsState> {
         getIncorrectLessonsUseCase = getIt(),
         super(LessonsInitial());
 
-  Future<void> getRegularLessons(int subjectId) async {
+  Future<void> getRegularLessons(int subjectId,
+      {bool isRefresh = false}) async {
     screenType = ScreenType.regularLessons;
-    emit(LessonsLoading());
-    final Either<Failure, List<LessonEntity>> result = await getLessonsUseCase.call(LessonsParams(subjectId: subjectId));
+    if (!isRefresh) {
+      emit(LessonsLoading());
+    }
+    final Either<Failure, List<LessonEntity>> result =
+        await getLessonsUseCase.call(LessonsParams(subjectId: subjectId));
     result.fold(
       (failure) => emit(LessonsError(failure.errMessage)),
       (lessons) => emit(LessonsLoaded(lessons)),
     );
   }
 
-  Future<void> getFavLessons(int subjectId) async {
+  Future<void> getFavLessons(int subjectId, {bool isRefresh = false}) async {
     screenType = ScreenType.favLessons;
-    emit(LessonsLoading());
-    final Either<Failure, List<LessonEntity>> result = await getFavLessonsUseCase.call(LessonsWithFavoriteGroupsParams(subjectId: subjectId));
+    if (!isRefresh) {
+      emit(LessonsLoading());
+    }
+    final Either<Failure, List<LessonEntity>> result =
+        await getFavLessonsUseCase
+            .call(LessonsWithFavoriteGroupsParams(subjectId: subjectId));
     result.fold(
       (failure) => emit(LessonsError(failure.errMessage)),
       (lessons) => emit(LessonsLoaded(lessons)),
     );
   }
 
-  Future<void> getEditedLessons(int subjectId) async {
+  Future<void> getEditedLessons(int subjectId, {bool isRefresh = false}) async {
     screenType = ScreenType.editedLessons;
-    emit(LessonsLoading());
-    final Either<Failure, List<LessonEntity>> result = await getEditedLessonsUseCase.call(LessonsWithEditedQuestionsParams(subjectId: subjectId));
+    if (!isRefresh) {
+      emit(LessonsLoading());
+    }
+    final Either<Failure, List<LessonEntity>> result =
+        await getEditedLessonsUseCase
+            .call(LessonsWithEditedQuestionsParams(subjectId: subjectId));
     result.fold(
       (failure) => emit(LessonsError(failure.errMessage)),
       (lessons) => emit(LessonsLoaded(lessons)),
     );
   }
 
-  Future<void> getIncorrectLessons(int subjectId) async {
+  Future<void> getIncorrectLessons(int subjectId, {bool isRefresh = false}) async {
     screenType = ScreenType.incorrectLessons;
-    emit(LessonsLoading());
-    final Either<Failure, List<LessonEntity>> result = await getIncorrectLessonsUseCase.call(LessonsWithIncorrectAnswerGroupsParams(subjectId: subjectId));
+    if (!isRefresh) {
+      emit(LessonsLoading());
+    }
+    final Either<Failure, List<LessonEntity>> result =
+        await getIncorrectLessonsUseCase
+            .call(LessonsWithIncorrectAnswerGroupsParams(subjectId: subjectId));
     result.fold(
       (failure) => emit(LessonsError(failure.errMessage)),
       (lessons) => emit(LessonsLoaded(lessons)),

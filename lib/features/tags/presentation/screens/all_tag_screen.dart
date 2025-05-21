@@ -33,7 +33,12 @@ class AllTagsTab extends StatelessWidget {
             log("");
             switch (state) {
               case TagLoading():
-                return const Center(child: CoolLoadingScreen());
+                return Center(
+                  child: CoolLoadingScreen(
+                    primaryColor: color,
+                    secondaryColor: color.withAlpha(100),
+                  ),
+                );
               case TagError():
                 return Center(child: Text(state.message));
               case TagLoaded():

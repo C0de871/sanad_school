@@ -37,7 +37,7 @@ class CustomBottomNavBar extends StatelessWidget {
             _NavBarItem(
               icon: Icons.settings_outlined,
               selectedIcon: Icons.settings,
-              label: 'Settings',
+              label: 'الإعدادات',
               isSelected: selectedIndex == 0,
               onTap: () => onItemSelected(0),
               theme: theme,
@@ -45,15 +45,15 @@ class CustomBottomNavBar extends StatelessWidget {
             _NavBarItem(
               icon: Icons.menu_book_outlined,
               selectedIcon: Icons.menu_book_rounded,
-              label: 'Subjects',
+              label: 'المواد',
               isSelected: selectedIndex == 1,
               onTap: () => onItemSelected(1),
               theme: theme,
             ),
             _NavBarItem(
-              icon: Icons.video_collection_outlined,
-              selectedIcon: Icons.video_collection,
-              label: 'Videos',
+              icon: Icons.card_giftcard,
+              selectedIcon: Icons.card_giftcard,
+              label: 'قريبا',
               isSelected: selectedIndex == 2,
               onTap: () => onItemSelected(2),
               theme: theme,
@@ -90,7 +90,9 @@ class _NavBarItem extends StatelessWidget {
         duration: const Duration(milliseconds: 200),
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         decoration: BoxDecoration(
-          color: isSelected ? theme.colorScheme.primary.withValues(alpha: 0.1) : Colors.transparent,
+          color: isSelected
+              ? theme.colorScheme.primary.withValues(alpha: 0.1)
+              : Colors.transparent,
           borderRadius: BorderRadius.circular(12),
         ),
         child: Column(
@@ -98,14 +100,18 @@ class _NavBarItem extends StatelessWidget {
           children: [
             Icon(
               isSelected ? selectedIcon : icon,
-              color: isSelected ? theme.colorScheme.primary : theme.colorScheme.onSurface.withValues(alpha: 0.7),
+              color: isSelected
+                  ? theme.colorScheme.primary
+                  : theme.colorScheme.onSurface.withValues(alpha: 0.7),
               size: 24,
             ),
             const SizedBox(height: 4),
             Text(
               label,
               style: TextStyle(
-                color: isSelected ? theme.colorScheme.primary : theme.colorScheme.onSurface.withValues(alpha: 0.7),
+                color: isSelected
+                    ? theme.colorScheme.primary
+                    : theme.colorScheme.onSurface.withValues(alpha: 0.7),
                 fontSize: 12,
                 fontWeight: isSelected ? FontWeight.w500 : FontWeight.normal,
               ),

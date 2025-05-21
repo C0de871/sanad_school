@@ -1,4 +1,4 @@
-import 'dart:developer';
+
 import 'dart:typed_data';
 
 import 'package:dartz/dartz.dart';
@@ -141,7 +141,7 @@ class QuestionRepositoryImpl extends QuestionRepository {
       } else {
         if (await networkInfo.isConnected!) {
           final photo = await remoteDataSource.downloadQuestionPhoto(params: params);
-          final response = await localDataSource.saveQuestionPhoto(params.questionId, photo);
+          await localDataSource.saveQuestionPhoto(params.questionId, photo);
           return Right(photo);
         } else {
           return Left(Failure(errMessage: 'No internet connection'));
@@ -172,7 +172,7 @@ class QuestionRepositoryImpl extends QuestionRepository {
       } else {
         if (await networkInfo.isConnected!) {
           final photo = await remoteDataSource.downloadQuestionPhoto(params: params);
-          final response = await localDataSource.saveQuestionHintPhoto(params.questionId, photo);
+           await localDataSource.saveQuestionHintPhoto(params.questionId, photo);
           return Right(photo);
         } else {
           return Left(Failure(errMessage: 'No internet connection'));

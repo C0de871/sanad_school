@@ -5,6 +5,7 @@ class AppRoutes {
   static const String home = '/home-screen';
   static const String subjectDetails = '/subject-details-screen';
   static const String questions = '/questions-screen';
+  static const String questionsFromQuiz = '/questions-screen-from-quiz';
   static const String questionsFromTag = '/questions-screen-from-tag';
   static const String profile = '/profile-screen';
   static const String subscription = '/subscription-screen';
@@ -17,6 +18,5 @@ class AppRoutes {
   static const String quizSelection = '/quiz-selection-screen';
   static const String qrScanner = '/qr-scanner-screen';
   static const String splash = '/';
-  static const String test1 = '/test1-screen';
-  static const String test2 = '/test2-screen';
+  
 }

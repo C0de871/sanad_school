@@ -1,4 +1,4 @@
 class Constant {
-  static final String whatsappNumber = "0959595917";
-  static final String telegramUsername = "Muhammad_Aydi";
+  static final String whatsappNumber = "+963996528061";
+  static final String telegramUsername = "SanadAlTaleb_bot";
 }

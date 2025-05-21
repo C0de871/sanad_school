@@ -1,11 +1,8 @@
-import 'dart:developer';
-
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:flutter_tex/flutter_tex.dart';
 import 'package:get_it/get_it.dart';
 import 'package:sanad_school/core/utils/services/qr_service/qr_service.dart';
@@ -46,6 +43,11 @@ import 'package:sanad_school/features/questions/domain/usecases/get_subject_ques
 import 'package:sanad_school/features/questions/domain/usecases/save_question_note_usecase.dart';
 import 'package:sanad_school/features/questions/domain/usecases/toggle_question_favorite_usecase.dart';
 import 'package:sanad_school/features/questions/domain/usecases/toggle_question_incorrect_answer_usecase.dart';
+import 'package:sanad_school/features/quiz/domain/repository/quiz_repository.dart';
+import 'package:sanad_school/features/quiz/domain/usecases/get_available_lessons.dart';
+import 'package:sanad_school/features/quiz/domain/usecases/get_available_questions_count.dart';
+import 'package:sanad_school/features/quiz/domain/usecases/get_available_tags.dart';
+import 'package:sanad_school/features/quiz/domain/usecases/get_available_types.dart';
 import 'package:sanad_school/features/subject_type/data/data_sources/type_remote_data_source.dart';
 import 'package:sanad_school/features/subject_type/domain/repo/type_repository.dart';
 import 'package:sanad_school/features/subject_type/domain/use_cases/get_types_use_case.dart';
@@ -59,7 +61,9 @@ import 'package:sanad_school/features/tags/domain/use_cases/get_tags_or_exams.da
 import '../../../features/auth/data/repository/auth_repository_imple.dart';
 import '../../../features/profile/data/repo/profile_repo_impl.dart';
 import '../../../features/questions/data/repo/question_repository_impl.dart';
-import '../../../features/questions/domain/usecases/get_questions_in_subject_by_tag.dart';
+import '../../../features/quiz/data/datasources/quiz_local_data_source.dart';
+import '../../../features/quiz/data/repository/quiz_repository_impl.dart';
+import '../../../features/quiz/domain/usecases/get_quiz_questions.dart';
 import '../../../features/subject_type/data/repo/repositories/type_repository_impl.dart';
 import '../../../features/subjects/data/data_sources/subject_local_data_source.dart';
 import '../../../features/subjects/data/repository/subject_repository.dart';
@@ -87,35 +91,57 @@ void setupServicesLocator() {
   //!service:
 
   //! Core:
-  getIt.registerLazySingleton<SharedPrefsHelper>(() => SharedPrefsHelper()..init());
+  getIt.registerLazySingleton<SharedPrefsHelper>(
+      () => SharedPrefsHelper()..init());
   getIt.registerLazySingleton<SecureStorageHelper>(() => SecureStorageHelper());
-  getIt.registerLazySingleton<Dio>(() => Dio());
+  getIt.registerLazySingleton<CertificatedDio>(() => CertificatedDio());
+  getIt.registerLazySingleton<Dio>(
+      () => getIt<CertificatedDio>().createLetsEncryptDio());
   getIt.registerLazySingleton<ApiConsumer>(() => DioConsumer(dio: getIt()));
   getIt.registerLazySingleton<Connectivity>(() => Connectivity());
-  getIt.registerLazySingleton<NetworkInfo>(() => NetworkInfoConnectivity(getIt()));
+  getIt.registerLazySingleton<NetworkInfo>(
+      () => NetworkInfoConnectivity(getIt()));
   getIt.registerLazySingleton<AppTheme>(() => AppTheme());
-  getIt.registerLazySingleton<QrCodeScannerService>(() => QrCodeScannerService());
+  getIt.registerLazySingleton<QrCodeScannerService>(
+      () => QrCodeScannerService());
   getIt.registerLazySingleton<DeviceInfoService>(() => DeviceInfoService());
   getIt.registerLazySingleton<SqlDB>(() => SqlDB());
-  getIt.registerLazySingleton<VideoDownloadService>(() => VideoDownloadService());
+  getIt.registerLazySingleton<VideoDownloadService>(
+      () => VideoDownloadService());
 
   //! Data Sources:
-  getIt.registerLazySingleton<LessonsRemoteDataSource>(() => LessonsRemoteDataSource(api: getIt()));
-  getIt.registerLazySingleton<QuestionRemoteDataSource>(() => QuestionRemoteDataSource(api: getIt()));
-  getIt.registerLazySingleton<SubjectRemoteDataSource>(() => SubjectRemoteDataSource(api: getIt()));
-  getIt.registerLazySingleton<TagRemoteDataSource>(() => TagRemoteDataSource(api: getIt()));
-  getIt.registerLazySingleton<AuthRemoteDataSource>(() => AuthRemoteDataSource(api: getIt()));
-  getIt.registerLazySingleton<AuthLocalDataSource>(() => AuthLocalDataSource(secureStorage: getIt()));
-  getIt.registerLazySingleton<TypeRemoteDataSource>(() => TypeRemoteDataSource(api: getIt()));
-  getIt.registerLazySingleton<ProfileRemoteDataSource>(() => ProfileRemoteDataSource(api: getIt()));
-  getIt.registerLazySingleton<CodeRemoteDataSource>(() => CodeRemoteDataSource(api: getIt()));
+  getIt.registerLazySingleton<LessonsRemoteDataSource>(
+      () => LessonsRemoteDataSource(api: getIt()));
+  getIt.registerLazySingleton<QuestionRemoteDataSource>(
+      () => QuestionRemoteDataSource(api: getIt()));
+  getIt.registerLazySingleton<SubjectRemoteDataSource>(
+      () => SubjectRemoteDataSource(api: getIt()));
+  getIt.registerLazySingleton<TagRemoteDataSource>(
+      () => TagRemoteDataSource(api: getIt()));
+  getIt.registerLazySingleton<AuthRemoteDataSource>(
+      () => AuthRemoteDataSource(api: getIt()));
+  getIt.registerLazySingleton<AuthLocalDataSource>(
+      () => AuthLocalDataSource(secureStorage: getIt()));
+  getIt.registerLazySingleton<TypeRemoteDataSource>(
+      () => TypeRemoteDataSource(api: getIt()));
+  getIt.registerLazySingleton<ProfileRemoteDataSource>(
+      () => ProfileRemoteDataSource(api: getIt()));
+  getIt.registerLazySingleton<CodeRemoteDataSource>(
+      () => CodeRemoteDataSource(api: getIt()));
 
   //! local date soures:
-  getIt.registerLazySingleton<SubjectLocalDataSource>(() => SubjectLocalDataSource());
-  getIt.registerLazySingleton<SubjectDetailLocalDataSource>(() => SubjectDetailLocalDataSource());
-  getIt.registerLazySingleton<LessonsLocalDataSource>(() => LessonsLocalDataSource(database: getIt()));
-  getIt.registerLazySingleton<QuestionLocalDataSource>(() => QuestionLocalDataSource(database: getIt()));
-  getIt.registerLazySingleton<TagLocalDataSource>(() => TagLocalDataSource(database: getIt()));
+  getIt.registerLazySingleton<SubjectLocalDataSource>(
+      () => SubjectLocalDataSource());
+  getIt.registerLazySingleton<SubjectDetailLocalDataSource>(
+      () => SubjectDetailLocalDataSource());
+  getIt.registerLazySingleton<LessonsLocalDataSource>(
+      () => LessonsLocalDataSource(database: getIt()));
+  getIt.registerLazySingleton<QuestionLocalDataSource>(
+      () => QuestionLocalDataSource(database: getIt()));
+  getIt.registerLazySingleton<TagLocalDataSource>(
+      () => TagLocalDataSource(database: getIt()));
+  getIt.registerLazySingleton<QuizLocalDataSource>(
+      () => QuizLocalDataSource(database: getIt()));
 
   //! Repository:
   getIt.registerLazySingleton<LessonsRepository>(
@@ -173,45 +199,91 @@ void setupServicesLocator() {
       remoteDataSource: getIt(),
     ),
   );
+  getIt.registerLazySingleton<QuizRepository>(
+    () => QuizRepositoryImpl(
+      filterService: getIt(),
+    ),
+  );
 
   //! use cases:
-  getIt.registerLazySingleton<GetLessonsUseCase>(() => GetLessonsUseCase(repository: getIt()));
-  getIt.registerLazySingleton<GetQuestionsInLessonByTypeUseCase>(() => GetQuestionsInLessonByTypeUseCase(repository: getIt()));
-  getIt.registerLazySingleton<GetSubjectsUseCase>(() => GetSubjectsUseCase(repository: getIt()));
-  getIt.registerLazySingleton<GetTagsOrExamsUseCase>(() => GetTagsOrExamsUseCase(repository: getIt()));
-  getIt.registerLazySingleton<GetQuestionsInSubjectByTagUseCase>(() => GetQuestionsInSubjectByTagUseCase(repository: getIt()));
-  getIt.registerLazySingleton<RegisterUseCase>(() => RegisterUseCase(repository: getIt()));
-  getIt.registerLazySingleton<LoginUseCase>(() => LoginUseCase(repository: getIt()));
-  getIt.registerLazySingleton<GetTokenUseCase>(() => GetTokenUseCase(repository: getIt()));
-  getIt.registerLazySingleton<SaveTokenUseCase>(() => SaveTokenUseCase(repository: getIt()));
-  getIt.registerLazySingleton<DeleteTokenUseCase>(() => DeleteTokenUseCase(repository: getIt()));
-  getIt.registerLazySingleton<LogoutUseCase>(() => LogoutUseCase(repository: getIt()));
-  getIt.registerLazySingleton<GetTypesUseCase>(() => GetTypesUseCase(repository: getIt()));
-  getIt.registerLazySingleton<GetStudentProfileUseCase>(() => GetStudentProfileUseCase(repository: getIt()));
-  getIt.registerLazySingleton<GetSubjectSyncUseCase>(() => GetSubjectSyncUseCase(repository: getIt()));
-  getIt.registerLazySingleton<GetCodesUseCase>(() => GetCodesUseCase(repository: getIt()));
-  getIt.registerLazySingleton<CheckCodeUseCase>(() => CheckCodeUseCase(repository: getIt()));
+  getIt.registerLazySingleton<GetLessonsUseCase>(
+      () => GetLessonsUseCase(repository: getIt()));
+  getIt.registerLazySingleton<GetQuestionsInLessonByTypeUseCase>(
+      () => GetQuestionsInLessonByTypeUseCase(repository: getIt()));
+  getIt.registerLazySingleton<GetSubjectsUseCase>(
+      () => GetSubjectsUseCase(repository: getIt()));
+  getIt.registerLazySingleton<GetTagsOrExamsUseCase>(
+      () => GetTagsOrExamsUseCase(repository: getIt()));
+  getIt.registerLazySingleton<GetQuestionsInSubjectByTagUseCase>(
+      () => GetQuestionsInSubjectByTagUseCase(repository: getIt()));
+  getIt.registerLazySingleton<RegisterUseCase>(
+      () => RegisterUseCase(repository: getIt()));
+  getIt.registerLazySingleton<LoginUseCase>(
+      () => LoginUseCase(repository: getIt()));
+  getIt.registerLazySingleton<GetTokenUseCase>(
+      () => GetTokenUseCase(repository: getIt()));
+  getIt.registerLazySingleton<SaveTokenUseCase>(
+      () => SaveTokenUseCase(repository: getIt()));
+  getIt.registerLazySingleton<DeleteTokenUseCase>(
+      () => DeleteTokenUseCase(repository: getIt()));
+  getIt.registerLazySingleton<LogoutUseCase>(
+      () => LogoutUseCase(repository: getIt()));
+  getIt.registerLazySingleton<GetTypesUseCase>(
+      () => GetTypesUseCase(repository: getIt()));
+  getIt.registerLazySingleton<GetStudentProfileUseCase>(
+      () => GetStudentProfileUseCase(repository: getIt()));
+  getIt.registerLazySingleton<GetSubjectSyncUseCase>(
+      () => GetSubjectSyncUseCase(repository: getIt()));
+  getIt.registerLazySingleton<GetCodesUseCase>(
+      () => GetCodesUseCase(repository: getIt()));
+  getIt.registerLazySingleton<CheckCodeUseCase>(
+      () => CheckCodeUseCase(repository: getIt()));
+  getIt.registerLazySingleton<GetQuizQuestionsUsecase>(
+      () => GetQuizQuestionsUsecase(repository: getIt()));
+  getIt.registerLazySingleton<GetAvailableLessonsUsecase>(
+      () => GetAvailableLessonsUsecase(repository: getIt()));
+  getIt.registerLazySingleton<GetAvailableTagsUsecase>(
+      () => GetAvailableTagsUsecase(repository: getIt()));
+  getIt.registerLazySingleton<GetAvailableTypesUsecase>(
+      () => GetAvailableTypesUsecase(repository: getIt()));
+  getIt.registerLazySingleton<GetAvailableQuestionsCountUsecase>(
+      () => GetAvailableQuestionsCountUsecase(repository: getIt()));
 
   // Add missing question use cases
-  getIt.registerLazySingleton<GetEditedQuestionsByLessonUseCase>(() => GetEditedQuestionsByLessonUseCase(getIt()));
-  getIt.registerLazySingleton<GetFavoriteGroupsQuestionsUseCase>(() => GetFavoriteGroupsQuestionsUseCase(getIt()));
-  getIt.registerLazySingleton<GetIncorrectAnswerGroupsQuestionsUseCase>(() => GetIncorrectAnswerGroupsQuestionsUseCase(getIt()));
-  getIt.registerLazySingleton<SaveQuestionNoteUseCase>(() => SaveQuestionNoteUseCase(getIt()));
-  getIt.registerLazySingleton<GetQuestionNoteUseCase>(() => GetQuestionNoteUseCase(getIt()));
-  getIt.registerLazySingleton<ToggleQuestionFavoriteUseCase>(() => ToggleQuestionFavoriteUseCase(getIt()));
-  getIt.registerLazySingleton<ToggleQuestionIncorrectAnswerUseCase>(() => ToggleQuestionIncorrectAnswerUseCase(getIt()));
-  getIt.registerLazySingleton<GetSubjectQuestionsByTagOrExamUseCase>(() => GetSubjectQuestionsByTagOrExamUseCase(getIt()));
-  getIt.registerLazySingleton<GetLessonQuestionsByTypeOrAllUseCase>(() => GetLessonQuestionsByTypeOrAllUseCase(getIt()));
+  getIt.registerLazySingleton<GetEditedQuestionsByLessonUseCase>(
+      () => GetEditedQuestionsByLessonUseCase(getIt()));
+  getIt.registerLazySingleton<GetFavoriteGroupsQuestionsUseCase>(
+      () => GetFavoriteGroupsQuestionsUseCase(getIt()));
+  getIt.registerLazySingleton<GetIncorrectAnswerGroupsQuestionsUseCase>(
+      () => GetIncorrectAnswerGroupsQuestionsUseCase(getIt()));
+  getIt.registerLazySingleton<SaveQuestionNoteUseCase>(
+      () => SaveQuestionNoteUseCase(getIt()));
+  getIt.registerLazySingleton<GetQuestionNoteUseCase>(
+      () => GetQuestionNoteUseCase(getIt()));
+  getIt.registerLazySingleton<ToggleQuestionFavoriteUseCase>(
+      () => ToggleQuestionFavoriteUseCase(getIt()));
+  getIt.registerLazySingleton<ToggleQuestionIncorrectAnswerUseCase>(
+      () => ToggleQuestionIncorrectAnswerUseCase(getIt()));
+  getIt.registerLazySingleton<GetSubjectQuestionsByTagOrExamUseCase>(
+      () => GetSubjectQuestionsByTagOrExamUseCase(getIt()));
+  getIt.registerLazySingleton<GetLessonQuestionsByTypeOrAllUseCase>(
+      () => GetLessonQuestionsByTypeOrAllUseCase(getIt()));
 
   // Add missing lesson use cases
-  getIt.registerLazySingleton<GetLessonsWithEditedQuestionsUseCase>(() => GetLessonsWithEditedQuestionsUseCase(repository: getIt()));
-  getIt.registerLazySingleton<GetLessonsWithFavoriteGroupsUseCase>(() => GetLessonsWithFavoriteGroupsUseCase(repository: getIt()));
-  getIt.registerLazySingleton<GetLessonsWithIncorrectAnswerGroupsUseCase>(() => GetLessonsWithIncorrectAnswerGroupsUseCase(repository: getIt()));
-  getIt.registerLazySingleton<GetQuestionPhoto>(() => GetQuestionPhoto(repository: getIt()));
-  getIt.registerLazySingleton<GetQuestionHintPhoto>(() => GetQuestionHintPhoto(repository: getIt()));
+  getIt.registerLazySingleton<GetLessonsWithEditedQuestionsUseCase>(
+      () => GetLessonsWithEditedQuestionsUseCase(repository: getIt()));
+  getIt.registerLazySingleton<GetLessonsWithFavoriteGroupsUseCase>(
+      () => GetLessonsWithFavoriteGroupsUseCase(repository: getIt()));
+  getIt.registerLazySingleton<GetLessonsWithIncorrectAnswerGroupsUseCase>(
+      () => GetLessonsWithIncorrectAnswerGroupsUseCase(repository: getIt()));
+  getIt.registerLazySingleton<GetQuestionPhoto>(
+      () => GetQuestionPhoto(repository: getIt()));
+  getIt.registerLazySingleton<GetQuestionHintPhoto>(
+      () => GetQuestionHintPhoto(repository: getIt()));
 
   //! Interceptors:
-  getIt.registerLazySingleton<AuthInterceptor>(() => AuthInterceptor(retrieveAccessTokenUseCase: getIt()));
+  getIt.registerLazySingleton<AuthInterceptor>(
+      () => AuthInterceptor(retrieveAccessTokenUseCase: getIt()));
 }
 
 Future<void> initApp() async {
@@ -233,7 +305,8 @@ Future<void> initApp() async {
   final SqlDB sqlDb = getIt<SqlDB>();
   // await sqlDb.deleteDB();
   await sqlDb.initialDb();
-  await (getIt<ApiConsumer>() as DioConsumer).addInterceptors(getIt<AuthInterceptor>());
+  await (getIt<ApiConsumer>() as DioConsumer)
+      .addInterceptors(getIt<AuthInterceptor>());
   // await FireBaseService.initializeApp();
 
   // await FireBaseService().initNotifications();

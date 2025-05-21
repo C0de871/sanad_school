@@ -1,4 +1,4 @@
-package com.example.sanad_school
+package com.timeofcode.sanadaltaleb
 
 import io.flutter.embedding.android.FlutterActivity
 

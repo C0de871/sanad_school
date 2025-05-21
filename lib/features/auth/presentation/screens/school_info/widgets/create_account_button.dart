@@ -30,14 +30,10 @@ class CreateAccountButton extends StatelessWidget {
             backgroundColor: Theme.of(context).colorScheme.primary,
             shadowColor: getIt<AppTheme>().extendedColors.buttonShadow,
             foregroundColor: Theme.of(context).colorScheme.onPrimary,
-            child: Center(
+            child: Center( 
               child: isLoading
-                  ? SizedBox(
-                      width: 20,
-                      height: 20,
-                      child: LoadingDots(
-                        color: Theme.of(context).colorScheme.onPrimary,
-                      ),
+                  ? LoadingDots(
+                      color: Theme.of(context).colorScheme.onPrimary,
                     )
                   : const Text(
                       'إنشاء الحساب',

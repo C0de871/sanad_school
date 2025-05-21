@@ -1,8 +1,10 @@
 // import 'package:flutter/material.dart';
 
-import 'package:flutter/material.dart';
+import 'dart:developer';
 
-import '../../../../core/Routes/app_routes.dart';
+import 'package:flutter/material.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:share_plus/share_plus.dart';
 
 class AppIcon extends StatelessWidget {
   const AppIcon({super.key});
@@ -11,11 +13,20 @@ class AppIcon extends StatelessWidget {
   Widget build(BuildContext context) {
     //todo remove this gesture dectecotr
     return GestureDetector(
-      onTap: () => Navigator.pushNamed(
-        context,
-        AppRoutes.test1,
-        arguments: 2,
-      ),
+      onTap: () async {
+        // final dir = await getApplicationDocumentsDirectory();
+        // final path = '${dir.path}/debug_log.txt';
+        // final params = ShareParams(
+        //   text: 'Great picture',
+        //   files: [XFile(path)],
+        // );
+
+        // final result = await SharePlus.instance.share(params);
+
+        // if (result.status == ShareResultStatus.success) {
+        //   log('Thank you for sharing the picture!');
+        // }
+      },
       child: Image.asset(
         "assets/icons/sanad_altaleb_white.png",
         height: 40,

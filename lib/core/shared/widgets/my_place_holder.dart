@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:svg_flutter/svg.dart';
 
-import '../../utils/constants/app_images.dart';
 import '../../utils/constants/app_numbers.dart';
 
 class MyPlaceHolder extends StatelessWidget {
@@ -22,14 +20,15 @@ class MyPlaceHolder extends StatelessWidget {
           children: [
             Flexible(
               child: ConstrainedBox(
-                constraints: const BoxConstraints(
-                  maxHeight: 200,
-                  maxWidth: 300,
-                ),
-                child: SvgPicture.asset(
-                  AppImages.underConstruction,
-                ),
-              ),
+                  constraints: const BoxConstraints(
+                    maxHeight: 200,
+                    maxWidth: 300,
+                  ),
+                  child: Icon(
+                    Icons.card_giftcard,
+                    size: 100,
+                    color: Theme.of(context).colorScheme.primary,
+                  )),
             ),
             const SizedBox(height: padding4 * 9),
             const Text(
@@ -41,7 +40,7 @@ class MyPlaceHolder extends StatelessWidget {
             ),
             const SizedBox(height: padding4 * 3),
             const Text(
-              "هذه الصفحة قيد التطوير",
+              "انتظروا مفاجأتنا القادمة",
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 14,
