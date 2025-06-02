@@ -58,4 +58,17 @@ abstract class QuestionRepository {
   Future<Either<Failure, Uint8List?>> getQuestionHintPhoto({
     required QuestionPhotoParams params,
   });
+
+  //updates methods:
+  Future<Either<Failure, bool>> updateQuestionAnswered({
+    required UpdateQuestionAnsweredParams params,
+  });
+
+  Future<Either<Failure, bool>> updateQuestionCorrected({
+    required UpdateQuestionCorrectedParams params,
+  });
+
+  Future<Either<Failure, bool>> updateQuestionAnsweredCorrectly({
+    required UpdateQuestionAnsweredCorrectlyParams params,
+  });
 }

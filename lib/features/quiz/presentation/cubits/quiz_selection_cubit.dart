@@ -1,4 +1,6 @@
 // Cubit to manage the quiz selection state
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -52,37 +54,48 @@ class QuizSelectionCubit extends Cubit<QuizSelectionState> {
       availableTypesStatus: QuizSelectionStatus.loading,
       availableQuestionCountStatus: QuizSelectionStatus.loading,
     ));
+    log("laoding quiz");
 
-    final availableLessonsResponse = getAvailableLessonsUsecase.call(GetAvailableLessonsParams(
+    final availableLessonsResponse =
+        getAvailableLessonsUsecase.call(GetAvailableLessonsParams(
       subjectId: quizScreenArgs.subjectId,
       selectedTypeIds: state.selectedTypes,
       selectedTagIds: state.selectedTags,
     ));
 
-    final availableTagsResponse = getAvailableTagsUsecase.call(GetAvailableTagsParams(
+    final availableTagsResponse =
+        getAvailableTagsUsecase.call(GetAvailableTagsParams(
       subjectId: quizScreenArgs.subjectId,
       selectedLessonIds: state.selectedLessons,
       selectedTypeIds: state.selectedTypes,
     ));
 
-    final availableTypesResponse = getAvailableTypesUsecase.call(GetAvailableTypesParams(
+    final availableTypesResponse =
+        getAvailableTypesUsecase.call(GetAvailableTypesParams(
       subjectId: quizScreenArgs.subjectId,
       selectedLessonIds: state.selectedLessons,
       selectedTagIds: state.selectedTags,
     ));
 
-    final availableQuestionsCountReponse = getAvailableQuestionsCountUsecase.call(QuizFilterParams(
+    final availableQuestionsCountReponse =
+        getAvailableQuestionsCountUsecase.call(QuizFilterParams(
       subjectId: quizScreenArgs.subjectId,
       lessonIds: state.selectedLessons,
       typeIds: state.selectedTypes,
       tagIds: state.selectedTags,
     ));
-    final [availableLessons, availableTags, availableTypes, availableQuestionsCount] = await Future.wait([
+    final [
+      availableLessons,
+      availableTags,
+      availableTypes,
+      availableQuestionsCount
+    ] = await Future.wait([
       availableLessonsResponse,
       availableTagsResponse,
       availableTypesResponse,
       availableQuestionsCountReponse,
     ]);
+    log("available lessons: ${availableLessons.toString()}");
 
     emit(state.copyWith(
       availableLessons: availableLessons as List<LessonEntity>?,
@@ -104,26 +117,30 @@ class QuizSelectionCubit extends Cubit<QuizSelectionState> {
       currentLessons.add(lessonId);
     }
 
-    final availableTagsResponse = getAvailableTagsUsecase.call(GetAvailableTagsParams(
+    final availableTagsResponse =
+        getAvailableTagsUsecase.call(GetAvailableTagsParams(
       subjectId: quizScreenArgs.subjectId,
       selectedLessonIds: currentLessons,
       selectedTypeIds: state.selectedTypes,
     ));
 
-    final availableTypesResponse = getAvailableTypesUsecase.call(GetAvailableTypesParams(
+    final availableTypesResponse =
+        getAvailableTypesUsecase.call(GetAvailableTypesParams(
       subjectId: quizScreenArgs.subjectId,
       selectedLessonIds: currentLessons,
       selectedTagIds: state.selectedTags,
     ));
 
-    final availableQuestionsCountResponse = getAvailableQuestionsCountUsecase.call(QuizFilterParams(
+    final availableQuestionsCountResponse =
+        getAvailableQuestionsCountUsecase.call(QuizFilterParams(
       subjectId: quizScreenArgs.subjectId,
       lessonIds: currentLessons,
       typeIds: state.selectedTypes,
       tagIds: state.selectedTags,
     ));
 
-    final [availableTags, availableTypes, availableQuestionsCount] = await Future.wait([
+    final [availableTags, availableTypes, availableQuestionsCount] =
+        await Future.wait([
       availableTagsResponse,
       availableTypesResponse,
       availableQuestionsCountResponse,
@@ -148,26 +165,30 @@ class QuizSelectionCubit extends Cubit<QuizSelectionState> {
       currentTags.add(tagId);
     }
 
-    final availableTypesResponse = getAvailableTypesUsecase.call(GetAvailableTypesParams(
+    final availableTypesResponse =
+        getAvailableTypesUsecase.call(GetAvailableTypesParams(
       subjectId: quizScreenArgs.subjectId,
       selectedLessonIds: state.selectedLessons,
       selectedTagIds: currentTags,
     ));
 
-    final availableQuestionsCountResponse = getAvailableQuestionsCountUsecase.call(QuizFilterParams(
+    final availableQuestionsCountResponse =
+        getAvailableQuestionsCountUsecase.call(QuizFilterParams(
       subjectId: quizScreenArgs.subjectId,
       lessonIds: state.selectedLessons,
       typeIds: state.selectedTypes,
       tagIds: currentTags,
     ));
 
-    final availableLessonsResponse = getAvailableLessonsUsecase.call(GetAvailableLessonsParams(
+    final availableLessonsResponse =
+        getAvailableLessonsUsecase.call(GetAvailableLessonsParams(
       subjectId: quizScreenArgs.subjectId,
       selectedTagIds: currentTags,
       selectedTypeIds: state.selectedTypes,
     ));
 
-    final [availableTypes, availableQuestionsCount, availableLessons] = await Future.wait([
+    final [availableTypes, availableQuestionsCount, availableLessons] =
+        await Future.wait([
       availableTypesResponse,
       availableQuestionsCountResponse,
       availableLessonsResponse,
@@ -192,26 +213,30 @@ class QuizSelectionCubit extends Cubit<QuizSelectionState> {
       currentTypes.add(typeId);
     }
 
-    final availableTagsResponse = getAvailableTagsUsecase.call(GetAvailableTagsParams(
+    final availableTagsResponse =
+        getAvailableTagsUsecase.call(GetAvailableTagsParams(
       subjectId: quizScreenArgs.subjectId,
       selectedLessonIds: state.selectedLessons,
       selectedTypeIds: currentTypes,
     ));
 
-    final availableLessonsResponse = getAvailableLessonsUsecase.call(GetAvailableLessonsParams(
+    final availableLessonsResponse =
+        getAvailableLessonsUsecase.call(GetAvailableLessonsParams(
       subjectId: quizScreenArgs.subjectId,
       selectedTagIds: state.selectedTags,
       selectedTypeIds: currentTypes,
     ));
 
-    final availableQuestionsCountResponse = getAvailableQuestionsCountUsecase.call(QuizFilterParams(
+    final availableQuestionsCountResponse =
+        getAvailableQuestionsCountUsecase.call(QuizFilterParams(
       subjectId: quizScreenArgs.subjectId,
       lessonIds: state.selectedLessons,
       typeIds: currentTypes,
       tagIds: state.selectedTags,
     ));
 
-    final [availableTags, availableLessons, availableQuestionsCount] = await Future.wait([
+    final [availableTags, availableLessons, availableQuestionsCount] =
+        await Future.wait([
       availableTagsResponse,
       availableLessonsResponse,
       availableQuestionsCountResponse,

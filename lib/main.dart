@@ -15,9 +15,15 @@ Future<void> disableScreenshot() async {
   debugPrint('Screenshot Off: $result');
 }
 
+//enable
+Future<void> enableScreenshot() async {
+  bool result = await _noScreenshot.screenshotOn();
+  debugPrint('Screenshot On: $result');
+}
+
 void main() async {
   await initApp();
-  await disableScreenshot();
+  // await disableScreenshot();
   // final logFile = await _getLogFile();
   // final logSink = logFile.openWrite(mode: FileMode.append);
 

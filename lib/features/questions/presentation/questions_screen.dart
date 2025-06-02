@@ -237,7 +237,7 @@ class _QuestionsPageState extends State<QuestionsPage> {
                                 textAlign: TextAlign.center,
                               ),
                               Text(
-                                '${state.correctAnswers} اجابة صحيحة',
+                                '${state.correctAnswersCount} اجابة صحيحة',
                                 style: TextStyle(
                                   fontSize: 16,
                                   color: Theme.of(context).colorScheme.outline,
@@ -245,7 +245,7 @@ class _QuestionsPageState extends State<QuestionsPage> {
                                 textAlign: TextAlign.center,
                               ),
                               Text(
-                                'و ${state.wrongAnswers} اجابة خاطئة',
+                                'و ${state.wrongAnswersCount} اجابة خاطئة',
                                 style: TextStyle(
                                   fontSize: 16,
                                   color: Theme.of(context).colorScheme.outline,
@@ -253,7 +253,7 @@ class _QuestionsPageState extends State<QuestionsPage> {
                                 textAlign: TextAlign.center,
                               ),
                               Text(
-                                'نسبة الاجابات الصحيحة ${(state.correctAnswers / state.questions.length * 100).toStringAsFixed(1)}%',
+                                'نسبة الاجابات الصحيحة ${(state.correctAnswersCount / state.questions.length * 100).toStringAsFixed(1)}%',
                                 style: TextStyle(
                                   fontSize: 16,
                                   color: Theme.of(context).colorScheme.outline,
@@ -516,13 +516,13 @@ class _QuestionsPageState extends State<QuestionsPage> {
                               ),
                               _buildEnhancedStatCard(
                                 'Correct',
-                                state.correctAnswers.toString(),
+                                state.correctAnswersCount.toString(),
                                 Icons.check_circle,
                                 Color.fromARGB(255, 121, 193, 69),
                               ),
                               _buildEnhancedStatCard(
                                 'Wrong',
-                                state.wrongAnswers.toString(),
+                                state.wrongAnswersCount.toString(),
                                 Icons.cancel,
                                 Color.fromARGB(255, 254, 117, 117),
                               ),
@@ -1027,6 +1027,7 @@ class _QuestionsPageState extends State<QuestionsPage> {
       QuestionEntity question, int questionIndex, QuestionSuccess state) {
     log("right choice for question id ${question.id} is ${question.adjustedRightChoice} , and the index of question is $questionIndex");
     final questionCubit = context.read<QuestionCubit>();
+    final customColors = getIt<AppTheme>().extendedColors;
     return Column(
       children: question.choices.map((answer) {
         // log("${userAnswers[index] ?? "this is null"}");
@@ -1034,7 +1035,7 @@ class _QuestionsPageState extends State<QuestionsPage> {
             state.userAnswers[questionIndex];
         bool isCorrect =
             question.choices.indexOf(answer) == question.adjustedRightChoice;
-        bool isQuestionCorrected = state.isCorrect[questionIndex] != null;
+        bool isQuestionCorrected = state.isRightList[questionIndex] != null;
 
         Color shadowColor = Colors.blueGrey.withAlpha(70);
         Color backgroundColor =
@@ -1045,22 +1046,22 @@ class _QuestionsPageState extends State<QuestionsPage> {
           log("question corrected");
           if (isCorrect) {
             log("the correct answer");
-            shadowColor = Color(0xFFA7EF75);
-            textColor = Color.fromARGB(255, 69, 165, 0);
-            backgroundColor = Color(0xFFD7FFB8);
+            shadowColor = customColors.greenShadowColor;
+            textColor = customColors.greenTextColor;
+            backgroundColor = customColors.greenBackgroundColor;
           } else if (isSelected) {
             log("user answer incorrect");
-            shadowColor = Color.fromARGB(255, 254, 117, 117);
-            textColor = Color.fromARGB(255, 242, 89, 89);
-            backgroundColor = Color(0xFFFFDFE0);
+            shadowColor = customColors.redShadowColor;
+            textColor = customColors.redTextColor;
+            backgroundColor = customColors.redBackgroundColor;
           }
         } else {
           log("question isn't corrected");
           if (isSelected) {
             log("answer is selected");
-            shadowColor = Color(0xFF84D6FD);
-            textColor = Color.fromARGB(255, 91, 203, 255);
-            backgroundColor = Color(0xFFDDF3FE);
+            shadowColor = customColors.blueShadowColor;
+            textColor = customColors.blueTextColor;
+            backgroundColor = customColors.blueBackgroundColor;
           }
         }
 
@@ -1081,10 +1082,13 @@ class _QuestionsPageState extends State<QuestionsPage> {
             onPressed: isQuestionCorrected
                 ? null
                 : () {
-                    setState(() {
-                      state.userAnswers[questionIndex] =
-                          question.choices.indexOf(answer);
-                    });
+                    questionCubit.updateQuestionAnswered(
+                        index: questionIndex,
+                        answerIndex: question.choices.indexOf(answer));
+                    // setState(() {
+                    //   state.userAnswers[questionIndex] =
+                    //       question.choices.indexOf(answer);
+                    // });
                   },
             child: Center(
               child: QuillEditor(
@@ -1095,6 +1099,35 @@ class _QuestionsPageState extends State<QuestionsPage> {
                 scrollController: questionCubit.getAnswerScrollController(
                     questionIndex, question.choices.indexOf(answer)),
                 config: QuillEditorConfig(
+                  customStyles: DefaultStyles(
+                    color: textColor,
+                    paragraph: DefaultTextBlockStyle(
+                      TextStyle(
+                        color: textColor, // Default text color
+                        fontSize: 16,
+                      ),
+                      const HorizontalSpacing(0, 0),
+                      const VerticalSpacing(0, 0),
+                      const VerticalSpacing(0, 0),
+                      null,
+                    ),
+                    // You can also set for other text types
+                    h1: DefaultTextBlockStyle(
+                      TextStyle(
+                        color: textColor, // Default text color
+                        fontSize: 16,
+                      ),
+                      const HorizontalSpacing(0, 0),
+                      const VerticalSpacing(0, 0),
+                      const VerticalSpacing(0, 0),
+                      null,
+                    ),
+                  ),
+                  customStyleBuilder: (a) {
+                    return TextStyle(
+                      color: textColor,
+                    );
+                  },
                   scrollable: false,
                   requestKeyboardFocusOnCheckListChanged: false,
                   showCursor: false,
@@ -1103,7 +1136,7 @@ class _QuestionsPageState extends State<QuestionsPage> {
                   enableInteractiveSelection: false,
                   unknownEmbedBuilder: FallbackEmbedBuilder(),
                   embedBuilders: [
-                    FormulaEmbedBuilder(),
+                    FormulaEmbedBuilder(textColor),
                   ],
                 ),
                 // answer, //todo: here the quill editor go
@@ -1214,6 +1247,9 @@ enum QuestionTypeEnum { multipleChoice, written }
 
 // Custom formula embed builder
 class FormulaEmbedBuilder extends EmbedBuilder {
+  FormulaEmbedBuilder([this.color]);
+
+  Color? color;
   @override
   String get key => 'formula';
 

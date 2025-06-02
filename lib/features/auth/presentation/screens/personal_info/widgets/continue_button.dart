@@ -21,7 +21,8 @@ class ContinueButton extends StatelessWidget {
         return AnimatedRaisedButtonWithChild(
             width: 300,
             height: 50,
-            borderRadius: BorderRadius.circular(12), // Set the border radius here
+            borderRadius:
+                BorderRadius.circular(12), // Set the border radius here
             onPressed: isLoading
                 ? null
                 : () {
@@ -29,9 +30,9 @@ class ContinueButton extends StatelessWidget {
                       context.read<AuthCubit>().fetchTypes();
                     }
                   },
-            backgroundColor: Theme.of(context).colorScheme.primary,
-            shadowColor: getIt<AppTheme>().extendedColors.buttonShadow,
-            foregroundColor: Theme.of(context).colorScheme.onPrimary,
+            backgroundColor: Theme.of(context).colorScheme.primaryContainer,
+            // shadowColor: getIt<AppTheme>().extendedColors.buttonShadow,
+            foregroundColor: Theme.of(context).colorScheme.onPrimaryContainer,
             child: Center(
               child: isLoading
                   ? LoadingDots(

@@ -79,7 +79,7 @@ class AnimatedAdaptiveGridLayout extends StatelessWidget {
                     mainAxisSpacing: spacing,
                   ),
                   delegate: SliverChildBuilderDelegate(
-                   (context, index) {
+                    (context, index) {
                       return AnimationConfiguration.staggeredGrid(
                         position: index,
                         duration: const Duration(milliseconds: 375),
@@ -103,78 +103,79 @@ class AnimatedAdaptiveGridLayout extends StatelessWidget {
   }
 }
 
-// Example usage:
-class AdaptiveGridExample extends StatefulWidget {
-  const AdaptiveGridExample({super.key});
+// // Example usage:
+// class AdaptiveGridExample extends StatefulWidget {
+//   const AdaptiveGridExample({super.key});
 
-  @override
-  State<AdaptiveGridExample> createState() => _AdaptiveGridExampleState();
-}
+//   @override
+//   State<AdaptiveGridExample> createState() => _AdaptiveGridExampleState();
+// }
 
-class _AdaptiveGridExampleState extends State<AdaptiveGridExample> {
-  int itemCount = 1;
+// class _AdaptiveGridExampleState extends State<AdaptiveGridExample> {
+//   int itemCount = 1;
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Adaptive Grid Layout'),
-      ),
-      body: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                ElevatedButton(
-                  onPressed: () {
-                    setState(() {
-                      if (itemCount > 1) itemCount--;
-                    });
-                  },
-                  child: const Text('Remove Item'),
-                ),
-                const SizedBox(width: 16),
-                Text('Items: $itemCount', style: const TextStyle(fontSize: 18)),
-                const SizedBox(width: 16),
-                ElevatedButton(
-                  onPressed: () {
-                    setState(() {
-                      itemCount++;
-                    });
-                  },
-                  child: const Text('Add Item'),
-                ),
-              ],
-            ),
-          ),
-          Expanded(
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: AnimatedAdaptiveGridLayout(
-                spacing: 12.0,
-                rowHeight: 100.0,
-                itemCount: itemCount,
-                itemBuilder: (context, index) {
-                  return Container(
-                    decoration: BoxDecoration(
-                      color: Colors.blue.shade200,
-                      borderRadius: BorderRadius.circular(8.0),
-                    ),
-                    alignment: Alignment.center,
-                    // child: Text(
-                    //   'Item ${index + 1}',
-                    //   style: const TextStyle(fontSize: 18),
-                    // ),
-                    child: Icon(Icons.home),
-                  );
-                },
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
+//   @override
+//   Widget build(BuildContext context) {
+//     return Scaffold(
+//       appBar: AppBar(
+//         title: const Text('Adaptive Grid Layout'),
+//       ),
+//       body: Column(
+//         children: [
+//           Padding(
+//             padding: const EdgeInsets.all(16.0),
+//             child: Row(
+//               mainAxisAlignment: MainAxisAlignment.center,
+//               children: [
+//                 ElevatedButton(
+//                   onPressed: () {
+//                     setState(() {
+//                       if (itemCount > 1) itemCount--;
+//                     });
+//                   },
+//                   child: const Text('Remove Item'),
+//                 ),
+//                 const SizedBox(width: 16),
+//                 Text('Items: $itemCount', style: const TextStyle(fontSize: 18)),
+//                 const SizedBox(width: 16),
+//                 ElevatedButton(
+//                   onPressed: () {
+//                     setState(() {
+//                       itemCount++;
+//                     });
+//                   },
+//                   child: const Text('Add Item'),
+//                 ),
+//               ],
+//             ),
+//           ),
+//           Expanded(
+//             child: Padding(
+//               padding: const EdgeInsets.all(16.0),
+//               child: AnimatedAdaptiveGridLayout(
+//                 spacing: 12.0,
+//                 rowHeight: 100.0,
+//                 itemCount: itemCount,
+//                 itemBuilder: (context, index) {
+//                   return Container(
+//                     decoration: BoxDecoration(
+//                       // color: Colors.blue.shade200,
+//                       color: Colors.red,
+//                       borderRadius: BorderRadius.circular(8.0),
+//                     ),
+//                     alignment: Alignment.center,
+//                     // child: Text(
+//                     //   'Item ${index + 1}',
+//                     //   style: const TextStyle(fontSize: 18),
+//                     // ),
+//                     child: Icon(Icons.home),
+//                   );
+//                 },
+//               ),
+//             ),
+//           ),
+//         ],
+//       ),
+//     );
+//   }
+// }

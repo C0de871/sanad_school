@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:sanad_school/features/questions/domain/entities/question_entity.dart';
 
 import '../../../../core/databases/params/params.dart';
@@ -14,6 +16,7 @@ class QuizRepositoryImpl extends QuizRepository {
     required QuizFilterParams params,
   }) async {
     final response = await filterService.getFilteredQuestions(params: params);
+    log("getFilteredQuestions");
     return response.questions;
   }
 
@@ -22,6 +25,7 @@ class QuizRepositoryImpl extends QuizRepository {
     required GetAvailableLessonsParams params,
   }) async {
     final response = await filterService.getAvailableLessons(params: params);
+    log("getAvailableLessons");
     return response.lessons;
   }
 
@@ -30,6 +34,7 @@ class QuizRepositoryImpl extends QuizRepository {
     required GetAvailableTagsParams params,
   }) async {
     final response = await filterService.getAvailableTags(params: params);
+    log("getAvailableTags");
     return response.tags;
   }
 
@@ -38,6 +43,7 @@ class QuizRepositoryImpl extends QuizRepository {
     required GetAvailableTypesParams params,
   }) async {
     final response = await filterService.getAvailableTypes(params: params);
+    log("getAvailableTypes");
     return response;
   }
 
@@ -45,6 +51,8 @@ class QuizRepositoryImpl extends QuizRepository {
   Future<int> getFilteredQuestionsCounts({
     required QuizFilterParams params,
   }) async {
-    return filterService.getFilteredQuestionsCounts(params: params);
+    final count = filterService.getFilteredQuestionsCounts(params: params);
+    log("getFilteredQuestionsCounts");
+    return count;
   }
 }

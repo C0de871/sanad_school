@@ -48,6 +48,11 @@ import 'package:sanad_school/features/quiz/domain/usecases/get_available_lessons
 import 'package:sanad_school/features/quiz/domain/usecases/get_available_questions_count.dart';
 import 'package:sanad_school/features/quiz/domain/usecases/get_available_tags.dart';
 import 'package:sanad_school/features/quiz/domain/usecases/get_available_types.dart';
+import 'package:sanad_school/features/settings/data/datasources/theme_loca_data_source.dart';
+import 'package:sanad_school/features/settings/data/repository/theme_repository.dart';
+import 'package:sanad_school/features/settings/domain/repository/theme_repository_impl.dart';
+import 'package:sanad_school/features/settings/domain/usecases/change_theme.dart';
+import 'package:sanad_school/features/settings/domain/usecases/get_theme.dart';
 import 'package:sanad_school/features/subject_type/data/data_sources/type_remote_data_source.dart';
 import 'package:sanad_school/features/subject_type/domain/repo/type_repository.dart';
 import 'package:sanad_school/features/subject_type/domain/use_cases/get_types_use_case.dart';
@@ -61,6 +66,9 @@ import 'package:sanad_school/features/tags/domain/use_cases/get_tags_or_exams.da
 import '../../../features/auth/data/repository/auth_repository_imple.dart';
 import '../../../features/profile/data/repo/profile_repo_impl.dart';
 import '../../../features/questions/data/repo/question_repository_impl.dart';
+import '../../../features/questions/domain/usecases/update_question_answered_correctly_usecase.dart';
+import '../../../features/questions/domain/usecases/update_question_answered_usecase.dart';
+import '../../../features/questions/domain/usecases/update_question_corrected_usecase.dart';
 import '../../../features/quiz/data/datasources/quiz_local_data_source.dart';
 import '../../../features/quiz/data/repository/quiz_repository_impl.dart';
 import '../../../features/quiz/domain/usecases/get_quiz_questions.dart';
@@ -74,6 +82,7 @@ import '../../../features/subscription/domain/use_cases/get_codes_use_case.dart'
 import '../../../features/tags/data/data_sources/tag_remote_data_source.dart';
 import '../../../features/tags/data/repo/tag_repository_impl.dart';
 import '../../../features/tags/domain/repo/tag_repository.dart';
+import '../../../main.dart';
 import '../../databases/api/api_consumer.dart';
 import '../../databases/api/auth_interceptor.dart';
 import '../../databases/api/dio_consumer.dart';
@@ -142,6 +151,8 @@ void setupServicesLocator() {
       () => TagLocalDataSource(database: getIt()));
   getIt.registerLazySingleton<QuizLocalDataSource>(
       () => QuizLocalDataSource(database: getIt()));
+  getIt.registerLazySingleton<ThemeLocaDataSource>(
+      () => ThemeLocaDataSource(storageHelper: getIt<SecureStorageHelper>()));
 
   //! Repository:
   getIt.registerLazySingleton<LessonsRepository>(
@@ -204,6 +215,12 @@ void setupServicesLocator() {
       filterService: getIt(),
     ),
   );
+  getIt.registerLazySingleton<ThemeRepository>(
+    () => ThemeRepositoryImpl(
+      networkInfo: getIt(),
+      localDataSource: getIt(),
+    ),
+  );
 
   //! use cases:
   getIt.registerLazySingleton<GetLessonsUseCase>(
@@ -248,6 +265,12 @@ void setupServicesLocator() {
       () => GetAvailableTypesUsecase(repository: getIt()));
   getIt.registerLazySingleton<GetAvailableQuestionsCountUsecase>(
       () => GetAvailableQuestionsCountUsecase(repository: getIt()));
+  getIt.registerLazySingleton<UpdateQuestionAnsweredUsecase>(
+      () => UpdateQuestionAnsweredUsecase(repository: getIt()));
+  getIt.registerLazySingleton<UpdateQuestionAnsweredCorrectlyUsecase>(
+      () => UpdateQuestionAnsweredCorrectlyUsecase(repository: getIt()));
+  getIt.registerLazySingleton<UpdateQuestionCorrectedUsecase>(
+      () => UpdateQuestionCorrectedUsecase(repository: getIt()));
 
   // Add missing question use cases
   getIt.registerLazySingleton<GetEditedQuestionsByLessonUseCase>(
@@ -281,6 +304,12 @@ void setupServicesLocator() {
   getIt.registerLazySingleton<GetQuestionHintPhoto>(
       () => GetQuestionHintPhoto(repository: getIt()));
 
+  //theme use cases:
+  getIt.registerLazySingleton<ChangeThemeUsecase>(
+      () => ChangeThemeUsecase(repository: getIt()));
+  getIt.registerLazySingleton<GetThemeUsecase>(
+      () => GetThemeUsecase(repository: getIt()));
+
   //! Interceptors:
   getIt.registerLazySingleton<AuthInterceptor>(
       () => AuthInterceptor(retrieveAccessTokenUseCase: getIt()));
@@ -303,6 +332,7 @@ Future<void> initApp() async {
   await deviceInfoService.init();
 
   final SqlDB sqlDb = getIt<SqlDB>();
+  await enableScreenshot();
   // await sqlDb.deleteDB();
   await sqlDb.initialDb();
   await (getIt<ApiConsumer>() as DioConsumer)

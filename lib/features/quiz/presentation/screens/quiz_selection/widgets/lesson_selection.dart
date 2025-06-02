@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -17,6 +19,7 @@ class LessonsSelectionWidget extends StatelessWidget {
 
     return BlocBuilder<QuizSelectionCubit, QuizSelectionState>(
       builder: (context, state) {
+        log("length: ${state.availableLessons.length}");
         return Column(
           children: [
             Container(
@@ -40,27 +43,38 @@ class LessonsSelectionWidget extends StatelessWidget {
                   crossAxisSpacing: 10,
                   mainAxisSpacing: 10,
                 ),
-                itemCount: state.availableLessons.length > 9 ? 9 : state.availableLessons.length,
+                itemCount: state.availableLessons.length > 9
+                    ? 9
+                    : state.availableLessons.length,
                 itemBuilder: (context, index) {
                   final lesson = state.availableLessons[index];
                   final isSelected = state.selectedLessons.contains(lesson.id);
 
                   return AnimatedRaisedButtonWithChild(
                     onPressed: () => cubit.toggleLesson(lesson.id),
-                    backgroundColor: isSelected ? cubit.quizScreenArgs.subjectColor : Theme.of(context).colorScheme.surfaceVariant,
-                    shadowColor: isSelected ? (null) : (getIt<AppTheme>().isDark ? Colors.blueGrey.withAlpha(70) : null),
+                    backgroundColor: isSelected
+                        ? cubit.quizScreenArgs.subjectColor
+                        : Theme.of(context).colorScheme.surfaceVariant,
+                    shadowColor: isSelected
+                        ? (null)
+                        : (getIt<AppTheme>().isDark
+                            ? Colors.blueGrey.withAlpha(70)
+                            : null),
                     shadowOffset: 5,
                     lerpValue: 0.1,
                     borderWidth: 1.5,
                     borderRadius: BorderRadius.circular(16),
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                     child: Center(
                       child: Text(
                         lesson.title,
                         style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w500,
-                          color: isSelected ? Theme.of(context).colorScheme.onPrimary : Theme.of(context).colorScheme.onSurfaceVariant,
+                          color: isSelected
+                              ? Theme.of(context).colorScheme.onPrimary
+                              : Theme.of(context).colorScheme.onSurfaceVariant,
                         ),
                         textAlign: TextAlign.center,
                       ),

@@ -29,9 +29,9 @@ class SignInButton extends StatelessWidget {
                     context.read<AuthCubit>().login();
                   }
                 },
-          backgroundColor: Theme.of(context).colorScheme.primary,
-          foregroundColor: Theme.of(context).colorScheme.onPrimary,
-          shadowColor: getIt<AppTheme>().extendedColors.buttonShadow,
+          backgroundColor: Theme.of(context).colorScheme.primaryContainer,
+          foregroundColor: Theme.of(context).colorScheme.onPrimaryContainer,
+          // shadowColor: getIt<AppTheme>().extendedColors.buttonShadow,
           child: Center(
             child: isLoading
                 ? LoadingDots(

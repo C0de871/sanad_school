@@ -8,7 +8,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     return AppBar(
-      backgroundColor: Theme.of(context).colorScheme.primary,
+      backgroundColor: Theme.of(context).colorScheme.primaryContainer,
       scrolledUnderElevation: 0,
       automaticallyImplyLeading: false,
       title: Row(
@@ -27,7 +27,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
     return Text(
       'سند الطالب',
       style: TextStyle(
-        color: Theme.of(context).colorScheme.onPrimary,
+        color: Theme.of(context).colorScheme.onPrimaryContainer,
         fontSize: 20,
         fontWeight: FontWeight.w600,
         letterSpacing: 0.5,

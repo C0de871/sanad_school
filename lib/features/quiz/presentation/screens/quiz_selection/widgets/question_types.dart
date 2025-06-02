@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../../../../core/theme/theme.dart';
+import '../../../../../../core/utils/services/service_locator.dart';
 import '../../../../../auth/presentation/widgets/animated_raised_button.dart';
 import '../../../cubits/quiz_selection_cubit.dart';
 import '../../../cubits/quiz_selection_state.dart';
@@ -24,14 +26,28 @@ class QuestionTypesWidget extends StatelessWidget {
               return Row(
                 children: [
                   AnimatedRaisedButtonWithChild(
-                    onPressed: () => cubit.toggleQuestionType(state.availableTypes[index].id!),
-                    backgroundColor: state.selectedTypes.contains(state.availableTypes[index].id) ? cubit.quizScreenArgs.subjectColor : Theme.of(context).colorScheme.surfaceVariant,
-                    foregroundColor: state.selectedTypes.contains(state.availableTypes[index].id) ? null : Theme.of(context).colorScheme.onSurfaceVariant,
+                    onPressed: () => cubit
+                        .toggleQuestionType(state.availableTypes[index].id!),
+                    backgroundColor: state.selectedTypes
+                            .contains(state.availableTypes[index].id)
+                        ? cubit.quizScreenArgs.subjectColor
+                        : Theme.of(context).colorScheme.surfaceVariant,
+                    foregroundColor: state.selectedTypes
+                            .contains(state.availableTypes[index].id)
+                        ? null
+                        : Theme.of(context).colorScheme.onSurfaceVariant,
                     // shadowColor: getIt<AppTheme>().extendedColors.buttonShadow,
+                    shadowColor: state.selectedTypes
+                            .contains(state.availableTypes[index].id)
+                        ? (null)
+                        : (getIt<AppTheme>().isDark
+                            ? Colors.blueGrey.withAlpha(70)
+                            : null),
                     borderRadius: BorderRadius.circular(12),
                     width: 120,
                     height: 120,
-                    padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 4),
+                    padding:
+                        const EdgeInsets.symmetric(vertical: 4, horizontal: 4),
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       mainAxisAlignment: MainAxisAlignment.center,

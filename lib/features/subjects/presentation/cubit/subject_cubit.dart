@@ -20,7 +20,8 @@ class SubjectCubit extends Cubit<SubjectState> {
     final result = await getSubjectsUseCase(isRefresh: isRefresh);
     result.fold(
       (failure) => emit(SubjectFailure(failure.errMessage)),
-      (subjects) => emit(SubjectSuccess(subjects)),
+      (subjects) => emit(SubjectSuccess(
+          subjects: subjects, isExpanded: List.filled(subjects.length, false))),
     );
   }
 
@@ -29,6 +30,4 @@ class SubjectCubit extends Cubit<SubjectState> {
     log("subject cubit is closed");
     return super.close();
   }
-
-  
 }

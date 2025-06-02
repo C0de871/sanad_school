@@ -364,24 +364,11 @@ class AppTheme {
         useMaterial3: true,
         brightness: colorScheme.brightness,
         colorScheme: colorScheme,
-        // textTheme: textTheme.apply(
-        //   bodyColor: colorScheme.onSurface,
-        //   displayColor: colorScheme.onSurface,
-        // ),
         scaffoldBackgroundColor: colorScheme.surface,
         canvasColor: colorScheme.surface,
-        // textTheme: TextTheme(
-        //   bodyLarge: TextStyle(
-        //     color: colorScheme.onSurface,
-        //     fontSize: 16,
-        //     fontWeight: FontWeight.w400,
-        //   ),
-        // ),
-        // fontFamily: GoogleFonts.cairo().fontFamily,
         fontFamily: 'Cairo',
         inputDecorationTheme: InputDecorationTheme(
           filled: true,
-          // fillColor: Colors.grey[50],
           fillColor: colorScheme.surface,
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12),
@@ -405,7 +392,8 @@ class AppTheme {
             borderRadius: BorderRadius.circular(12),
             borderSide: BorderSide(color: colorScheme.error, width: 2),
           ),
-          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+          contentPadding:
+              const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
         ),
       );
 
@@ -442,6 +430,21 @@ abstract class ExtendedColors {
   Color get gradientBrown;
   Color get gradientBlueGrey;
   Color get gradientTeal;
+
+  // Blue theme colors
+  Color get blueShadowColor;
+  Color get blueTextColor;
+  Color get blueBackgroundColor;
+
+  // Red theme colors
+  Color get redShadowColor;
+  Color get redTextColor;
+  Color get redBackgroundColor;
+
+  // Green theme colors
+  Color get greenShadowColor;
+  Color get greenTextColor;
+  Color get greenBackgroundColor;
 }
 
 class LightBlueColors extends ExtendedColors {
@@ -484,6 +487,34 @@ class LightBlueColors extends ExtendedColors {
 
   @override
   final Color gradientTeal = Color(0xFF009688);
+
+  // Light mode theme colors
+  @override
+  final Color blueShadowColor = Color(0xFF84D6FD);
+
+  @override
+  final Color blueTextColor = Color.fromARGB(255, 91, 203, 255);
+
+  @override
+  final Color blueBackgroundColor = Color(0xFFDDF3FE);
+
+  @override
+  final Color redShadowColor = Color.fromARGB(255, 254, 117, 117);
+
+  @override
+  final Color redTextColor = Color.fromARGB(255, 242, 89, 89);
+
+  @override
+  final Color redBackgroundColor = Color(0xFFFFDFE0);
+
+  @override
+  final Color greenShadowColor = Color(0xFFA7EF75);
+
+  @override
+  final Color greenTextColor = Color.fromARGB(255, 69, 165, 0);
+
+  @override
+  final Color greenBackgroundColor = Color(0xFFD7FFB8);
 }
 
 class DarkBlueColors extends ExtendedColors {
@@ -525,4 +556,32 @@ class DarkBlueColors extends ExtendedColors {
 
   @override
   final Color gradientTeal = Color(0xFF00695C);
+
+  // Dark mode theme colors
+  @override
+  final Color blueShadowColor = Color(0xFF1A4A5C);
+
+  @override
+  final Color blueTextColor = Color(0xFF84D6FD);
+
+  @override
+  final Color blueBackgroundColor = Color(0xFF0A1A2E);
+
+  @override
+  final Color redShadowColor = Color(0xFF4A1A1A);
+
+  @override
+  final Color redTextColor = Color(0xFFFF7575);
+
+  @override
+  final Color redBackgroundColor = Color(0xFF2E0A0A);
+
+  @override
+  final Color greenShadowColor = Color(0xFF1A4A1A);
+
+  @override
+  final Color greenTextColor = Color(0xFFA7EF75);
+
+  @override
+  final Color greenBackgroundColor = Color(0xFF0A2E0A);
 }

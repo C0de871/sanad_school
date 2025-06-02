@@ -17,7 +17,8 @@ class QuestionsInLessonWithTypeParams {
   final int lessonId;
   final int? typeId;
 
-  QuestionsInLessonWithTypeParams({required this.lessonId, required this.typeId});
+  QuestionsInLessonWithTypeParams(
+      {required this.lessonId, required this.typeId});
 }
 
 class QuestionsInSubjectByTag {
@@ -207,5 +208,37 @@ class GetAvailableLessonsParams {
     required this.subjectId,
     required this.selectedTypeIds,
     required this.selectedTagIds,
+  });
+}
+
+class UpdateQuestionAnsweredParams {
+  final int questionId;
+  final bool isAnswered;
+  final int? userAnswer;
+
+  UpdateQuestionAnsweredParams({
+    required this.questionId,
+    required this.isAnswered,
+    this.userAnswer,
+  });
+}
+
+class UpdateQuestionCorrectedParams {
+  final int questionId;
+  final bool isCorrected;
+
+  UpdateQuestionCorrectedParams({
+    required this.questionId,
+    required this.isCorrected,
+  });
+}
+
+class UpdateQuestionAnsweredCorrectlyParams {
+  final int questionId;
+  final bool isAnsweredCorrectly;
+
+  UpdateQuestionAnsweredCorrectlyParams({
+    required this.questionId,
+    required this.isAnsweredCorrectly,
   });
 }

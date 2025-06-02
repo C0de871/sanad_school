@@ -7,6 +7,7 @@ import '../../../../core/databases/errors/failure.dart';
 import '../../../../core/databases/params/params.dart';
 import '../../../../core/utils/services/service_locator.dart';
 import '../../domain/entities/lesson_entity.dart';
+import '../../domain/entities/lessons_response_entity.dart';
 import 'lessons_state.dart';
 
 class LessonsCubit extends Cubit<LessonsState> {
@@ -30,11 +31,14 @@ class LessonsCubit extends Cubit<LessonsState> {
     if (!isRefresh) {
       emit(LessonsLoading());
     }
-    final Either<Failure, List<LessonEntity>> result =
+    final Either<Failure, LessonsResponseEntity> result =
         await getLessonsUseCase.call(LessonsParams(subjectId: subjectId));
     result.fold(
       (failure) => emit(LessonsError(failure.errMessage)),
-      (lessons) => emit(LessonsLoaded(lessons)),
+      (data) => emit(LessonsLoaded(
+          lessons: data.lessons,
+          questionsCount: data.totalQuestions,
+          answeredQuestionsCount: data.totalAnsweredQuestions)),
     );
   }
 
@@ -43,12 +47,15 @@ class LessonsCubit extends Cubit<LessonsState> {
     if (!isRefresh) {
       emit(LessonsLoading());
     }
-    final Either<Failure, List<LessonEntity>> result =
+    final Either<Failure, LessonsResponseEntity> result =
         await getFavLessonsUseCase
             .call(LessonsWithFavoriteGroupsParams(subjectId: subjectId));
     result.fold(
       (failure) => emit(LessonsError(failure.errMessage)),
-      (lessons) => emit(LessonsLoaded(lessons)),
+      (data) => emit(LessonsLoaded(
+          lessons: data.lessons,
+          questionsCount: data.totalQuestions,
+          answeredQuestionsCount: data.totalAnsweredQuestions)),
     );
   }
 
@@ -57,26 +64,33 @@ class LessonsCubit extends Cubit<LessonsState> {
     if (!isRefresh) {
       emit(LessonsLoading());
     }
-    final Either<Failure, List<LessonEntity>> result =
+    final Either<Failure, LessonsResponseEntity> result =
         await getEditedLessonsUseCase
             .call(LessonsWithEditedQuestionsParams(subjectId: subjectId));
     result.fold(
       (failure) => emit(LessonsError(failure.errMessage)),
-      (lessons) => emit(LessonsLoaded(lessons)),
+      (data) => emit(LessonsLoaded(
+          lessons: data.lessons,
+          questionsCount: data.totalQuestions,
+          answeredQuestionsCount: data.totalAnsweredQuestions)),
     );
   }
 
-  Future<void> getIncorrectLessons(int subjectId, {bool isRefresh = false}) async {
+  Future<void> getIncorrectLessons(int subjectId,
+      {bool isRefresh = false}) async {
     screenType = ScreenType.incorrectLessons;
     if (!isRefresh) {
       emit(LessonsLoading());
     }
-    final Either<Failure, List<LessonEntity>> result =
+    final Either<Failure, LessonsResponseEntity> result =
         await getIncorrectLessonsUseCase
             .call(LessonsWithIncorrectAnswerGroupsParams(subjectId: subjectId));
     result.fold(
       (failure) => emit(LessonsError(failure.errMessage)),
-      (lessons) => emit(LessonsLoaded(lessons)),
+      (data) => emit(LessonsLoaded(
+          lessons: data.lessons,
+          questionsCount: data.totalQuestions,
+          answeredQuestionsCount: data.totalAnsweredQuestions)),
     );
   }
 }

@@ -14,7 +14,7 @@ class QuestionEntity extends Equatable {
   final String? questionPhoto;
   final List<List<dynamic>> choices;
   final int rightChoice;
-  final int isEdited;
+  final bool isEdited;
   final List<Map<String, dynamic>>? hint;
   final String? hintPhoto;
   final QuestionTypeEnum type;
@@ -23,6 +23,10 @@ class QuestionEntity extends Equatable {
   final String? note;
   final Uint8List? downloadedHintPhoto;
   final Uint8List? downloadedQuestionPhoto;
+  final bool isAnswered;
+  final bool isCorrected;
+  final bool isAnsweredCorrectly;
+  final int? userAnswer;
 
   const QuestionEntity({
     required this.id,
@@ -42,6 +46,10 @@ class QuestionEntity extends Equatable {
     this.note,
     this.downloadedHintPhoto,
     this.downloadedQuestionPhoto,
+    this.isAnswered = false,
+    this.isCorrected = false,
+    this.isAnsweredCorrectly = false,
+    this.userAnswer,
   }) : type = typeId <= 2 ? QuestionTypeEnum.multipleChoice : QuestionTypeEnum.written;
 
   int get adjustedRightChoice => rightChoice - 1;
@@ -65,6 +73,9 @@ class QuestionEntity extends Equatable {
         note,
         downloadedHintPhoto,
         downloadedQuestionPhoto,
+        isAnswered,
+        isCorrected,
+        isAnsweredCorrectly,
       ];
 
   QuestionEntity copyWith({
@@ -73,6 +84,9 @@ class QuestionEntity extends Equatable {
     String? note,
     Uint8List? downloadedHintPhoto,
     Uint8List? downloadedQuestionPhoto,
+    bool? isAnswered,
+    bool? isCorrected,
+    bool? isAnsweredCorrectly,
   }) {
     return QuestionEntity(
       id: id,
@@ -92,6 +106,9 @@ class QuestionEntity extends Equatable {
       note: note ?? this.note,
       downloadedHintPhoto: downloadedHintPhoto ?? this.downloadedHintPhoto,
       downloadedQuestionPhoto: downloadedQuestionPhoto ?? this.downloadedQuestionPhoto,
+      isAnswered: isAnswered ?? this.isAnswered,
+      isCorrected: isCorrected ?? this.isCorrected,
+      isAnsweredCorrectly: isAnsweredCorrectly ?? this.isAnsweredCorrectly,
     );
   }
 }

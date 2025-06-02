@@ -16,6 +16,10 @@ class QuestionTable {
   static const String note = "note";
   static const String downloadedHintPhoto = "downloaded_hint_photo";
   static const String downloadedQuestionPhoto = "downloaded_question_photo";
+  static const String isAnswered = "is_answered";
+  static const String isCorrected = "is_corrected";
+  static const String isAnsweredCorrectly = "is_answered_correctly";
+  static const String userAnswer = "user_answer";
 
   static const String tableName = "questions";
 
@@ -37,6 +41,10 @@ class QuestionTable {
       $idTypeQuestion INTEGER NOT NULL,
       $questionPhoto TEXT,
       $note TEXT,
+      $isAnswered INTEGER,
+      $userAnswer INTEGER,
+      $isCorrected INTEGER,
+      $isAnsweredCorrectly INTEGER,
       $downloadedHintPhoto BLOB,
       $downloadedQuestionPhoto BLOB,
       FOREIGN KEY ($questionGroupId) REFERENCES question_groups(id) ON DELETE CASCADE,

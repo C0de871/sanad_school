@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sanad_school/core/shared/widgets/step_indicator.dart';
 import 'package:sanad_school/core/theme/theme.dart';
+import 'package:sanad_school/core/utils/constants/constant.dart';
 import 'package:sanad_school/core/utils/services/service_locator.dart';
 import 'package:sanad_school/features/auth/presentation/cubit/auth_cubit/auth_cubit.dart';
 import 'package:sanad_school/features/auth/presentation/screens/school_info/widgets/certificate_dropdown_button.dart';
@@ -19,7 +20,8 @@ class SchoolInfoScreen extends StatefulWidget {
   State<SchoolInfoScreen> createState() => _SchoolInfoScreenState();
 }
 
-class _SchoolInfoScreenState extends State<SchoolInfoScreen> with SingleTickerProviderStateMixin {
+class _SchoolInfoScreenState extends State<SchoolInfoScreen>
+    with SingleTickerProviderStateMixin {
   late AnimationController _slideController;
   late Animation<Offset> _slideAnimation;
   late Animation<double> _fadeAnimation;
@@ -75,7 +77,10 @@ class _SchoolInfoScreenState extends State<SchoolInfoScreen> with SingleTickerPr
                 Container(
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
+                    color: Theme.of(context)
+                        .colorScheme
+                        .primary
+                        .withValues(alpha: 0.1),
                     shape: BoxShape.circle,
                   ),
                   child: Icon(
@@ -104,16 +109,27 @@ class _SchoolInfoScreenState extends State<SchoolInfoScreen> with SingleTickerPr
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 24),
-                AnimatedRaisedButton(
-                  onPressed: () {
-                    parentContext.read<AuthCubit>().emitLoginSuccess();
-                   
-                  },
-                  text: 'تم',
-                  backgroundColor: Theme.of(context).colorScheme.primary,
-                  shadowColor: getIt<AppTheme>().extendedColors.buttonShadow,
-                  foregroundColor: Theme.of(context).colorScheme.onPrimary,
-                ),
+                AnimatedRaisedButtonWithChild(
+                    onPressed: () {
+                      parentContext.read<AuthCubit>().emitLoginSuccess();
+                    },
+                    width: 300,
+                    height: 50,
+                    borderRadius:
+                        BorderRadius.circular(12), // Set the border radius here
+                    backgroundColor:
+                        Theme.of(context).colorScheme.primaryContainer,
+                    // shadowColor: getIt<AppTheme>().extendedColors.buttonShadow,
+                    foregroundColor:
+                        Theme.of(context).colorScheme.onPrimaryContainer,
+                    child: Center(
+                      child: const Text(
+                        'تم',
+                        style: TextStyle(
+                          fontSize: 18,
+                        ),
+                      ),
+                    )),
               ],
             ),
           ),
@@ -142,7 +158,8 @@ class _SchoolInfoScreenState extends State<SchoolInfoScreen> with SingleTickerPr
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
                     content: Text(state.errMessage),
-                    duration: Duration(seconds: 2), // Optional: how long it shows
+                    duration:
+                        Duration(seconds: 2), // Optional: how long it shows
                   ),
                 );
               case _:
@@ -196,7 +213,6 @@ class _SchoolInfoScreenState extends State<SchoolInfoScreen> with SingleTickerPr
   }
 
   DropdownButtonFormField<String> _cityDropDownButton(BuildContext context) {
-    final citiesMap = context.read<AuthCubit>().syrianCitiesMap;
     final selectedKey = context.read<AuthCubit>().selectedCity;
 
     return DropdownButtonFormField<String>(
@@ -208,7 +224,7 @@ class _SchoolInfoScreenState extends State<SchoolInfoScreen> with SingleTickerPr
           color: Theme.of(context).colorScheme.primary,
         ),
       ),
-      items: citiesMap.entries.map((entry) {
+      items: Constant.syrianCitiesMap.entries.map((entry) {
         return DropdownMenuItem<String>(
           value: entry.key, // English key
           child: Text(entry.value), // Arabic name

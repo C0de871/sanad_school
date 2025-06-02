@@ -41,13 +41,20 @@ class TagsSelectionWidget extends StatelessWidget {
 
                   return AnimatedRaisedButtonWithChild(
                     onPressed: () => cubit.toggleTag(tag.id),
-                    backgroundColor: isSelected ? cubit.quizScreenArgs.subjectColor : Theme.of(context).colorScheme.surfaceVariant,
-                    shadowColor: isSelected ? (null) : (getIt<AppTheme>().isDark ? Colors.blueGrey.withAlpha(70) : null),
+                    backgroundColor: isSelected
+                        ? cubit.quizScreenArgs.subjectColor
+                        : Theme.of(context).colorScheme.surfaceVariant,
+                    shadowColor: isSelected
+                        ? (null)
+                        : (getIt<AppTheme>().isDark
+                            ? Colors.blueGrey.withAlpha(70)
+                            : null),
                     shadowOffset: 5,
                     lerpValue: 0.1,
                     borderWidth: 1.5,
                     borderRadius: BorderRadius.circular(16),
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                     child: Text(
                       tag.name,
                       style: TextStyle(

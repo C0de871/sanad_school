@@ -1,4 +1,3 @@
-
 import 'package:awesome_video_player/awesome_video_player.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -27,43 +26,47 @@ class _SamsungSplashScreenState extends State<SamsungSplashScreen> {
   }
 
   Future<void> _initializePlayer() async {
-    await Utils.saveAssetVideoToFile("assets/videos/sanad_intro.mp4", "sanad_intro.mp4");
+    await Utils.saveAssetVideoToFile(
+        "assets/videos/sanad_intro.mp4", "sanad_intro.mp4");
     final videoUrl = await Utils.getFileUrl("sanad_intro.mp4");
-    BetterPlayerDataSource betterPlayerDataSource = BetterPlayerDataSource(BetterPlayerDataSourceType.file, videoUrl);
+    BetterPlayerDataSource betterPlayerDataSource =
+        BetterPlayerDataSource(BetterPlayerDataSourceType.file, videoUrl);
     _betterPlayerController = BetterPlayerController(
       BetterPlayerConfiguration(
+        errorBuilder: (context, error) => Center(
+          child: Image.asset(
+            'assets/app_icon/sanad_icon.png',
+            width: MediaQuery.of(context).size.width * 0.5,
+          ),
+        ),
+        // // Enable handle lifecycle for tablets
+        // handleLifecycle: true,
+        // // Force software decoding
+        // playerVisibilityChangedBehavior: null,
         autoPlay: true,
         looping: false,
-        // aspectRatio: MediaQuery.of(context).size.width / MediaQuery.of(context).size.height,
+        // Disable pip mode that might conflict with DeX
+        allowedScreenSleep: false,
         controlsConfiguration: BetterPlayerControlsConfiguration(
           showControls: false,
           backgroundColor: Colors.white,
+          enablePip: false, // Disable PIP for Samsung tablets
         ),
         fit: BoxFit.contain,
-        aspectRatio: MediaQuery.of(context).size.width / MediaQuery.of(context).size.height,
-        // expandToFill: false,
-        // autoDetectFullscreenAspectRatio: true,
-        // autoDetectFullscreenDeviceOrientation: true,
-        // deviceOrientationsAfterFullScreen: [DeviceOrientation.portraitDown, DeviceOrientation.portraitUp],
+        aspectRatio: MediaQuery.of(context).size.width /
+            MediaQuery.of(context).size.height,
       ),
       betterPlayerDataSource: betterPlayerDataSource,
     );
 
     _betterPlayerController!.addEventsListener((BetterPlayerEvent event) async {
       if (event.betterPlayerEventType == BetterPlayerEventType.finished) {
-        // await Future.delayed(const Duration(seconds: 3));
-        // final dir = await getApplicationDocumentsDirectory();
-        // final path = '${dir.path}/debug_log.txt';
-        // final params = ShareParams(
-        //   text: 'Great picture',
-        //   files: [XFile(path)],
-        // );
-
-        // final result = await SharePlus.instance.share(params);
-
-        // if (result.status == ShareResultStatus.success) {
-        //   log('Thank you for sharing the picture!');
-        // }
+        setState(() {
+          _isVideoComplete = true;
+        });
+        _navigateBasedOnAuthState();
+      } else if (event.betterPlayerEventType ==
+          BetterPlayerEventType.exception) {
         setState(() {
           _isVideoComplete = true;
         });
@@ -80,19 +83,6 @@ class _SamsungSplashScreenState extends State<SamsungSplashScreen> {
     if (!context.mounted) return;
 
     final authState = context.read<AuthCubit>().state;
-    // await Future.delayed(const Duration(seconds: 3));
-    // final dir = await getApplicationDocumentsDirectory();
-    // final path = '${dir.path}/debug_log.txt';
-    // final params = ShareParams(
-    //   text: 'Great picture',
-    //   files: [XFile(path)],
-    // );
-
-    // final result = await SharePlus.instance.share(params);
-
-    // if (result.status == ShareResultStatus.success) {
-    //   log('Thank you for sharing the picture!');
-    // }
     if (authState is PreviouslyAuthentecated) {
       Navigator.pushReplacementNamed(context, AppRoutes.home);
     } else if (authState is UnAuthentecated) {

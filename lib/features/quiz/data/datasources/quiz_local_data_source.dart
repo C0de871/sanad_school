@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer';
 
 import 'package:sanad_school/features/tags/data/models/tag_response_model.dart';
 
@@ -31,16 +32,26 @@ class QuizLocalDataSource {
         QuestionTable.questionGroupId: q[QuestionTable.questionGroupId],
         QuestionTable.displayOrder: q[QuestionTable.displayOrder],
         QuestionModel.typeIdKey: q[QuestionTable.idTypeQuestion],
-        QuestionModel.textQuestionKey: q[QuestionTable.textQuestion] != null ? {"ops": jsonDecode(q[QuestionTable.textQuestion])} : null,
+        QuestionModel.textQuestionKey: q[QuestionTable.textQuestion] != null
+            ? {"ops": jsonDecode(q[QuestionTable.textQuestion])}
+            : null,
         QuestionModel.questionPhotoKey: q[QuestionTable.questionPhoto],
-        QuestionModel.choicesKey: q[QuestionTable.choices] != null ? jsonDecode(q[QuestionTable.choices]).map((item) => {"ops": item}).toList() : null,
+        QuestionModel.choicesKey: q[QuestionTable.choices] != null
+            ? jsonDecode(q[QuestionTable.choices])
+                .map((item) => {"ops": item})
+                .toList()
+            : null,
         QuestionModel.rightChoiceKey: q[QuestionTable.rightChoice],
         QuestionModel.isEditedKey: q[QuestionTable.isEdited],
-        QuestionModel.hintKey: q[QuestionTable.hint] != null ? {"ops": jsonDecode(q[QuestionTable.hint])} : null,
+        QuestionModel.hintKey: q[QuestionTable.hint] != null
+            ? {"ops": jsonDecode(q[QuestionTable.hint])}
+            : null,
         QuestionModel.hintPhotoKey: q[QuestionTable.hintPhoto],
         QuestionModel.noteKey: q[QuestionTable.note],
-        QuestionModel.isFavoriteKey: q[QuestionGroupsTable.isFavorite] == 1 ? true : false,
-        QuestionModel.answerStatusKey: q[QuestionGroupsTable.answerStatus] == 1 ? true : false,
+        QuestionModel.isFavoriteKey:
+            q[QuestionGroupsTable.isFavorite] == 1 ? true : false,
+        QuestionModel.answerStatusKey:
+            q[QuestionGroupsTable.answerStatus] == 1 ? true : false,
       };
     }).toList();
   }
@@ -58,7 +69,8 @@ class QuizLocalDataSource {
 
     // Add lesson filter if provided
     if (params.lessonIds.isNotEmpty) {
-      conditions.add('qg.${QuestionGroupsTable.lessonId} IN (${params.lessonIds.join(',')})');
+      conditions.add(
+          'qg.${QuestionGroupsTable.lessonId} IN (${params.lessonIds.join(',')})');
     }
 
     // For type and tag filters, we need to use EXISTS clauses because we need to check
@@ -100,13 +112,16 @@ class QuizLocalDataSource {
 
     // Execute the query to get matching question group IDs
     List<Map> matchingGroups = await database.sqlReadData(query);
-    List<int> groupIds = matchingGroups.map<int>((group) => group[QuestionGroupsTable.id] as int).toList();
+    List<int> groupIds = matchingGroups
+        .map<int>((group) => group[QuestionGroupsTable.id] as int)
+        .toList();
 
     if (groupIds.isEmpty) {
       // No matching question groups found
       final response = {
         QuestionsResponseModel.dataKey: [],
-        QuestionsResponseModel.messageKey: 'No questions match the selected criteria',
+        QuestionsResponseModel.messageKey:
+            'No questions match the selected criteria',
         QuestionsResponseModel.statusKey: 200,
       };
       return QuestionsResponseModel.fromMap(response);
@@ -198,6 +213,8 @@ class QuizLocalDataSource {
             })
         .toList();
 
+    log("formatted lesssons: ${formattedLessons.toString()}");
+
     final response = {
       LessonsResponseModel.dataKey: formattedLessons,
       LessonsResponseModel.messageKey: 'Lessons fetched successfully',
@@ -215,12 +232,15 @@ class QuizLocalDataSource {
     // Basic condition to connect tables
     conditions.add('l.${LessonTable.subjectId} = ${params.subjectId}');
     conditions.add('qg.${QuestionGroupsTable.lessonId} = l.${LessonTable.id}');
-    conditions.add('q.${QuestionTable.questionGroupId} = qg.${QuestionGroupsTable.id}');
-    conditions.add('q.${QuestionTable.idTypeQuestion} = t.${TypeQuestionTable.id}');
+    conditions.add(
+        'q.${QuestionTable.questionGroupId} = qg.${QuestionGroupsTable.id}');
+    conditions
+        .add('q.${QuestionTable.idTypeQuestion} = t.${TypeQuestionTable.id}');
 
     // Lesson filter
     if (params.selectedLessonIds.isNotEmpty) {
-      conditions.add('l.${LessonTable.id} IN (${params.selectedLessonIds.join(',')})');
+      conditions.add(
+          'l.${LessonTable.id} IN (${params.selectedLessonIds.join(',')})');
     }
 
     // Tag filter
@@ -255,7 +275,10 @@ class QuizLocalDataSource {
     //           TypeModel.nameKey: type[TypeQuestionTable.name],
     //         })
     //     .toList();
-    return types.map((type) => QuestionTypeModel.fromMap(type as Map<String, dynamic>)).toList();
+    log("formatted types: ${types.toString()}");
+    return types
+        .map((type) => QuestionTypeModel.fromMap(type as Map<String, dynamic>))
+        .toList();
   }
 
   // Get available tags based on selected lessons and types
@@ -267,18 +290,21 @@ class QuizLocalDataSource {
     // Basic condition to connect tables
     conditions.add('l.${LessonTable.subjectId} = ${params.subjectId}');
     conditions.add('qg.${QuestionGroupsTable.lessonId} = l.${LessonTable.id}');
-    conditions.add('q.${QuestionTable.questionGroupId} = qg.${QuestionGroupsTable.id}');
+    conditions.add(
+        'q.${QuestionTable.questionGroupId} = qg.${QuestionGroupsTable.id}');
     conditions.add('tq.${TagQuestionTable.idQuestion} = q.${QuestionTable.id}');
     conditions.add('tq.${TagQuestionTable.idTag} = tag.${TagTable.id}');
 
     // Lesson filter
     if (params.selectedLessonIds.isNotEmpty) {
-      conditions.add('l.${LessonTable.id} IN (${params.selectedLessonIds.join(',')})');
+      conditions.add(
+          'l.${LessonTable.id} IN (${params.selectedLessonIds.join(',')})');
     }
 
     // Type filter
     if (params.selectedTypeIds.isNotEmpty) {
-      conditions.add('q.${QuestionTable.idTypeQuestion} IN (${params.selectedTypeIds.join(',')})');
+      conditions.add(
+          'q.${QuestionTable.idTypeQuestion} IN (${params.selectedTypeIds.join(',')})');
     }
 
     // Combine all conditions
@@ -296,6 +322,7 @@ class QuizLocalDataSource {
     ''';
 
     List<Map> tags = await database.sqlReadData(query);
+    log("formatted tags: ${tags.toString()}");
 
     final response = {
       TagResponseModel.dataKey: tags,
@@ -325,7 +352,8 @@ class QuizLocalDataSource {
 
     // Add lesson filter if provided
     if (params.lessonIds.isNotEmpty) {
-      conditions.add('qg.${QuestionGroupsTable.lessonId} IN (${params.lessonIds.join(',')})');
+      conditions.add(
+          'qg.${QuestionGroupsTable.lessonId} IN (${params.lessonIds.join(',')})');
     }
 
     // For type and tag filters, we need to use EXISTS clauses because we need to check
@@ -367,7 +395,9 @@ class QuizLocalDataSource {
 
     // Execute the query to get matching question group IDs
     List<Map> matchingGroups = await database.sqlReadData(query);
-    List<int> groupIds = matchingGroups.map<int>((group) => group[QuestionGroupsTable.id] as int).toList();
+    List<int> groupIds = matchingGroups
+        .map<int>((group) => group[QuestionGroupsTable.id] as int)
+        .toList();
 
     if (groupIds.isEmpty) {
       return 0;
@@ -395,6 +425,7 @@ class QuizLocalDataSource {
 
     List<Map> questions = await database.sqlReadData(questionsQuery);
     List<Map<String, dynamic>> formattedQuestions = _formatQuestions(questions);
+      log("formatted formattedQuestions.length: ${formattedQuestions.length.toString()}");
 
     return formattedQuestions.length;
   }

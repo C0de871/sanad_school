@@ -19,11 +19,17 @@ final class LessonsLoading extends LessonsInitial {}
 
 final class LessonsLoaded extends LessonsInitial {
   final List<LessonEntity> lessons;
+  final int questionsCount;
+  final int answeredQuestionsCount;
 
-  const LessonsLoaded(this.lessons);
+  const LessonsLoaded({
+    required this.lessons,
+    this.questionsCount = 0,
+    this.answeredQuestionsCount = 0,
+  });
 
   @override
-  List<Object> get props => [lessons];
+  List<Object> get props => [lessons, questionsCount, answeredQuestionsCount];
 }
 
 final class LessonsError extends LessonsInitial {

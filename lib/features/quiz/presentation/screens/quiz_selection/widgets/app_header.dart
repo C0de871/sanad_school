@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:sanad_school/core/theme/theme.dart';
 
+import '../../../../../../core/utils/services/service_locator.dart';
 import '../../../cubits/quiz_selection_cubit.dart';
 
 class AppHeader extends StatelessWidget {
@@ -11,6 +13,8 @@ class AppHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final cubit = context.read<QuizSelectionCubit>();
+    final colors = getIt<AppTheme>().extendedColors;
+    final colorScheme = Theme.of(context).colorScheme;
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
@@ -38,7 +42,7 @@ class AppHeader extends StatelessWidget {
             child: IconButton(
               icon: Icon(
                 Icons.arrow_back,
-                color: Theme.of(context).colorScheme.onPrimary,
+                color: colors.white,
               ),
               onPressed: () => Navigator.of(context).pop(),
             ),
@@ -49,7 +53,7 @@ class AppHeader extends StatelessWidget {
             style: TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.bold,
-              color: Theme.of(context).colorScheme.onPrimary,
+              color: colorScheme.onSurfaceVariant,
             ),
           ),
         ],

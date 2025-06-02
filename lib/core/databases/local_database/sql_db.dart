@@ -33,7 +33,7 @@ class SqlDB {
     Database myDb = await openDatabase(
       path,
       onCreate: _onCreate,
-      version: 15,
+      version: 16,
       onUpgrade: _onUpgrade,
     );
     return myDb;
@@ -46,18 +46,7 @@ class SqlDB {
   }
 
   _onUpgrade(Database db, int oldVersion, int newVersion) async {
-    Batch batch = db.batch();
-
-    batch.execute(TypeTable.createTableQuery);
-    batch.execute(StudentTable.createTableQuery);
-    batch.execute(SubjectTable.createTableQuery);
-    batch.execute(LessonTable.createTableQuery);
-    batch.execute(QuestionGroupsTable.createTableQuery);
-    batch.execute(TypeQuestionTable.createTableQuery);
-    batch.execute(QuestionTable.createTableQuery);
-    batch.execute(TagTable.createTableQuery);
-    batch.execute(TagQuestionTable.createTableQuery);
-    batch.commit();
+    _createTables(db);
     log("upgrade database ================");
   }
 
@@ -80,9 +69,9 @@ class SqlDB {
     batch.commit();
   }
 
-  Future<List<Map>> sqlReadData(String sql) async {
+  Future<List<Map>> sqlReadData(String sql, [List<Object?>? values]) async {
     Database? myDB = await db;
-    List<Map> response = await myDB!.rawQuery(sql);
+    List<Map> response = await myDB!.rawQuery(sql, values);
     return response;
   }
 
@@ -109,7 +98,8 @@ class SqlDB {
     String? where,
   }) async {
     Database? myDB = await db;
-    List<Map<String, dynamic>> response = await myDB!.query(table, where: where);
+    List<Map<String, dynamic>> response =
+        await myDB!.query(table, where: where);
     return response;
   }
 
@@ -119,7 +109,8 @@ class SqlDB {
     return response;
   }
 
-  Future<int> updateData(String table, Map<String, Object?> values, String? myWhere) async {
+  Future<int> updateData(
+      String table, Map<String, Object?> values, String? myWhere) async {
     Database? myDB = await db;
     int response = await myDB!.update(table, values, where: myWhere);
     return response;

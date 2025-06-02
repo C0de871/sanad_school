@@ -22,18 +22,6 @@ class ProfileCubit extends Cubit<ProfileState> {
   final emailController = TextEditingController();
   final phoneController = TextEditingController();
 
-  final Map<String, String> syrianCitiesMap = {
-    'damascus': 'دمشق',
-    'aleppo': 'حلب',
-    'homs': 'حمص',
-    'hama': 'حماة',
-    'latakia': 'اللاذقية',
-    'tartus': 'طرطوس',
-    'deir_ezzor': 'دير الزور',
-    'raqqa': 'الرقة',
-    'hasaka': 'الحسكة',
-    'qamishli': 'القامشلي',
-  };
 
   // Form values
   String selectedCertificate = '';

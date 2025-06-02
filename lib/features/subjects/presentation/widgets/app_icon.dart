@@ -12,6 +12,7 @@ class AppIcon extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     //todo remove this gesture dectecotr
+    final colors =Theme.of(context).colorScheme ;
     return GestureDetector(
       onTap: () async {
         // final dir = await getApplicationDocumentsDirectory();
@@ -31,6 +32,7 @@ class AppIcon extends StatelessWidget {
         "assets/icons/sanad_altaleb_white.png",
         height: 40,
         width: 40,
+        color:colors.onPrimaryContainer ,
       ),
     );
   }

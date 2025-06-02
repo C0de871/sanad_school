@@ -17,39 +17,38 @@ class QuestionLoading extends QuestionState {}
 
 class QuestionSuccess extends QuestionState {
   final List<QuestionEntity> questions;
-  final int correctAnswers;
-  final int wrongAnswers;
+  final int correctAnswersCount; // User's correct answers count
+  final int wrongAnswersCount; // User's wrong answers count
   final int seconds;
   final bool isTimerRunning;
-  final List<int?> userAnswers;
-  final List<bool?> isCorrect;
-  final Map<int, bool> expandedImages;
-  final Map<int, bool> expandedAnswers;
-  final int unAnsweredQuestions;
-
+  final List<int?> userAnswers; // User's answers
+  final List<bool?> isRightList; // list to store if the answer of the user is right or not
+  final Map<int, bool> expandedImages; //image expanded status
+  final Map<int, bool> expandedAnswers; //answer expanded status
+  final int unAnsweredQuestionsCount; // User's unanswered questions
 
   const QuestionSuccess({
     required this.questions,
-    this.correctAnswers = 0,
-    this.wrongAnswers = 0,
+    this.correctAnswersCount = 0,
+    this.wrongAnswersCount = 0,
     this.seconds = 0,
     this.isTimerRunning = false,
     this.userAnswers = const [],
-    this.isCorrect = const [],
+    this.isRightList = const [],
     this.expandedImages = const {},
     this.expandedAnswers = const {},
-    this.unAnsweredQuestions = 0,
+    this.unAnsweredQuestionsCount = 0,
   });
 
   @override
   List<Object?> get props => [
         questions,
-        correctAnswers,
-        wrongAnswers,
+        correctAnswersCount,
+        wrongAnswersCount,
         seconds,
         isTimerRunning,
         userAnswers,
-        isCorrect,
+        isRightList,
         expandedImages,
         expandedAnswers,
       ];
@@ -69,15 +68,15 @@ class QuestionSuccess extends QuestionState {
   }) {
     return QuestionSuccess(
       questions: questions ?? this.questions,
-      correctAnswers: correctAnswers ?? this.correctAnswers,
-      wrongAnswers: wrongAnswers ?? this.wrongAnswers,
+      correctAnswersCount: correctAnswers ?? this.correctAnswersCount,
+      wrongAnswersCount: wrongAnswers ?? this.wrongAnswersCount,
       seconds: seconds ?? this.seconds,
       isTimerRunning: isTimerRunning ?? this.isTimerRunning,
       userAnswers: userAnswers ?? this.userAnswers,
-      isCorrect: isCorrect ?? this.isCorrect,
+      isRightList: isCorrect ?? this.isRightList,
       expandedImages: expandedImages ?? this.expandedImages,
       expandedAnswers: expandedAnswers ?? this.expandedAnswers,
-      unAnsweredQuestions: unAnsweredQuestions ?? this.unAnsweredQuestions,
+      unAnsweredQuestionsCount: unAnsweredQuestions ?? this.unAnsweredQuestionsCount,
     );
   }
 }

@@ -44,18 +44,7 @@ class AuthCubit extends Cubit<AuthState> {
   final schoolNameController = TextEditingController();
   String selectedCity = "damascus";
   int selectedCertificateType = 1;
-  final Map<String, String> syrianCitiesMap = {
-    'damascus': 'دمشق',
-    'aleppo': 'حلب',
-    'homs': 'حمص',
-    'hama': 'حماة',
-    'latakia': 'اللاذقية',
-    'tartus': 'طرطوس',
-    'deir_ezzor': 'دير الزور',
-    'raqqa': 'الرقة',
-    'hasaka': 'الحسكة',
-    'qamishli': 'القامشلي',
-  };
+  
 
   AuthCubit()
       : registerUseCase = getIt(),
@@ -114,7 +103,8 @@ class AuthCubit extends Cubit<AuthState> {
     emit(AuthCertificateTypesLoading());
     final result = await getTypesUseCase.call();
     result.fold(
-      (failure) => emit(AuthCertificateTypesFailure(errMessage: failure.errMessage)),
+      (failure) =>
+          emit(AuthCertificateTypesFailure(errMessage: failure.errMessage)),
       (types) => emit(AuthCertificateTypesLoaded(types: types)),
     );
   }

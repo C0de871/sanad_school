@@ -16,18 +16,18 @@ class ProfileIcon extends StatelessWidget {
         padding: const EdgeInsets.all(2),
         decoration: BoxDecoration(
           border: Border.all(
-            color: Theme.of(context).colorScheme.onPrimary.withValues(alpha: 0.3),
+            color: Theme.of(context).colorScheme.onPrimaryContainer.withValues(alpha: 0.3),
             width: 2,
           ),
           shape: BoxShape.circle,
         ),
         child: CircleAvatar(
           radius: 14,
-          backgroundColor: Theme.of(context).colorScheme.onPrimary.withValues(alpha: 0.3),
+          backgroundColor: Theme.of(context).colorScheme.onPrimaryContainer.withValues(alpha: 0.3),
           child: Icon(
             Icons.person_outline,
             size: 20,
-            color: Theme.of(context).colorScheme.onPrimary,
+            color: Theme.of(context).colorScheme.onPrimaryContainer,
           ),
         ),
       ),

@@ -22,6 +22,10 @@ class QuestionModel extends QuestionEntity {
   static const String noteKey = 'note';
   static const String downloadedHintPhotoKey = 'downloaded_hint_photo';
   static const String downloadedQuestionPhotoKey = 'downloaded_question_photo';
+  static const String isAnsweredKey = 'is_answered';
+  static const String isCorrectedKey = 'is_corrected';
+  static const String isAnsweredCorrectlyKey = 'is_answered_correctly';
+  static const String userAnswerKey = 'user_answer';
 
   const QuestionModel({
     required super.id,
@@ -41,31 +45,40 @@ class QuestionModel extends QuestionEntity {
     super.note,
     super.downloadedHintPhoto,
     super.downloadedQuestionPhoto,
+    super.isAnswered,
+    super.isCorrected,
+    super.isAnsweredCorrectly,
+    super.userAnswer,
   });
 
   factory QuestionModel.fromMap(Map<String, dynamic> map) {
-    // log("question model map: $map");
-    log("is favorite for question id ${map[idKey]} is: ${map[isFavoriteKey]}");
     return QuestionModel(
       id: map[idKey] as int,
       uuid: map[uuidKey] as String,
       questionGroupId: map[questionGroupIdKey] as int?,
       order: map[displayOrderKey] as int?,
       typeId: map[typeIdKey] as int,
-      textQuestion: List<Map<String, dynamic>>.from(map[textQuestionKey][opsKey]),
+      textQuestion:
+          List<Map<String, dynamic>>.from(map[textQuestionKey][opsKey]),
       questionPhoto: map[questionPhotoKey] as String?,
       choices: List<List<dynamic>>.from(
         (map[choicesKey] as List).map((choice) => choice[opsKey]),
       ),
       rightChoice: map[rightChoiceKey] as int,
-      isEdited: map[isEditedKey] as int,
-      hint: (map[hintKey] != null && map[hintKey][opsKey] != null) ? List<Map<String, dynamic>>.from(map[hintKey][opsKey]) : null,
+      isEdited: map[isEditedKey] as int == 1,
+      hint: (map[hintKey] != null && map[hintKey][opsKey] != null)
+          ? List<Map<String, dynamic>>.from(map[hintKey][opsKey])
+          : null,
       hintPhoto: map[hintPhotoKey] as String?,
       isFavorite: map[isFavoriteKey] as bool? ?? false,
       answerStatus: map[answerStatusKey] as bool? ?? false,
       note: map[noteKey] as String?,
       downloadedHintPhoto: map[downloadedHintPhotoKey] as Uint8List?,
       downloadedQuestionPhoto: map[downloadedQuestionPhotoKey] as Uint8List?,
+      isAnswered: map[isAnsweredKey] as bool? ?? false,
+      isCorrected: map[isCorrectedKey] as bool? ?? false,
+      isAnsweredCorrectly: map[isAnsweredCorrectlyKey] as bool? ?? false,
+      userAnswer: map[userAnswerKey] as int?,
     );
   }
 
@@ -88,6 +101,10 @@ class QuestionModel extends QuestionEntity {
       noteKey: note,
       downloadedHintPhotoKey: downloadedHintPhoto,
       downloadedQuestionPhotoKey: downloadedQuestionPhoto,
+      isAnsweredKey: isAnswered ? 1 : 0,
+      isCorrectedKey: isCorrected ? 1 : 0,
+      isAnsweredCorrectlyKey: isAnsweredCorrectly ? 1 : 0,
+      userAnswerKey: userAnswer,
     };
   }
 }

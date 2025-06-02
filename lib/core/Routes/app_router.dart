@@ -53,7 +53,9 @@ class AppRouter with CubitProviderMixin {
           settings: settings,
           builder: (_) => BlocProvider(
             create: (context) => getCubit(() => AuthCubit()..checkToken()),
-            child: getIt<DeviceInfoService>().isSamsung() ? const SamsungSplashScreen() : const SamsungSplashScreen(),
+            child: getIt<DeviceInfoService>().isSamsung()
+                ? const SamsungSplashScreen()
+                : const SamsungSplashScreen(),
           ),
         );
 
@@ -85,10 +87,7 @@ class AppRouter with CubitProviderMixin {
       case AppRoutes.home:
         return SlidingPageRouteBuilder(
           settings: settings,
-          builder: (context) => BlocProvider(
-            create: (context) => getCubit(() => SubjectCubit())..getSubjects(),
-            child: const HomeScreen(),
-          ),
+          builder: (context) => const HomeScreen(),
         );
 
       case AppRoutes.completeSignUp:
@@ -111,7 +110,8 @@ class AppRouter with CubitProviderMixin {
               BlocProvider(
                 lazy: false,
                 create: (context) {
-                  return getCubit(() => SubjectSyncCubit())..getSubjectSync(subject.id);
+                  return getCubit(() => SubjectSyncCubit())
+                    ..getSubjectSync(subject.id);
                 },
               ),
             ],
@@ -128,7 +128,8 @@ class AppRouter with CubitProviderMixin {
           settings: settings,
           builder: (context) {
             final arg = settings.arguments as Map;
-            final LessonWithOneTypeEntity lessonWithOneTypeEntity = arg["lesson"];
+            final LessonWithOneTypeEntity lessonWithOneTypeEntity =
+                arg["lesson"];
             // final SubjectEntity subject = arg["subject"];
             final Color subjectColor = arg["color"];
             final TextDirection textDirection = arg["direction"];
@@ -214,7 +215,8 @@ class AppRouter with CubitProviderMixin {
         return SlidingPageRouteBuilder(
           settings: settings,
           builder: (context) => BlocProvider(
-            create: (context) => getCubit(() => ProfileCubit()..fetchStudentProfile()),
+            create: (context) =>
+                getCubit(() => ProfileCubit()..fetchStudentProfile()),
             child: const ProfileScreen(),
           ),
         );
@@ -223,7 +225,8 @@ class AppRouter with CubitProviderMixin {
         return SlidingPageRouteBuilder(
           settings: settings,
           builder: (context) => BlocProvider(
-            create: (context) => getCubit(() => SubscriptionCubit()..loadSubscriptions()),
+            create: (context) =>
+                getCubit(() => SubscriptionCubit()..loadSubscriptions()),
             child: SubscriptionScreen(),
           ),
         );
@@ -270,7 +273,8 @@ class AppRouter with CubitProviderMixin {
         return SlidingPageRouteBuilder(
           settings: settings,
           builder: (context) => BlocProvider(
-            create: (context) => getCubit(() => QuizSelectionCubit(quizScreenArgs: arg)),
+            create: (context) =>
+                getCubit(() => QuizSelectionCubit(quizScreenArgs: arg)),
             child: QuizSelectionScreen(),
           ),
         );
@@ -280,7 +284,8 @@ class AppRouter with CubitProviderMixin {
         return SlidingPageRouteBuilder(
           settings: settings,
           builder: (context) => BlocProvider(
-            create: (context) => getCubit(() => QuestionCubit())..startQuiz(arg: arg),
+            create: (context) =>
+                getCubit(() => QuestionCubit())..startQuiz(arg: arg),
             child: QuestionsPage(
               lessonName: "اختبار عشوائي",
               subjectColor: arg.subjectColor,

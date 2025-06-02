@@ -19,7 +19,8 @@ class CoolLoadingScreen extends StatefulWidget {
   _CoolLoadingScreenState createState() => _CoolLoadingScreenState();
 }
 
-class _CoolLoadingScreenState extends State<CoolLoadingScreen> with TickerProviderStateMixin {
+class _CoolLoadingScreenState extends State<CoolLoadingScreen>
+    with TickerProviderStateMixin {
   late AnimationController _orbitController;
   late AnimationController _pulseController;
   late AnimationController _rotationController;
@@ -100,18 +101,10 @@ class _CoolLoadingScreenState extends State<CoolLoadingScreen> with TickerProvid
                 builder: (context, child) {
                   return Transform.rotate(
                     angle: _rotationController.value * 2 * math.pi,
-                    child: Container(
+                    child: SizedBox(
                       width: 300,
                       height: 300,
-                      decoration: BoxDecoration(
-                        gradient: RadialGradient(
-                          colors: [
-                            widget.primaryColor.withOpacity(0.1),
-                            widget.backgroundColor.withOpacity(0.01),
-                          ],
-                          stops: const [0.2, 1.0],
-                        ),
-                      ),
+                     
                     ),
                   );
                 },
@@ -232,7 +225,8 @@ class ParticlePainter extends CustomPainter {
       final particle = particles[i];
 
       // Calculate position based on angle, distance and animation
-      final angle = particle.angle + (animationValue * particle.speed * 2 * math.pi) % (2 * math.pi);
+      final angle = particle.angle +
+          (animationValue * particle.speed * 2 * math.pi) % (2 * math.pi);
       final x = center.dx + math.cos(angle) * particle.distance;
       final y = center.dy + math.sin(angle) * particle.distance;
 
@@ -286,7 +280,8 @@ class LoadingDots extends StatefulWidget {
   _LoadingDotsState createState() => _LoadingDotsState();
 }
 
-class _LoadingDotsState extends State<LoadingDots> with SingleTickerProviderStateMixin {
+class _LoadingDotsState extends State<LoadingDots>
+    with SingleTickerProviderStateMixin {
   late AnimationController _controller;
 
   @override

@@ -182,4 +182,34 @@ class QuestionRepositoryImpl extends QuestionRepository {
       return Left(Failure(errMessage: e.errorModel.errorMessage));
     }
   }
+  
+  @override
+  Future<Either<Failure, bool>> updateQuestionAnswered({required UpdateQuestionAnsweredParams params})async {
+    try {
+      final response = await localDataSource.updateQuestionAnswered(params.questionId, params.isAnswered, params.userAnswer);
+      return Right(response);
+    } on ServerException catch (e) {
+      return Left(Failure(errMessage: e.errorModel.errorMessage));
+    }
+  }
+  
+  @override
+  Future<Either<Failure, bool>> updateQuestionAnsweredCorrectly({required UpdateQuestionAnsweredCorrectlyParams params})async {
+    try {
+      final response = await localDataSource.updateQuestionAnsweredCorrectly(params.questionId, params.isAnsweredCorrectly);
+      return Right(response);
+    } on ServerException catch (e) {
+      return Left(Failure(errMessage: e.errorModel.errorMessage));
+    }
+  }
+  
+  @override
+  Future<Either<Failure, bool>> updateQuestionCorrected({required UpdateQuestionCorrectedParams params})async {
+    try {
+      final response = await localDataSource.updateQuestionCorrected(params.questionId, params.isCorrected);
+      return Right(response);
+    } on ServerException catch (e) {
+      return Left(Failure(errMessage: e.errorModel.errorMessage));
+    }
+  }
 }

@@ -179,9 +179,12 @@ class LogoutButton extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(16),
       borderRadius: BorderRadius.circular(16),
-      backgroundColor: Theme.of(context).colorScheme.primary,
-      foregroundColor: Theme.of(context).colorScheme.onPrimary,
-      child: const Text('تسجيل الخروج'),
+      backgroundColor: Theme.of(context).colorScheme.primaryContainer,
+      foregroundColor: Theme.of(context).colorScheme.onPrimaryContainer,
+      child: const Text(
+        'تسجيل الخروج',
+        textAlign: TextAlign.center,
+      ),
     );
   }
 }

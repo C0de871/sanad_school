@@ -13,11 +13,12 @@ class SubjectLoading extends SubjectState {}
 
 class SubjectSuccess extends SubjectState {
   final List<SubjectEntity> subjects;
+  final List<bool> isExpanded;
 
-  const SubjectSuccess(this.subjects);
+  const SubjectSuccess({required this.subjects, required this.isExpanded});
 
   @override
-  List<Object> get props => [subjects];
+  List<Object> get props => [subjects, isExpanded];
 }
 
 class SubjectFailure extends SubjectState {

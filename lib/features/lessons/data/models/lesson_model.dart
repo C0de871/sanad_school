@@ -1,4 +1,6 @@
 // lib/features/lessons/data/models/lesson_model.dart
+import 'dart:developer';
+
 import '../../domain/entities/lesson_entity.dart';
 import 'question_type_model.dart';
 
@@ -16,6 +18,7 @@ class LessonModel extends LessonEntity {
   });
 
   factory LessonModel.fromMap(Map<String, dynamic> map) {
+    log("from map in lessons model");
     return LessonModel(
       id: map[idKey],
       title: map[titleKey],
@@ -36,7 +39,8 @@ class LessonModel extends LessonEntity {
       idKey: id,
       titleKey: title,
       subjectIdKey: subjectId,
-      questionTypesKey: questionTypes.map((e) => (e as QuestionTypeModel).toMap()).toList(),
+      questionTypesKey:
+          questionTypes.map((e) => (e as QuestionTypeModel).toMap()).toList(),
     };
   }
 }

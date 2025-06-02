@@ -27,9 +27,9 @@ class CreateAccountButton extends StatelessWidget {
                       context.read<AuthCubit>().register();
                     }
                   },
-            backgroundColor: Theme.of(context).colorScheme.primary,
-            shadowColor: getIt<AppTheme>().extendedColors.buttonShadow,
-            foregroundColor: Theme.of(context).colorScheme.onPrimary,
+            backgroundColor: Theme.of(context).colorScheme.primaryContainer,
+            // shadowColor: getIt<AppTheme>().extendedColors.buttonShadow,
+            foregroundColor: Theme.of(context).colorScheme.onPrimaryContainer,
             child: Center( 
               child: isLoading
                   ? LoadingDots(

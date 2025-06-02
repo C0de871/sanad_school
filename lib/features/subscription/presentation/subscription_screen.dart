@@ -88,9 +88,10 @@ class _SubscriptionScreenContent extends StatelessWidget {
                 height: 50,
                 borderRadius: BorderRadius.circular(12),
                 onPressed: () => _showSubscriptionDialog(context),
-                backgroundColor: Theme.of(context).colorScheme.primary,
-                foregroundColor: Theme.of(context).colorScheme.onPrimary,
-                shadowColor: getIt<AppTheme>().extendedColors.buttonShadow,
+                backgroundColor: Theme.of(context).colorScheme.primaryContainer,
+                foregroundColor:
+                    Theme.of(context).colorScheme.onPrimaryContainer,
+                // shadowColor: getIt<AppTheme>().extendedColors.buttonShadow,
                 child: Align(
                   alignment: Alignment.center,
                   child: Text(
@@ -297,18 +298,19 @@ class _SubscriptionScreenContent extends StatelessWidget {
                                     .read<SubscriptionCubit>()
                                     .formKey
                                     .currentState!
-                                    .validate())
+                                    .validate()) {
                                   context.read<SubscriptionCubit>().checkCode();
+                                }
                               },
                               padding: EdgeInsets.all(16),
                               borderRadius: BorderRadius.circular(12),
                               width: double.infinity,
-                              backgroundColor:
-                                  Theme.of(context).colorScheme.primary,
-                              foregroundColor:
-                                  Theme.of(context).colorScheme.onPrimary,
-                              shadowColor:
-                                  getIt<AppTheme>().extendedColors.buttonShadow,
+                              backgroundColor: Theme.of(context)
+                                  .colorScheme
+                                  .primaryContainer,
+                              foregroundColor: Theme.of(context)
+                                  .colorScheme
+                                  .onPrimaryContainer,
                               child: state is AddCodeLoading
                                   ? Center(
                                       child: LoadingDots(
@@ -346,7 +348,7 @@ class _SubscriptionScreenContent extends StatelessWidget {
                           ),
                         ),
                       ),
-                      AnimatedRaisedButton(
+                      AnimatedRaisedButtonWithChild(
                         onPressed: () async {
                           QrCodeResult? result =
                               await Navigator.pushNamed<QrCodeResult>(
@@ -356,12 +358,19 @@ class _SubscriptionScreenContent extends StatelessWidget {
                               .read<SubscriptionCubit>()
                               .handleQrResult(result);
                         },
-                        text: 'امسح رمز الاشتراك',
-                        backgroundColor: Theme.of(context).colorScheme.primary,
+                        width: double.infinity,
+                        padding: EdgeInsets.all(4),
+                        backgroundColor:
+                            Theme.of(context).colorScheme.primaryContainer,
                         foregroundColor:
-                            Theme.of(context).colorScheme.onPrimary,
-                        shadowColor:
-                            getIt<AppTheme>().extendedColors.buttonShadow,
+                            Theme.of(context).colorScheme.onPrimaryContainer,
+                        child: Align(
+                          alignment: Alignment.center,
+                          child: Text(
+                            "امسح رمز الاشتراك",
+                            style: TextStyle(fontSize: 18),
+                          ),
+                        ),
                       ),
                     ],
                   );

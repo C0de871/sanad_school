@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:sanad_school/features/settings/presentation/cubit/theme_cubit.dart';
 
 import '../../../../core/Routes/app_routes.dart';
 import '../../../../core/theme/theme.dart';
+import '../../../../core/utils/constants/constant.dart';
 import '../../../../core/utils/services/service_locator.dart';
 import '../../../auth/presentation/widgets/animated_raised_button.dart';
 import '../cubits/profile_cubit.dart';
@@ -21,7 +23,8 @@ class ProfileHeader extends StatelessWidget {
             tag: 'profile-avatar',
             child: CircleAvatar(
               radius: 50,
-              backgroundColor: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+              backgroundColor:
+                  Theme.of(context).colorScheme.primary.withOpacity(0.1),
               child: Icon(
                 Icons.person,
                 size: 50,
@@ -104,7 +107,7 @@ class ProfileGeneralInfo extends StatelessWidget {
             return FormDropdownField(
               label: 'المدينة',
               value: cubit.selectedCity,
-              items: cubit.syrianCitiesMap.entries.map((entry) {
+              items: Constant.syrianCitiesMap.entries.map((entry) {
                 return DropdownMenuItem<String>(
                   value: entry.key, // English key
                   child: Text(entry.value), // Arabic name
@@ -168,9 +171,12 @@ class ProfileActionButtons extends StatelessWidget {
           itemBuilder: (context, index) => Padding(
             padding: const EdgeInsets.only(bottom: 16),
             child: AnimatedRaisedButtonWithChild(
-              backgroundColor: Theme.of(context).colorScheme.surfaceContainerLow,
+              backgroundColor:
+                  Theme.of(context).colorScheme.surfaceContainerLow,
               padding: EdgeInsets.symmetric(vertical: 16, horizontal: 8),
-              shadowColor: getIt<AppTheme>().isDark ? Colors.blueGrey.withAlpha(70) : null,
+              shadowColor: getIt<AppTheme>().isDark
+                  ? Colors.blueGrey.withAlpha(70)
+                  : null,
               shadowOffset: 3,
               lerpValue: 0.1,
               borderWidth: 1.5,
@@ -208,6 +214,7 @@ class ProfileActionButtons extends StatelessWidget {
             ),
           ),
         ),
+        ProfileThemeSelector(),
       ],
     );
   }
@@ -218,17 +225,15 @@ class ProfileThemeSelector extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final cubit = context.read<ProfileCubit>();
-
-    return BlocBuilder<ProfileCubit, ProfileState>(
-      buildWhen: (previous, current) => current is ThemeModeChanged,
+    final cubit = context.read<ThemeCubit>();
+    return BlocBuilder<ThemeCubit, ThemeState>(
       builder: (context, state) {
         return ListTile(
           title: const Text('وضع العرض'),
           trailing: PopupMenuButton<ThemeMode>(
-            initialValue: cubit.currentThemeMode,
+            initialValue: state.themeMode,
             onSelected: (ThemeMode mode) {
-              cubit.updateThemeMode(mode);
+              cubit.changeTheme(mode);
             },
             itemBuilder: (BuildContext context) => <PopupMenuEntry<ThemeMode>>[
               const PopupMenuItem<ThemeMode>(
@@ -277,7 +282,9 @@ class FormTextField extends StatelessWidget {
         Text(
           label,
           style: Theme.of(context).textTheme.titleMedium!.copyWith(
-                color: getIt<AppTheme>().isDark ? Color(0xFF4F5E63) : Color(0xFFB0B0AD),
+                color: getIt<AppTheme>().isDark
+                    ? Color(0xFF4F5E63)
+                    : Color(0xFFB0B0AD),
                 fontWeight: FontWeight.bold,
               ),
         ),
@@ -290,22 +297,30 @@ class FormTextField extends StatelessWidget {
             obscureText: obscureText,
             keyboardType: keyboardType,
             decoration: InputDecoration(
-              fillColor: getIt<AppTheme>().isDark ? Color(0xFF202F36) : Color.fromARGB(255, 238, 239, 245),
+              fillColor: getIt<AppTheme>().isDark
+                  ? Color(0xFF202F36)
+                  : Color.fromARGB(255, 238, 239, 245),
               filled: true,
               prefixIcon: Icon(
                 icon,
-                color: getIt<AppTheme>().isDark ? Color(0xFF4F5E63) : Color(0xFFB0B0AD),
+                color: getIt<AppTheme>().isDark
+                    ? Color(0xFF4F5E63)
+                    : Color(0xFFB0B0AD),
               ),
               enabledBorder: OutlineInputBorder(
                 borderSide: BorderSide(
-                  color: getIt<AppTheme>().isDark ? Color(0xFF384448) : Color.fromARGB(255, 210, 210, 210),
+                  color: getIt<AppTheme>().isDark
+                      ? Color(0xFF384448)
+                      : Color.fromARGB(255, 210, 210, 210),
                   width: 2,
                 ),
                 borderRadius: BorderRadius.circular(12),
               ),
               focusedBorder: OutlineInputBorder(
                 borderSide: BorderSide(
-                  color: getIt<AppTheme>().isDark ? Color(0xFF384448) : Color.fromARGB(255, 146, 146, 146),
+                  color: getIt<AppTheme>().isDark
+                      ? Color(0xFF384448)
+                      : Color.fromARGB(255, 146, 146, 146),
                   width: 2,
                 ),
                 borderRadius: BorderRadius.circular(12),
@@ -342,7 +357,9 @@ class FormDropdownField extends StatelessWidget {
         Text(
           label,
           style: Theme.of(context).textTheme.titleMedium!.copyWith(
-                color: getIt<AppTheme>().isDark ? Color(0xFF4F5E63) : Color(0xFFB0B0AD),
+                color: getIt<AppTheme>().isDark
+                    ? Color(0xFF4F5E63)
+                    : Color(0xFFB0B0AD),
                 fontWeight: FontWeight.bold,
               ),
         ),
@@ -355,22 +372,30 @@ class FormDropdownField extends StatelessWidget {
             icon: onChanged == null ? SizedBox.shrink() : null,
             onChanged: onChanged,
             decoration: InputDecoration(
-              fillColor: getIt<AppTheme>().isDark ? Color(0xFF202F36) : Color.fromARGB(255, 238, 239, 245),
+              fillColor: getIt<AppTheme>().isDark
+                  ? Color(0xFF202F36)
+                  : Color.fromARGB(255, 238, 239, 245),
               filled: true,
               prefixIcon: Icon(
                 icon,
-                color: getIt<AppTheme>().isDark ? Color(0xFF4F5E63) : Color(0xFFB0B0AD),
+                color: getIt<AppTheme>().isDark
+                    ? Color(0xFF4F5E63)
+                    : Color(0xFFB0B0AD),
               ),
               enabledBorder: OutlineInputBorder(
                 borderSide: BorderSide(
-                  color: getIt<AppTheme>().isDark ? Color(0xFF384448) : Color.fromARGB(255, 210, 210, 210),
+                  color: getIt<AppTheme>().isDark
+                      ? Color(0xFF384448)
+                      : Color.fromARGB(255, 210, 210, 210),
                   width: 2,
                 ),
                 borderRadius: BorderRadius.circular(12),
               ),
               focusedBorder: OutlineInputBorder(
                 borderSide: BorderSide(
-                  color: getIt<AppTheme>().isDark ? Color(0xFF384448) : Color.fromARGB(255, 146, 146, 146),
+                  color: getIt<AppTheme>().isDark
+                      ? Color(0xFF384448)
+                      : Color.fromARGB(255, 146, 146, 146),
                   width: 2,
                 ),
                 borderRadius: BorderRadius.circular(12),

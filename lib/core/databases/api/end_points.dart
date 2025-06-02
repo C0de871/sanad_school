@@ -14,26 +14,29 @@ class EndPoints {
   static const String code = 'code';
 
   static String subjectSyncEndpoint(int subjectId) {
-    return '$baseUrl$subject/$subjectId/sync';
+    return '${baseUrl}subject/$subjectId/sync';
   }
 
   static String lessonEndpoint(int subjectId) {
-    return '$baseUrl$subject/$subjectId/lessons';
+    return '${baseUrl}subject/$subjectId/lessons';
   }
 
-  static String questionInLessonWithType({required QuestionsInLessonWithTypeParams params}) {
+  static String questionInLessonWithType(
+      {required QuestionsInLessonWithTypeParams params}) {
     // "${EndPoints.lesson}/$lessonId/questions/$typeId"
-    if (params.typeId == null) return '${baseUrl}lesson/${params.lessonId}/questions';
+    if (params.typeId == null) {
+      return '${baseUrl}lesson/${params.lessonId}/questions';
+    }
     return '${baseUrl}lesson/${params.lessonId}/questions/${params.typeId}';
   }
 
-  static String questionInSubjectbByTag({required QuestionsInSubjectByTag params}) {
-    // "${EndPoints.lesson}/$lessonId/questions/$typeId"
+  static String questionInSubjectbByTag(
+      {required QuestionsInSubjectByTag params}) {
     return '${baseUrl}tag/${params.tagId}/questions';
   }
 
   static String getTagsOrExamsEndpoint(int subjectId, bool isExam) {
-    return '$baseUrl$subject/$subjectId/${isExam ? 'exams' : 'tags'}';
+    return '${baseUrl}subject/$subjectId/${isExam ? 'exams' : 'tags'}';
   }
 
   static const String templateT = "";
