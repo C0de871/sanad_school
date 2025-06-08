@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:sanad_school/core/helper/extensions.dart';
 
 import '../../../../../../core/theme/theme.dart';
 import '../../../../../../core/utils/services/service_locator.dart';
@@ -46,7 +47,7 @@ class TagsSelectionWidget extends StatelessWidget {
                         : Theme.of(context).colorScheme.surfaceVariant,
                     shadowColor: isSelected
                         ? (null)
-                        : (getIt<AppTheme>().isDark
+                        : (Theme.of(context).brightness.isDark
                             ? Colors.blueGrey.withAlpha(70)
                             : null),
                     shadowOffset: 5,

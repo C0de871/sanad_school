@@ -31,7 +31,7 @@ class SignInButton extends StatelessWidget {
                 },
           backgroundColor: Theme.of(context).colorScheme.primaryContainer,
           foregroundColor: Theme.of(context).colorScheme.onPrimaryContainer,
-          // shadowColor: getIt<AppTheme>().extendedColors.buttonShadow,
+          // shadowColor: AppTheme.extendedColorOf(context).buttonShadow,
           child: Center(
             child: isLoading
                 ? LoadingDots(

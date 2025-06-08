@@ -13,11 +13,18 @@ class AvailableQuestionsInfo extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocBuilder<QuizSelectionCubit, QuizSelectionState>(
       builder: (context, state) {
-        final bool isValid = (state.availableQuestionCount >= state.requestedQuestionCount && state.availableQuestionCount != 0 && state.requestedQuestionCount != 0);
+        final bool isValid =
+            (state.availableQuestionCount >= state.requestedQuestionCount &&
+                state.availableQuestionCount != 0 &&
+                state.requestedQuestionCount != 0);
 
-        final backgroundColor = isValid ? getIt<AppTheme>().extendedColors.gradientGreen.withOpacity(0.2) : getIt<AppTheme>().extendedColors.gradientPink.withOpacity(0.2);
+        final backgroundColor = isValid
+            ? AppTheme.extendedColorOf(context).gradientGreen.withOpacity(0.2)
+            : AppTheme.extendedColorOf(context).gradientPink.withOpacity(0.2);
 
-        final textColor = isValid ? getIt<AppTheme>().extendedColors.gradientGreen : getIt<AppTheme>().extendedColors.gradientPink;
+        final textColor = isValid
+            ? AppTheme.extendedColorOf(context).gradientGreen
+            : AppTheme.extendedColorOf(context).gradientPink;
 
         return Container(
           width: double.infinity,

@@ -14,7 +14,8 @@ class ResetPasswordScreen extends StatefulWidget {
   State<ResetPasswordScreen> createState() => _ResetPasswordScreenState();
 }
 
-class _ResetPasswordScreenState extends State<ResetPasswordScreen> with SingleTickerProviderStateMixin {
+class _ResetPasswordScreenState extends State<ResetPasswordScreen>
+    with SingleTickerProviderStateMixin {
   final _formKey = GlobalKey<FormState>();
 
   late AnimationController _slideController;
@@ -114,7 +115,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> with SingleTi
       text: 'تأكيد',
       backgroundColor: Theme.of(context).colorScheme.primary,
       foregroundColor: Theme.of(context).colorScheme.onPrimary,
-      shadowColor: getIt<AppTheme>().extendedColors.buttonShadow,
+      shadowColor: AppTheme.extendedColorOf(context).buttonShadow,
     );
   }
 
@@ -129,7 +130,9 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> with SingleTi
         ),
         suffixIcon: IconButton(
           icon: Icon(
-            _obscurePassword ? Icons.visibility_off_outlined : Icons.visibility_outlined,
+            _obscurePassword
+                ? Icons.visibility_off_outlined
+                : Icons.visibility_outlined,
             color: Theme.of(context).colorScheme.outline,
           ),
           onPressed: () {
@@ -164,7 +167,9 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> with SingleTi
         ),
         suffixIcon: IconButton(
           icon: Icon(
-            _obscurePassword ? Icons.visibility_off_outlined : Icons.visibility_outlined,
+            _obscurePassword
+                ? Icons.visibility_off_outlined
+                : Icons.visibility_outlined,
             color: Theme.of(context).colorScheme.outline,
           ),
           onPressed: () {

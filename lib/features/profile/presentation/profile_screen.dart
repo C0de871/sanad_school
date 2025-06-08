@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:sanad_school/core/helper/extensions.dart';
 import 'package:sanad_school/features/auth/presentation/widgets/animated_raised_button.dart';
 
 import '../../../core/Routes/app_routes.dart';
@@ -108,15 +109,16 @@ class ProfileScreenContent extends StatelessWidget {
       title: Text(
         'حسابي',
         style: TextStyle(
-          color:
-              getIt<AppTheme>().isDark ? Color(0xFF4F5E63) : Color(0xFFB0B0AD),
+          color: Theme.of(context).brightness.isDark
+              ? Color(0xFF4F5E63)
+              : Color(0xFFB0B0AD),
         ),
       ),
       forceMaterialTransparency: true,
       bottom: PreferredSize(
         preferredSize: Size.fromHeight(1.0),
         child: Divider(
-          color: getIt<AppTheme>().isDark
+          color: Theme.of(context).brightness.isDark
               ? Color(0xFF384448)
               : Color.fromARGB(255, 210, 210, 210),
           height: 0,

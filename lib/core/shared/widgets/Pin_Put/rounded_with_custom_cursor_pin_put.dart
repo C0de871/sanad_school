@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:pinput/pinput.dart';
 
 //RoundedWithCustomCursor :
@@ -35,7 +34,11 @@ class _RoundedWithCustomCursorState extends State<RoundedWithCustomCursor> {
     final defaultPinTheme = PinTheme(
       width: 56,
       height: 56,
-      textStyle: GoogleFonts.poppins(
+      // textStyle: GoogleFonts.poppins(
+      //   fontSize: 22,
+      //   color: const Color.fromRGBO(30, 60, 87, 1),
+      // ),
+      textStyle: TextStyle(
         fontSize: 22,
         color: const Color.fromRGBO(30, 60, 87, 1),
       ),

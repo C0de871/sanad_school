@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:sanad_school/core/helper/extensions.dart';
 
-import '../../../core/theme/theme.dart';
-import '../../../core/utils/services/service_locator.dart';
 import '../../auth/presentation/widgets/animated_raised_button.dart';
 
 class FAQScreen extends StatelessWidget {
@@ -9,19 +8,23 @@ class FAQScreen extends StatelessWidget {
   final List<Map<String, String>> faqItems = [
     {
       'question': 'كيف يمكنني الاشتراك في المنصة؟',
-      'answer': 'يمكنك الاشتراك من خلال الضغط على زر "التسجيل" في الصفحة الرئيسية، ثم اختيار الباقة المناسبة لك وإتمام عملية الدفع.',
+      'answer':
+          'يمكنك الاشتراك من خلال الضغط على زر "التسجيل" في الصفحة الرئيسية، ثم اختيار الباقة المناسبة لك وإتمام عملية الدفع.',
     },
     {
       'question': 'هل المحتوى متاح على مدار الساعة؟',
-      'answer': 'نعم، جميع المحتوى متاح للوصول 24/7، يمكنك الدراسة في أي وقت يناسبك.',
+      'answer':
+          'نعم، جميع المحتوى متاح للوصول 24/7، يمكنك الدراسة في أي وقت يناسبك.',
     },
     {
       'question': 'هل يمكنني تحميل الملفات للدراسة بدون إنترنت؟',
-      'answer': 'نعم، يمكنك تحميل جميع الملفات والمراجع للدراسة في وضع عدم الاتصال.',
+      'answer':
+          'نعم، يمكنك تحميل جميع الملفات والمراجع للدراسة في وضع عدم الاتصال.',
     },
     {
       'question': 'كم عدد الأسئلة المتوفرة في التطبيق؟',
-      'answer': 'يتوفر ما لا يقل عن 10,000 اختبار، مع تحديثات مستمرة وإضافة المزيد بشكل دوري.',
+      'answer':
+          'يتوفر ما لا يقل عن 10,000 اختبار، مع تحديثات مستمرة وإضافة المزيد بشكل دوري.',
     },
     {
       'question': 'هل يمكنني إلغاء اشتراكي في أي وقت؟',
@@ -86,7 +89,9 @@ class _FAQCardState extends State<FAQCard> {
       padding: EdgeInsets.only(bottom: 16),
       child: AnimatedRaisedButtonWithChild(
         backgroundColor: Theme.of(context).colorScheme.surface,
-        shadowColor: getIt<AppTheme>().isDark ? Colors.blueGrey.withAlpha(70) : null,
+        shadowColor: Theme.of(context).brightness.isDark
+            ? Colors.blueGrey.withAlpha(70)
+            : null,
         shadowOffset: 3,
         lerpValue: 0.1,
         borderWidth: 1.5,
@@ -141,7 +146,10 @@ class _FAQCardState extends State<FAQCard> {
                     style: TextStyle(
                       fontSize: 16,
                       height: 1.4,
-                      color: Theme.of(context).colorScheme.onSurface.withOpacity(0.8),
+                      color: Theme.of(context)
+                          .colorScheme
+                          .onSurface
+                          .withOpacity(0.8),
                     ),
                   ),
                 ),

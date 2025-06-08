@@ -2,15 +2,12 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:sanad_school/core/Routes/app_routes.dart';
 import 'package:sanad_school/core/utils/services/qr_service/qr_result.dart';
 import 'package:sanad_school/features/subscription/presentation/cubits/subscription_cubit.dart';
 import 'package:sanad_school/features/subscription/presentation/cubits/subscription_state.dart';
 
 import '../../../core/shared/widgets/animated_loading_screen.dart';
-import '../../../core/theme/theme.dart';
-import '../../../core/utils/services/service_locator.dart';
 import '../../auth/presentation/widgets/animated_raised_button.dart';
 import '../domain/entities/code_entity.dart';
 
@@ -31,9 +28,10 @@ class _SubscriptionScreenContent extends StatelessWidget {
       appBar: AppBar(
         title: Text(
           'اشتراكاتي',
-          style: GoogleFonts.poppins(
-            fontWeight: FontWeight.w600,
-          ),
+          // style: GoogleFonts.poppins(
+          //   fontWeight: FontWeight.w600,
+          // ),
+          style: TextStyle(fontWeight: FontWeight.w600),
         ),
         elevation: 0,
         backgroundColor: Colors.transparent,
@@ -43,17 +41,20 @@ class _SubscriptionScreenContent extends StatelessWidget {
         listener: (context, state) {
           switch (state) {
             case SubscriptionError():
-              ScaffoldMessenger.of(context)
-                  .showSnackBar(SnackBar(content: Text(state.message)));
+              ScaffoldMessenger.of(
+                context,
+              ).showSnackBar(SnackBar(content: Text(state.message)));
             case AddCodeFailure():
               // log(state.errMessage);
-              ScaffoldMessenger.of(context)
-                  .showSnackBar(SnackBar(content: Text(state.errMessage)));
+              ScaffoldMessenger.of(
+                context,
+              ).showSnackBar(SnackBar(content: Text(state.errMessage)));
               break;
             case AddCodeLoaded():
               // log(state.codeEntity.code ?? "where is the code");
-              ScaffoldMessenger.of(context)
-                  .showSnackBar(SnackBar(content: Text("تم إضافة الاشتراك")));
+              ScaffoldMessenger.of(
+                context,
+              ).showSnackBar(SnackBar(content: Text("تم إضافة الاشتراك")));
               break;
             default:
               break;
@@ -78,10 +79,7 @@ class _SubscriptionScreenContent extends StatelessWidget {
               duration: Duration(milliseconds: 800),
               curve: Curves.elasticOut,
               builder: (context, double value, child) {
-                return Transform.scale(
-                  scale: value,
-                  child: child,
-                );
+                return Transform.scale(scale: value, child: child);
               },
               child: AnimatedRaisedButtonWithChild(
                 width: MediaQuery.of(context).size.width - 32,
@@ -91,16 +89,13 @@ class _SubscriptionScreenContent extends StatelessWidget {
                 backgroundColor: Theme.of(context).colorScheme.primaryContainer,
                 foregroundColor:
                     Theme.of(context).colorScheme.onPrimaryContainer,
-                // shadowColor: getIt<AppTheme>().extendedColors.buttonShadow,
+                // shadowColor: AppTheme.extendedColorOf(context).buttonShadow,
                 child: Align(
                   alignment: Alignment.center,
                   child: Text(
                     'أضف اشتراك',
                     textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w600,
-                    ),
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
                   ),
                 ),
               ),
@@ -132,77 +127,70 @@ class _SubscriptionScreenContent extends StatelessWidget {
         SliverPadding(
           padding: EdgeInsets.symmetric(horizontal: 20),
           sliver: SliverList(
-            delegate: SliverChildBuilderDelegate(
-              (context, index) {
-                final foramtedSubjects = codes[index].subjects?.join(', ');
-                return TweenAnimationBuilder(
-                  tween: Tween(begin: 0.0, end: 1.0),
-                  duration: Duration(milliseconds: 600 + (index * 100)),
-                  builder: (context, double value, child) {
-                    return Transform.translate(
-                      offset: Offset(0, 50 * (1 - value)),
-                      child: Opacity(
-                        opacity: value,
-                        child: child,
-                      ),
-                    );
-                  },
-                  child: Container(
-                    margin: EdgeInsets.only(bottom: 20),
-                    child: Card(
-                      elevation: 2,
-                      shadowColor:
-                          Theme.of(context).colorScheme.shadow.withOpacity(0.3),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                      child: Padding(
-                        padding: EdgeInsets.all(20),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              foramtedSubjects ?? "Unknown",
-                              style: TextStyle(
-                                fontSize: 20,
-                                fontWeight: FontWeight.w600,
-                                color: Theme.of(context).colorScheme.onSurface,
+            delegate: SliverChildBuilderDelegate((context, index) {
+              final foramtedSubjects = codes[index].subjects?.join(', ');
+              return TweenAnimationBuilder(
+                tween: Tween(begin: 0.0, end: 1.0),
+                duration: Duration(milliseconds: 600 + (index * 100)),
+                builder: (context, double value, child) {
+                  return Transform.translate(
+                    offset: Offset(0, 50 * (1 - value)),
+                    child: Opacity(opacity: value, child: child),
+                  );
+                },
+                child: Container(
+                  margin: EdgeInsets.only(bottom: 20),
+                  child: Card(
+                    elevation: 2,
+                    shadowColor: Theme.of(
+                      context,
+                    ).colorScheme.shadow.withOpacity(0.3),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    child: Padding(
+                      padding: EdgeInsets.all(20),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            foramtedSubjects ?? "Unknown",
+                            style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.w600,
+                              color: Theme.of(context).colorScheme.onSurface,
+                            ),
+                          ),
+                          SizedBox(height: 12),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                'الكود: ${codes[index].code}',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  color: Theme.of(
+                                    context,
+                                  ).colorScheme.onSurface.withOpacity(0.7),
+                                ),
                               ),
-                            ),
-                            SizedBox(height: 12),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text(
-                                  'الكود: ${codes[index].code}',
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    color: Theme.of(context)
-                                        .colorScheme
-                                        .onSurface
-                                        .withOpacity(0.7),
-                                  ),
+                              Text(
+                                '${codes[index].expiresAt}',
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.w600,
+                                  color: Theme.of(context).colorScheme.primary,
                                 ),
-                                Text(
-                                  '${codes[index].expiresAt}',
-                                  style: TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.w600,
-                                    color:
-                                        Theme.of(context).colorScheme.primary,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
+                              ),
+                            ],
+                          ),
+                        ],
                       ),
                     ),
                   ),
-                );
-              },
-              childCount: codes.length,
-            ),
+                ),
+              );
+            }, childCount: codes.length),
           ),
         ),
       ],
@@ -226,10 +214,7 @@ class _SubscriptionScreenContent extends StatelessWidget {
               duration: Duration(milliseconds: 300),
               curve: Curves.easeOutBack,
               builder: (context, double value, child) {
-                return Transform.scale(
-                  scale: value,
-                  child: child,
-                );
+                return Transform.scale(scale: value, child: child);
               },
               child: BlocBuilder<SubscriptionCubit, SubscriptionState>(
                 builder: (context, state) {
@@ -258,9 +243,10 @@ class _SubscriptionScreenContent extends StatelessWidget {
                                 }
                                 return null;
                               },
-                              controller: context
-                                  .read<SubscriptionCubit>()
-                                  .codeController,
+                              controller:
+                                  context
+                                      .read<SubscriptionCubit>()
+                                      .codeController,
                               onChanged: (value) {
                                 context
                                     .read<SubscriptionCubit>()
@@ -269,14 +255,14 @@ class _SubscriptionScreenContent extends StatelessWidget {
                               decoration: InputDecoration(
                                 labelText: 'أدخل رمز الاشتراك',
                                 labelStyle: TextStyle(
-                                    color:
-                                        Theme.of(context).colorScheme.primary),
+                                  color: Theme.of(context).colorScheme.primary,
+                                ),
                                 enabledBorder: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(12),
                                   borderSide: BorderSide(
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .outline),
+                                    color:
+                                        Theme.of(context).colorScheme.outline,
+                                  ),
                                 ),
                                 focusedBorder: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(12),
@@ -305,27 +291,31 @@ class _SubscriptionScreenContent extends StatelessWidget {
                               padding: EdgeInsets.all(16),
                               borderRadius: BorderRadius.circular(12),
                               width: double.infinity,
-                              backgroundColor: Theme.of(context)
-                                  .colorScheme
-                                  .primaryContainer,
-                              foregroundColor: Theme.of(context)
-                                  .colorScheme
-                                  .onPrimaryContainer,
-                              child: state is AddCodeLoading
-                                  ? Center(
-                                      child: LoadingDots(
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .onPrimary,
+                              backgroundColor:
+                                  Theme.of(
+                                    context,
+                                  ).colorScheme.primaryContainer,
+                              foregroundColor:
+                                  Theme.of(
+                                    context,
+                                  ).colorScheme.onPrimaryContainer,
+                              child:
+                                  state is AddCodeLoading
+                                      ? Center(
+                                        child: LoadingDots(
+                                          color:
+                                              Theme.of(
+                                                context,
+                                              ).colorScheme.onPrimary,
+                                        ),
+                                      )
+                                      : Align(
+                                        alignment: Alignment.center,
+                                        child: Text(
+                                          "تأكيد",
+                                          style: TextStyle(fontSize: 18),
+                                        ),
                                       ),
-                                    )
-                                  : Align(
-                                      alignment: Alignment.center,
-                                      child: Text(
-                                        "تأكيد",
-                                        style: TextStyle(fontSize: 18),
-                                      ),
-                                    ),
                             ),
                           ],
                         ),
@@ -339,10 +329,9 @@ class _SubscriptionScreenContent extends StatelessWidget {
                           child: Text(
                             'الغاء',
                             style: TextStyle(
-                              color: Theme.of(context)
-                                  .colorScheme
-                                  .onSurface
-                                  .withOpacity(0.7),
+                              color: Theme.of(
+                                context,
+                              ).colorScheme.onSurface.withOpacity(0.7),
                               fontWeight: FontWeight.w600,
                             ),
                           ),
@@ -352,7 +341,9 @@ class _SubscriptionScreenContent extends StatelessWidget {
                         onPressed: () async {
                           QrCodeResult? result =
                               await Navigator.pushNamed<QrCodeResult>(
-                                  context, AppRoutes.qrScanner);
+                                context,
+                                AppRoutes.qrScanner,
+                              );
                           log(result?.code ?? "where is the code");
                           parentContext
                               .read<SubscriptionCubit>()

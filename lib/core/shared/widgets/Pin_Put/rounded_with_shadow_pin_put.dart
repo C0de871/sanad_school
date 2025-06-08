@@ -1,6 +1,5 @@
 //RoundedWithShadow :
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:pinput/pinput.dart';
 
 class RoundedWithShadow extends StatefulWidget {
@@ -29,9 +28,13 @@ class _RoundedWithShadowState extends State<RoundedWithShadow> {
     final defaultPinTheme = PinTheme(
       width: 60,
       height: 64,
-      textStyle: GoogleFonts.poppins(
+      // textStyle: GoogleFonts.poppins(
+      //   fontSize: 20,
+      //   color: const Color.fromRGBO(70, 69, 66, 1),
+      // ),
+      textStyle: const TextStyle(
         fontSize: 20,
-        color: const Color.fromRGBO(70, 69, 66, 1),
+        color: Color.fromRGBO(70, 69, 66, 1),
       ),
       decoration: BoxDecoration(
         color: const Color.fromRGBO(232, 235, 241, 0.37),

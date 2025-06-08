@@ -4,6 +4,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:sanad_school/core/helper/extensions.dart';
 import 'package:sanad_school/features/lessons/domain/entities/lesson_entity.dart';
 import 'package:sanad_school/features/lessons/presentation/cubit/lessons_cubit.dart';
 import 'package:sanad_school/features/lessons/presentation/cubit/lessons_state.dart';
@@ -105,7 +106,7 @@ class _SubjectDetailsScreenState extends State<SubjectDetailsScreen>
     final String subjectName = widget.subject.name;
     final String subjectDescription = widget.subject.description;
     final Color subjectColor = widget.color;
-    final colors = getIt<AppTheme>().extendedColors;
+    final colors = AppTheme.extendedColorOf(context);
     final colorScheme = Theme.of(context).colorScheme;
 
     return MultiBlocProvider(
@@ -278,9 +279,10 @@ class _SubjectDetailsScreenState extends State<SubjectDetailsScreen>
                                       backgroundColor: Theme.of(context)
                                           .colorScheme
                                           .surfaceContainerLow,
-                                      shadowColor: getIt<AppTheme>().isDark
-                                          ? Colors.blueGrey.withAlpha(200)
-                                          : null,
+                                      shadowColor:
+                                          Theme.of(context).brightness.isDark
+                                              ? Colors.blueGrey.withAlpha(200)
+                                              : null,
                                       width: 150,
                                       shadowOffset: 5,
                                       lerpValue: 0.1,
@@ -405,7 +407,7 @@ class LessonsTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // final colors = getIt<AppTheme>().extendedColors;
+    // final colors = AppTheme.extendedColorOf(context);
     return Column(
       children: [
         Expanded(
@@ -579,8 +581,9 @@ class _LessonCardState extends State<LessonCard> with TickerProviderStateMixin {
     return AnimatedRaisedButtonWithChild(
       height: 160,
       backgroundColor: colors.surfaceContainerLow,
-      shadowColor:
-          getIt<AppTheme>().isDark ? Colors.blueGrey.withAlpha(70) : null,
+      shadowColor: Theme.of(context).brightness.isDark
+          ? Colors.blueGrey.withAlpha(70)
+          : null,
       // shadowColor: ,
       onPressed: () async {
         widget.onTap();
@@ -646,8 +649,9 @@ class _LessonCardState extends State<LessonCard> with TickerProviderStateMixin {
       itemBuilder: (context, index) {
         return AnimatedRaisedButtonWithChild(
           backgroundColor: colors.surfaceContainerLow,
-          shadowColor:
-              getIt<AppTheme>().isDark ? Colors.blueGrey.withAlpha(70) : null,
+          shadowColor: Theme.of(context).brightness.isDark
+              ? Colors.blueGrey.withAlpha(70)
+              : null,
           shadowOffset: 3,
           lerpValue: 0.1,
           borderWidth: 1.5,

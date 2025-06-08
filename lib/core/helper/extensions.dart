@@ -17,6 +17,11 @@ extension StringCapitalize on String {
   }
 }
 
+extension BrightnessExtentions on Brightness {
+  bool get isDark => this == Brightness.dark;
+  bool get isLight => this == Brightness.light;
+}
+
 // extension ThemeModeToString on ThemeMode {
 //   String themeModeToString() {
 //     switch (this) {

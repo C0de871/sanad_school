@@ -6,8 +6,6 @@ import 'package:sanad_school/core/theme/theme.dart';
 import 'package:sanad_school/features/subjects/presentation/cubit/subject_cubit.dart';
 
 import '../../../../core/shared/widgets/animated_loading_screen.dart';
-import '../../../../core/utils/services/service_locator.dart';
-import '../../domain/entities/subject_entity.dart';
 import 'subject_card.dart';
 
 class SubjectsGrid extends StatelessWidget {
@@ -30,34 +28,33 @@ class _SubjectsLayoutState extends State<SubjectsLayout> {
   //0xFF4CAF50
   //0xFF1A1B1F
 
-  final List<Color> subjectColors = [
-    // Color(0xFF4CAF50), // Green
-    // Color(0xFF2196F3), // Blue
-    // Color(0xFFFF9800), // Orange
-    // Color(0xFFE91E63), // Pink
-    // Color(0xFF9C27B0), // Purple
-    // Color(0xFF00BCD4), // Cyan
-    // Color(0xFF795548), // Brown
-    // Color(0xFF607D8B), // Blue Grey
-    getIt<AppTheme>().extendedColors.gradientGreen,
-    getIt<AppTheme>().extendedColors.gradientBlue,
-    getIt<AppTheme>().extendedColors.gradientOrange,
-    getIt<AppTheme>().extendedColors.gradientPink,
-    getIt<AppTheme>().extendedColors.gradientPurple,
-    getIt<AppTheme>().extendedColors.gradientBrown,
-    getIt<AppTheme>().extendedColors.gradientIndigo,
-    getIt<AppTheme>().extendedColors.gradientTeal,
-    getIt<AppTheme>().extendedColors.gradientBlueGrey,
-  ];
   @override
   void initState() {
     super.initState();
-    log(subjectColors.toString());
     // isExpanded = List.filled(9, false);
   }
 
   @override
   Widget build(BuildContext context) {
+    final List<Color> subjectColors = [
+      // Color(0xFF4CAF50), // Green
+      // Color(0xFF2196F3), // Blue
+      // Color(0xFFFF9800), // Orange
+      // Color(0xFFE91E63), // Pink
+      // Color(0xFF9C27B0), // Purple
+      // Color(0xFF00BCD4), // Cyan
+      // Color(0xFF795548), // Brown
+      // Color(0xFF607D8B), // Blue Grey
+      AppTheme.extendedColorOf(context).gradientGreen,
+      AppTheme.extendedColorOf(context).gradientBlue,
+      AppTheme.extendedColorOf(context).gradientOrange,
+      AppTheme.extendedColorOf(context).gradientPink,
+      AppTheme.extendedColorOf(context).gradientPurple,
+      AppTheme.extendedColorOf(context).gradientBrown,
+      AppTheme.extendedColorOf(context).gradientIndigo,
+      AppTheme.extendedColorOf(context).gradientTeal,
+      AppTheme.extendedColorOf(context).gradientBlueGrey,
+    ];
     return LayoutBuilder(
       builder: (context, constraints) {
         // final int rowCount = (subjects.length / 2).ceil();
@@ -82,7 +79,7 @@ class _SubjectsLayoutState extends State<SubjectsLayout> {
                     padding: const EdgeInsets.all(16),
                     itemCount: state.subjects.length,
                     itemBuilder: (context, index) {
-                      return _card(index, state);
+                      return _card(index, state, subjectColors);
                     },
                   ),
                 ),
@@ -96,7 +93,7 @@ class _SubjectsLayoutState extends State<SubjectsLayout> {
     );
   }
 
-  Widget _card(int index, SubjectSuccess state) {
+  Widget _card(int index, SubjectSuccess state, List<Color> subjectColors) {
     return Column(
       children: [
         SubjectCard(

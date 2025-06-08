@@ -3,23 +3,24 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:no_screenshot/no_screenshot.dart';
+// import 'package:no_screenshot/no_screenshot.dart';
 import 'package:path_provider/path_provider.dart';
 import 'core/app/app.dart';
 import 'core/utils/services/service_locator.dart';
 // import 'features/questions/temp.dart';
 
-final _noScreenshot = NoScreenshot.instance;
-Future<void> disableScreenshot() async {
-  bool result = await _noScreenshot.screenshotOff();
-  debugPrint('Screenshot Off: $result');
-}
+// final _noScreenshot = NoScreenshot.instance;
+// Future<void> disableScreenshot() async {
+//   bool result = await _noScreenshot.screenshotOff();
+//   debugPrint('Screenshot Off: $result');
+// }
 
-//enable
-Future<void> enableScreenshot() async {
-  bool result = await _noScreenshot.screenshotOn();
-  debugPrint('Screenshot On: $result');
-}
+// //enable
+
+// Future<void> enableScreenshot() async {
+//   bool result = await _noScreenshot.screenshotOn();
+//   debugPrint('Screenshot On: $result');
+// }
 
 void main() async {
   await initApp();

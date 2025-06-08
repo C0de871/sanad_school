@@ -31,7 +31,7 @@ class ContinueButton extends StatelessWidget {
                     }
                   },
             backgroundColor: Theme.of(context).colorScheme.primaryContainer,
-            // shadowColor: getIt<AppTheme>().extendedColors.buttonShadow,
+            // shadowColor: AppTheme.extendedColorOf(context).buttonShadow,
             foregroundColor: Theme.of(context).colorScheme.onPrimaryContainer,
             child: Center(
               child: isLoading

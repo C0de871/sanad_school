@@ -14,7 +14,8 @@ class EnterEmailScreen extends StatefulWidget {
   State<EnterEmailScreen> createState() => _EnterEmailScreenState();
 }
 
-class _EnterEmailScreenState extends State<EnterEmailScreen> with SingleTickerProviderStateMixin {
+class _EnterEmailScreenState extends State<EnterEmailScreen>
+    with SingleTickerProviderStateMixin {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
 
@@ -113,7 +114,7 @@ class _EnterEmailScreenState extends State<EnterEmailScreen> with SingleTickerPr
       text: 'ارسال رمز التحقق',
       backgroundColor: Theme.of(context).colorScheme.primary,
       foregroundColor: Theme.of(context).colorScheme.onPrimary,
-      shadowColor: getIt<AppTheme>().extendedColors.buttonShadow,
+      shadowColor: AppTheme.extendedColorOf(context).buttonShadow,
     );
   }
 

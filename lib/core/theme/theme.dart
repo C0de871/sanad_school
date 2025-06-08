@@ -1,14 +1,12 @@
 // ignore_for_file: constant_identifier_names
 
 import "package:flutter/material.dart";
+import 'package:sanad_school/core/helper/extensions.dart';
 
 class AppTheme {
-  // final TextTheme textTheme;
-
-  bool isDark = false;
-  AppColor colorScheme = AppColor.BLUE;
-  final LightBlueColors _lightBlueColors = LightBlueColors();
-  final DarkBlueColors _darkBlueColors = DarkBlueColors();
+  static AppColor colorScheme = AppColor.BLUE;
+  static final LightBlueColors _lightBlueColors = LightBlueColors();
+  static final DarkBlueColors _darkBlueColors = DarkBlueColors();
 
   AppTheme();
 
@@ -382,7 +380,9 @@ class AppTheme {
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12),
-            borderSide: BorderSide(color: extendedColors.border, width: 2),
+            borderSide: BorderSide(
+                color: extendedColorofBrightness(colorScheme.brightness).border,
+                width: 2),
           ),
           errorBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12),
@@ -397,7 +397,18 @@ class AppTheme {
         ),
       );
 
-  ExtendedColors get extendedColors {
+  static ExtendedColors extendedColorOf(BuildContext context) {
+    bool isDark =
+        Theme.of(context).brightness == Brightness.dark ? true : false;
+    return _getExtendedColors(isDark);
+  }
+
+  static ExtendedColors extendedColorofBrightness(Brightness brightness) {
+    bool isDark = brightness == Brightness.dark ? true : false;
+    return _getExtendedColors(isDark);
+  }
+
+  static ExtendedColors _getExtendedColors(bool isDark) {
     if (isDark) {
       switch (colorScheme) {
         case AppColor.BLUE:
@@ -430,6 +441,7 @@ abstract class ExtendedColors {
   Color get gradientBrown;
   Color get gradientBlueGrey;
   Color get gradientTeal;
+  Color get answerCard;
 
   // Blue theme colors
   Color get blueShadowColor;
@@ -487,6 +499,9 @@ class LightBlueColors extends ExtendedColors {
 
   @override
   final Color gradientTeal = Color(0xFF009688);
+
+  @override
+  final Color answerCard =Color.fromARGB(255, 233, 236, 242);
 
   // Light mode theme colors
   @override
@@ -556,6 +571,9 @@ class DarkBlueColors extends ExtendedColors {
 
   @override
   final Color gradientTeal = Color(0xFF00695C);
+
+  @override
+  final Color answerCard = const Color.fromARGB(255, 41, 44, 50);
 
   // Dark mode theme colors
   @override

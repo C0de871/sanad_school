@@ -4,7 +4,7 @@ import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:image_picker/image_picker.dart';
+// import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
 
 //! get System Ui Overlay Style:
@@ -23,17 +23,17 @@ SystemUiOverlayStyle getSystemUiOverlayStyle(Brightness currentBrightness, Build
 }
 
 //! pick Image:
-Future<XFile?> pickImage() async {
-  final ImagePicker picker = ImagePicker();
-  final image = await picker.pickImage(source: ImageSource.gallery); // or ImageSource.camera
-  return image;
-}
+// Future<XFile?> pickImage() async {
+//   final ImagePicker picker = ImagePicker();
+//   final image = await picker.pickImage(source: ImageSource.gallery); // or ImageSource.camera
+//   return image;
+// }
 
 //! upload Image To Api:
-Future uploadImageToApi(XFile? image) async {
-  if (image == null) return null;
-  return MultipartFile.fromFile(image.path, filename: image.path.split('/').last);
-}
+// Future uploadImageToApi(XFile? image) async {
+//   if (image == null) return null;
+//   return MultipartFile.fromFile(image.path, filename: image.path.split('/').last);
+// }
 
 //! log navigator stack:
 class RouteObserverService extends NavigatorObserver {

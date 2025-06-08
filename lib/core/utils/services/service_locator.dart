@@ -1,9 +1,8 @@
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:dio/dio.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:flutter_tex/flutter_tex.dart';
+// import 'package:flutter_tex/flutter_tex.dart';
 import 'package:get_it/get_it.dart';
 import 'package:sanad_school/core/utils/services/qr_service/qr_service.dart';
 import 'package:sanad_school/core/utils/services/device_info_service.dart';
@@ -317,11 +316,11 @@ void setupServicesLocator() {
 
 Future<void> initApp() async {
   WidgetsFlutterBinding.ensureInitialized();
-  TeXRederingServer.renderingEngine = const TeXViewRenderingEngine.mathjax();
-  if (!kIsWeb) {
-    await TeXRederingServer.run();
-    await TeXRederingServer.initController();
-  }
+  // TeXRederingServer.renderingEngine = const TeXViewRenderingEngine.mathjax();
+  // if (!kIsWeb) {
+  //   await TeXRederingServer.run();
+  //   await TeXRederingServer.initController();
+  // }
   await dotenv.load(fileName: ".env");
   setupServicesLocator();
 
@@ -332,7 +331,7 @@ Future<void> initApp() async {
   await deviceInfoService.init();
 
   final SqlDB sqlDb = getIt<SqlDB>();
-  await enableScreenshot();
+  // await enableScreenshot();
   // await sqlDb.deleteDB();
   await sqlDb.initialDb();
   await (getIt<ApiConsumer>() as DioConsumer)

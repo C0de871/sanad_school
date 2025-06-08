@@ -7,6 +7,7 @@ import '../../../../../core/utils/services/service_locator.dart';
 import '../../../../auth/presentation/widgets/animated_raised_button.dart';
 import '../../cubits/quiz_selection_cubit.dart';
 import '../../cubits/quiz_selection_state.dart';
+import 'package:sanad_school/core/helper/extensions.dart';
 
 class AllLessonsScreen extends StatelessWidget {
   const AllLessonsScreen({super.key});
@@ -36,13 +37,20 @@ class AllLessonsScreen extends StatelessWidget {
                   padding: const EdgeInsets.only(bottom: 12),
                   child: AnimatedRaisedButtonWithChild(
                     onPressed: () => cubit.toggleLesson(lesson.id),
-                    backgroundColor: isSelected ? cubit.quizScreenArgs.subjectColor : Theme.of(context).colorScheme.surfaceVariant,
-                    shadowColor: isSelected ? (null) : (getIt<AppTheme>().isDark ? Colors.blueGrey.withAlpha(70) : null),
+                    backgroundColor: isSelected
+                        ? cubit.quizScreenArgs.subjectColor
+                        : Theme.of(context).colorScheme.surfaceVariant,
+                    shadowColor: isSelected
+                        ? (null)
+                        : (Theme.of(context).brightness.isDark
+                            ? Colors.blueGrey.withAlpha(70)
+                            : null),
                     shadowOffset: 5,
                     lerpValue: 0.1,
                     borderWidth: 1.5,
                     borderRadius: BorderRadius.circular(16),
-                    padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 16, horizontal: 16),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
@@ -53,7 +61,8 @@ class AllLessonsScreen extends StatelessWidget {
                             fontWeight: FontWeight.w500,
                           ),
                         ),
-                        if (isSelected) const Icon(Icons.check_circle, size: 24),
+                        if (isSelected)
+                          const Icon(Icons.check_circle, size: 24),
                       ],
                     ),
                   ),

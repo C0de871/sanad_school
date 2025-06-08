@@ -8,7 +8,7 @@ plugins {
 android {
     namespace = "com.timeofcode.sanadaltaleb"
     compileSdk = 35  // Set to 35 instead of flutter.compileSdkVersion
-    ndkVersion = flutter.ndkVersion
+    ndkVersion = "27.0.12077973"
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8

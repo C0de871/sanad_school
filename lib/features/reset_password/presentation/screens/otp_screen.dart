@@ -57,7 +57,8 @@ class _OtpScreenState extends State<OtpScreen> {
                     },
                     child: Text(
                       "اطلب رمز تحقق جديد", // Use localized text here
-                      style: const TextStyle(decoration: TextDecoration.underline),
+                      style:
+                          const TextStyle(decoration: TextDecoration.underline),
                     ),
                   ),
                 ],
@@ -106,7 +107,7 @@ class _OtpScreenState extends State<OtpScreen> {
       text: 'تأكيد رمز التحقق',
       backgroundColor: Theme.of(context).colorScheme.primary,
       foregroundColor: Theme.of(context).colorScheme.onPrimary,
-      shadowColor: getIt<AppTheme>().extendedColors.buttonShadow,
+      shadowColor: AppTheme.extendedColorOf(context).buttonShadow,
     );
   }
 
@@ -125,7 +126,8 @@ class _OtpScreenState extends State<OtpScreen> {
             int remainingMinutes = remainingTimeInSeconds ~/ 60;
             int remainingSeconds = remainingTimeInSeconds % 60;
 
-            String formattedTime = '${remainingMinutes.toString().padLeft(2, '0')}:${remainingSeconds.toString().padLeft(2, '0')}';
+            String formattedTime =
+                '${remainingMinutes.toString().padLeft(2, '0')}:${remainingSeconds.toString().padLeft(2, '0')}';
 
             return Text(
               formattedTime,

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:sanad_school/core/helper/extensions.dart';
 
 import '../../../../../../core/theme/theme.dart';
 import '../../../../../../core/utils/services/service_locator.dart';
@@ -36,11 +37,11 @@ class QuestionTypesWidget extends StatelessWidget {
                             .contains(state.availableTypes[index].id)
                         ? null
                         : Theme.of(context).colorScheme.onSurfaceVariant,
-                    // shadowColor: getIt<AppTheme>().extendedColors.buttonShadow,
+                    // shadowColor: AppTheme.extendedColorOf(context).buttonShadow,
                     shadowColor: state.selectedTypes
                             .contains(state.availableTypes[index].id)
                         ? (null)
-                        : (getIt<AppTheme>().isDark
+                        : (Theme.of(context).brightness.isDark
                             ? Colors.blueGrey.withAlpha(70)
                             : null),
                     borderRadius: BorderRadius.circular(12),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:sanad_school/core/helper/extensions.dart';
 import 'package:sanad_school/features/settings/presentation/cubit/theme_cubit.dart';
 import 'package:sanad_school/features/subjects/presentation/cubit/subject_cubit.dart';
 import '../Routes/app_router.dart';
@@ -26,9 +27,6 @@ class MyApp extends StatelessWidget {
       ],
       child: BlocBuilder<ThemeCubit, ThemeState>(
         builder: (context, state) {
-          getIt<AppTheme>().isDark =
-              state.themeMode == ThemeMode.dark ? true : false;
-
           return MaterialApp(
             navigatorObservers: [RouteObserverService()],
             debugShowCheckedModeBanner: false,

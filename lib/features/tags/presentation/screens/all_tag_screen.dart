@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:sanad_school/core/Routes/app_routes.dart';
+import 'package:sanad_school/core/helper/extensions.dart';
 import 'package:sanad_school/features/tags/presentation/cubits/tag_cubit.dart';
 
 import '../../../../../core/theme/theme.dart';
@@ -64,15 +65,20 @@ class AllTagsTab extends StatelessWidget {
                     final tag = state.tags[index];
 
                     return AnimatedRaisedButtonWithChild(
-                      onPressed: () => Navigator.pushNamed(context, AppRoutes.questionsFromTag, arguments: {
-                        'color': color,
-                        'tag': tag,
-                        'direction': direction,
-                      }),
+                      onPressed: () => Navigator.pushNamed(
+                          context, AppRoutes.questionsFromTag,
+                          arguments: {
+                            'color': color,
+                            'tag': tag,
+                            'direction': direction,
+                          }),
                       // backgroundColor: isSelected ? Theme.of(context).colorScheme.primary : Theme.of(context).colorScheme.surfaceVariant,
-                      // shadowColor: isSelected ? (getIt<AppTheme>().extendedColors.buttonShadow) : (getIt<AppTheme>().isDark ? Colors.blueGrey.withAlpha(70) : null),
-                      backgroundColor: Theme.of(context).colorScheme.surfaceVariant,
-                      shadowColor: (getIt<AppTheme>().isDark ? Colors.blueGrey.withAlpha(70) : null),
+                      // shadowColor: isSelected ? (AppTheme.extendedColorOf(context).buttonShadow) : (Theme.of(context).brightness.isDark ? Colors.blueGrey.withAlpha(70) : null),
+                      backgroundColor:
+                          Theme.of(context).colorScheme.surfaceVariant,
+                      shadowColor: (Theme.of(context).brightness.isDark
+                          ? Colors.blueGrey.withAlpha(70)
+                          : null),
 
                       shadowOffset: 5,
                       lerpValue: 0.1,

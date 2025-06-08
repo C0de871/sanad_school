@@ -1,3 +1,4 @@
 {
-    "java.configuration.updateBuildConfiguration": "automatic"
+    "java.configuration.updateBuildConfiguration": "automatic",
+    "cmake.sourceDirectory": "C:/Users/moham/AndroidStudioProjects/flutter_projects/sanad_school/linux"
 }

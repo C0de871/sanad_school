@@ -19,18 +19,23 @@ class CreateAccountButton extends StatelessWidget {
         return AnimatedRaisedButtonWithChild(
             width: 300,
             height: 50,
-            borderRadius: BorderRadius.circular(12), // Set the border radius here
+            borderRadius:
+                BorderRadius.circular(12), // Set the border radius here
             onPressed: isLoading
                 ? null
                 : () {
-                    if (context.read<AuthCubit>().schoolInfoFormKey.currentState!.validate()) {
+                    if (context
+                        .read<AuthCubit>()
+                        .schoolInfoFormKey
+                        .currentState!
+                        .validate()) {
                       context.read<AuthCubit>().register();
                     }
                   },
             backgroundColor: Theme.of(context).colorScheme.primaryContainer,
-            // shadowColor: getIt<AppTheme>().extendedColors.buttonShadow,
+            // shadowColor: AppTheme.extendedColorOf(context).buttonShadow,
             foregroundColor: Theme.of(context).colorScheme.onPrimaryContainer,
-            child: Center( 
+            child: Center(
               child: isLoading
                   ? LoadingDots(
                       color: Theme.of(context).colorScheme.onPrimary,

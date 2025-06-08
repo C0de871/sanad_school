@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:sanad_school/core/helper/extensions.dart';
 import 'package:sanad_school/features/settings/presentation/cubit/theme_cubit.dart';
 
 import '../../../../core/Routes/app_routes.dart';
@@ -174,7 +175,7 @@ class ProfileActionButtons extends StatelessWidget {
               backgroundColor:
                   Theme.of(context).colorScheme.surfaceContainerLow,
               padding: EdgeInsets.symmetric(vertical: 16, horizontal: 8),
-              shadowColor: getIt<AppTheme>().isDark
+              shadowColor: Theme.of(context).brightness.isDark
                   ? Colors.blueGrey.withAlpha(70)
                   : null,
               shadowOffset: 3,
@@ -282,7 +283,7 @@ class FormTextField extends StatelessWidget {
         Text(
           label,
           style: Theme.of(context).textTheme.titleMedium!.copyWith(
-                color: getIt<AppTheme>().isDark
+                color: Theme.of(context).brightness.isDark
                     ? Color(0xFF4F5E63)
                     : Color(0xFFB0B0AD),
                 fontWeight: FontWeight.bold,
@@ -297,19 +298,19 @@ class FormTextField extends StatelessWidget {
             obscureText: obscureText,
             keyboardType: keyboardType,
             decoration: InputDecoration(
-              fillColor: getIt<AppTheme>().isDark
+              fillColor: Theme.of(context).brightness.isDark
                   ? Color(0xFF202F36)
                   : Color.fromARGB(255, 238, 239, 245),
               filled: true,
               prefixIcon: Icon(
                 icon,
-                color: getIt<AppTheme>().isDark
+                color: Theme.of(context).brightness.isDark
                     ? Color(0xFF4F5E63)
                     : Color(0xFFB0B0AD),
               ),
               enabledBorder: OutlineInputBorder(
                 borderSide: BorderSide(
-                  color: getIt<AppTheme>().isDark
+                  color: Theme.of(context).brightness.isDark
                       ? Color(0xFF384448)
                       : Color.fromARGB(255, 210, 210, 210),
                   width: 2,
@@ -318,7 +319,7 @@ class FormTextField extends StatelessWidget {
               ),
               focusedBorder: OutlineInputBorder(
                 borderSide: BorderSide(
-                  color: getIt<AppTheme>().isDark
+                  color: Theme.of(context).brightness.isDark
                       ? Color(0xFF384448)
                       : Color.fromARGB(255, 146, 146, 146),
                   width: 2,
@@ -357,7 +358,7 @@ class FormDropdownField extends StatelessWidget {
         Text(
           label,
           style: Theme.of(context).textTheme.titleMedium!.copyWith(
-                color: getIt<AppTheme>().isDark
+                color: Theme.of(context).brightness.isDark
                     ? Color(0xFF4F5E63)
                     : Color(0xFFB0B0AD),
                 fontWeight: FontWeight.bold,
@@ -372,19 +373,19 @@ class FormDropdownField extends StatelessWidget {
             icon: onChanged == null ? SizedBox.shrink() : null,
             onChanged: onChanged,
             decoration: InputDecoration(
-              fillColor: getIt<AppTheme>().isDark
+              fillColor: Theme.of(context).brightness.isDark
                   ? Color(0xFF202F36)
                   : Color.fromARGB(255, 238, 239, 245),
               filled: true,
               prefixIcon: Icon(
                 icon,
-                color: getIt<AppTheme>().isDark
+                color: Theme.of(context).brightness.isDark
                     ? Color(0xFF4F5E63)
                     : Color(0xFFB0B0AD),
               ),
               enabledBorder: OutlineInputBorder(
                 borderSide: BorderSide(
-                  color: getIt<AppTheme>().isDark
+                  color: Theme.of(context).brightness.isDark
                       ? Color(0xFF384448)
                       : Color.fromARGB(255, 210, 210, 210),
                   width: 2,
@@ -393,7 +394,7 @@ class FormDropdownField extends StatelessWidget {
               ),
               focusedBorder: OutlineInputBorder(
                 borderSide: BorderSide(
-                  color: getIt<AppTheme>().isDark
+                  color: Theme.of(context).brightness.isDark
                       ? Color(0xFF384448)
                       : Color.fromARGB(255, 146, 146, 146),
                   width: 2,

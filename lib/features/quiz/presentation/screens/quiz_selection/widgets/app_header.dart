@@ -13,7 +13,7 @@ class AppHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final cubit = context.read<QuizSelectionCubit>();
-    final colors = getIt<AppTheme>().extendedColors;
+    final colors = AppTheme.extendedColorOf(context);
     final colorScheme = Theme.of(context).colorScheme;
 
     return Container(

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-import 'package:google_fonts/google_fonts.dart';
 import 'package:pinput/pinput.dart';
 
 //onlyBottomCursor :
@@ -28,12 +27,16 @@ class _OnlyBottomCursorState extends State<OnlyBottomCursor> {
 
   @override
   Widget build(BuildContext context) {
-// const borderColor = Color.fromRGBO(114, 178, 238, 1);
-//     const errorColor = Color.fromRGBO(255, 234, 238, 1);
+    // const borderColor = Color.fromRGBO(114, 178, 238, 1);
+    //     const errorColor = Color.fromRGBO(255, 234, 238, 1);
     final submittedTheme = PinTheme(
       width: 56,
       height: 56,
-      textStyle: GoogleFonts.poppins(
+      // textStyle: GoogleFonts.poppins(
+      //   fontSize: 22,
+      //   color: const Color.fromRGBO(30, 60, 87, 1),
+      // ),
+      textStyle: TextStyle(
         fontSize: 22,
         color: const Color.fromRGBO(30, 60, 87, 1),
       ),
@@ -47,7 +50,11 @@ class _OnlyBottomCursorState extends State<OnlyBottomCursor> {
     final defaultPinTheme = PinTheme(
       width: 56,
       height: 56,
-      textStyle: GoogleFonts.poppins(
+      // textStyle: GoogleFonts.poppins(
+      //   fontSize: 22,
+      //   color: const Color.fromRGBO(30, 60, 87, 1),
+      // ),
+      textStyle: TextStyle(
         fontSize: 22,
         color: const Color.fromRGBO(30, 60, 87, 1),
       ),

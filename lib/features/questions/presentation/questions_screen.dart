@@ -1,4 +1,4 @@
-// ignore_for_file: deprecated_member_use
+
 
 import 'dart:developer';
 
@@ -20,6 +20,7 @@ import '../../../core/utils/constants/constant.dart';
 import '../../../core/utils/services/service_locator.dart';
 import '../../auth/presentation/widgets/animated_raised_button.dart';
 import '../domain/entities/question_entity.dart';
+import 'package:sanad_school/core/helper/extensions.dart';
 
 class QuestionsPage extends StatefulWidget {
   final String lessonName;
@@ -73,7 +74,7 @@ class _QuestionsPageState extends State<QuestionsPage> {
                 height: 4,
                 margin: const EdgeInsets.only(bottom: 20),
                 decoration: BoxDecoration(
-                  color: Colors.grey[400],
+                  color: AppTheme.extendedColorOf(context).answerCard,
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
@@ -273,7 +274,7 @@ class _QuestionsPageState extends State<QuestionsPage> {
                     },
                     text: 'تم',
                     backgroundColor: Theme.of(context).colorScheme.primary,
-                    shadowColor: getIt<AppTheme>().extendedColors.buttonShadow,
+                    shadowColor: AppTheme.extendedColorOf(context).buttonShadow,
                     foregroundColor: Theme.of(context).colorScheme.onPrimary,
                   ),
                 ],
@@ -366,7 +367,7 @@ class _QuestionsPageState extends State<QuestionsPage> {
                     height: 4,
                     margin: const EdgeInsets.only(top: 12),
                     decoration: BoxDecoration(
-                      color: Colors.grey[400],
+                      color: AppTheme.extendedColorOf(context).answerCard,
                       borderRadius: BorderRadius.circular(2),
                     ),
                   ),
@@ -663,6 +664,7 @@ class _QuestionsPageState extends State<QuestionsPage> {
       child: Card(
         elevation: 3,
         shadowColor: Colors.black.withOpacity(0.1),
+        // color: Colors.red,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(20),
         ),
@@ -755,7 +757,8 @@ class _QuestionsPageState extends State<QuestionsPage> {
                             )
                           : Container(
                               width: double.infinity,
-                              color: Colors.grey[200],
+                              color:
+                                  AppTheme.extendedColorOf(context).answerCard,
                               child: Center(
                                   child: CoolLoadingScreen(
                                 primaryColor: widget.subjectColor,
@@ -779,7 +782,7 @@ class _QuestionsPageState extends State<QuestionsPage> {
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(16),
                     child: Container(
-                      color: Colors.grey[200],
+                      color: AppTheme.extendedColorOf(context).answerCard,
                       child: Padding(
                         padding: EdgeInsets.all(padding4 * 4),
                         child: Center(
@@ -793,6 +796,35 @@ class _QuestionsPageState extends State<QuestionsPage> {
                                       questionCubit.getAnswerScrollController(
                                           questionIndex, 0),
                                   config: QuillEditorConfig(
+                                    customStyles: DefaultStyles(
+                                      color: AppTheme.extendedColorOf(context)
+                                          .blueTextColor,
+                                      paragraph: DefaultTextBlockStyle(
+                                        TextStyle(
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .onSurface,
+                                          fontSize: 16,
+                                        ),
+                                        const HorizontalSpacing(0, 0),
+                                        const VerticalSpacing(0, 0),
+                                        const VerticalSpacing(0, 0),
+                                        null,
+                                      ),
+                                      // You can also set for other text types
+                                      h1: DefaultTextBlockStyle(
+                                        TextStyle(
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .onSurface,
+                                          fontSize: 16,
+                                        ),
+                                        const HorizontalSpacing(0, 0),
+                                        const VerticalSpacing(0, 0),
+                                        const VerticalSpacing(0, 0),
+                                        null,
+                                      ),
+                                    ),
                                     scrollable: false,
                                     showCursor: false,
                                     autoFocus: false,
@@ -1027,7 +1059,7 @@ class _QuestionsPageState extends State<QuestionsPage> {
       QuestionEntity question, int questionIndex, QuestionSuccess state) {
     log("right choice for question id ${question.id} is ${question.adjustedRightChoice} , and the index of question is $questionIndex");
     final questionCubit = context.read<QuestionCubit>();
-    final customColors = getIt<AppTheme>().extendedColors;
+    final customColors = AppTheme.extendedColorOf(context);
     return Column(
       children: question.choices.map((answer) {
         // log("${userAnswers[index] ?? "this is null"}");
@@ -1070,7 +1102,8 @@ class _QuestionsPageState extends State<QuestionsPage> {
           child: AnimatedRaisedButtonWithChild(
             isDisable: isQuestionCorrected,
             backgroundColor: backgroundColor,
-            shadowColor: getIt<AppTheme>().isDark ? shadowColor : shadowColor,
+            shadowColor:
+                Theme.of(context).brightness.isDark ? shadowColor : shadowColor,
             shadowOffset: 3,
             lerpValue: 0.1,
             borderWidth: 1.5,

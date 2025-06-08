@@ -6,6 +6,7 @@ import 'package:sanad_school/core/shared/widgets/vibratation_container.dart';
 import 'package:sanad_school/core/utils/services/service_locator.dart';
 import 'package:sanad_school/features/auth/presentation/widgets/animated_raised_button.dart';
 
+import '../../../../core/helper/string_to_icon_converter.dart';
 import '../../../../core/theme/theme.dart';
 import '../../domain/entities/subject_entity.dart';
 
@@ -39,7 +40,8 @@ class SubjectCard extends StatelessWidget {
           end: Alignment.bottomRight,
           colors: [
             color,
-            Color.lerp(color, Theme.of(context).colorScheme.scrim, 0.2) ?? color,
+            Color.lerp(color, Theme.of(context).colorScheme.scrim, 0.2) ??
+                color,
           ],
           stops: const [0.3, 1],
         ),
@@ -49,11 +51,18 @@ class SubjectCard extends StatelessWidget {
           log("pressed");
           final englishFirstCharRegExp = RegExp(r'^[a-zA-Z]');
 
-          TextDirection direction = englishFirstCharRegExp.hasMatch(subject.name) ? TextDirection.ltr : TextDirection.rtl;
+          TextDirection direction =
+              englishFirstCharRegExp.hasMatch(subject.name)
+                  ? TextDirection.ltr
+                  : TextDirection.rtl;
           Navigator.pushNamed(
             context,
             AppRoutes.subjectDetails,
-            arguments: {"subject": subject, "color": color, "direction": direction},
+            arguments: {
+              "subject": subject,
+              "color": color,
+              "direction": direction
+            },
           );
         },
         child: Column(
@@ -81,7 +90,7 @@ class SubjectCard extends StatelessWidget {
                   child: Column(
                     children: [
                       Divider(
-                        color: getIt<AppTheme>().extendedColors.white,
+                        color: AppTheme.extendedColorOf(context).white,
                         thickness: 3,
                         // indent: 20,
                         // endIndent: 20,
@@ -96,7 +105,8 @@ class SubjectCard extends StatelessWidget {
                               Text(
                                 "عدد الأسئلة: ${subject.numberOfQuestions}",
                                 style: TextStyle(
-                                  color: getIt<AppTheme>().extendedColors.white,
+                                  color:
+                                      AppTheme.extendedColorOf(context).white,
                                   fontSize: 14,
                                   height: 1.6,
                                   letterSpacing: 0.3,
@@ -105,7 +115,8 @@ class SubjectCard extends StatelessWidget {
                               Text(
                                 "عدد الدورات: ${subject.numberOfExams}",
                                 style: TextStyle(
-                                  color: getIt<AppTheme>().extendedColors.white,
+                                  color:
+                                      AppTheme.extendedColorOf(context).white,
                                   fontSize: 14,
                                   height: 1.6,
                                   letterSpacing: 0.3,
@@ -114,7 +125,8 @@ class SubjectCard extends StatelessWidget {
                               Text(
                                 "عدد الدروس: ${subject.numberOfLessons}",
                                 style: TextStyle(
-                                  color: getIt<AppTheme>().extendedColors.white,
+                                  color:
+                                      AppTheme.extendedColorOf(context).white,
                                   fontSize: 14,
                                   height: 1.6,
                                   letterSpacing: 0.3,
@@ -129,7 +141,8 @@ class SubjectCard extends StatelessWidget {
                               Text(
                                 "عدد التصنيفات: ${subject.numberOfTags}",
                                 style: TextStyle(
-                                  color: getIt<AppTheme>().extendedColors.white,
+                                  color:
+                                      AppTheme.extendedColorOf(context).white,
                                   fontSize: 14,
                                   height: 1.6,
                                   letterSpacing: 0.3,
@@ -138,7 +151,8 @@ class SubjectCard extends StatelessWidget {
                               Text(
                                 "الأستاذ: ${subject.teacher}",
                                 style: TextStyle(
-                                  color: getIt<AppTheme>().extendedColors.white,
+                                  color:
+                                      AppTheme.extendedColorOf(context).white,
                                   fontSize: 14,
                                   height: 1.6,
                                   letterSpacing: 0.3,
@@ -174,38 +188,13 @@ class _DecorativeIcon extends StatelessWidget {
       child: Transform.rotate(
         angle: 0.2,
         child: Icon(
-          getIcon(),
-          // getIconByName(subject.iconName),
+          getIconByName(subject.icon),
           size: 140,
-          color: getIt<AppTheme>().extendedColors.white.withValues(alpha: 0.05),
+          color:
+              AppTheme.extendedColorOf(context).white.withValues(alpha: 0.05),
         ),
       ),
     );
-  }
-
-  IconData getIcon() {
-    switch (subject.id) {
-      case 1:
-        return Icons.calculate; // الرياضيات
-      case 2:
-        return Icons.abc; // English
-      case 3:
-        return Icons.biotech; // علم الأحياء
-      case 4:
-        return Icons.content_cut; // المهارات الجراحية
-      case 5:
-        return Icons.sick; // علم المناعة و الدمويات
-      case 6:
-        return Icons.vaccines; // علم الأدوية
-      case 7:
-        return Icons.electric_bolt; // الفيزياء
-      case 8:
-        return Icons.science; // الكيمياء
-      case 9:
-        return Icons.mosque; // التربية الدينية
-      default:
-        return Icons.calculate; // fallback icon
-    }
   }
 }
 
@@ -264,7 +253,7 @@ class _IconTitleSection extends StatelessWidget {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        _subjectIcon(context),
+        _subjectIcon(context, subject.icon),
         const SizedBox(height: 16),
         _subjectTitle(context),
       ],
@@ -277,7 +266,7 @@ class _IconTitleSection extends StatelessWidget {
       style: TextStyle(
         fontSize: 24,
         fontWeight: FontWeight.w600,
-        color: getIt<AppTheme>().extendedColors.white,
+        color: AppTheme.extendedColorOf(context).white,
         height: 1.2,
       ),
       textAlign: TextAlign.center,
@@ -285,51 +274,26 @@ class _IconTitleSection extends StatelessWidget {
     );
   }
 
-  AnimatedContainer _subjectIcon(BuildContext context) {
+  AnimatedContainer _subjectIcon(BuildContext context, String icon) {
     // log("icon code:${int.parse(subject.iconCodePoint, radix: 16)}");
     return AnimatedContainer(
       duration: const Duration(milliseconds: 300),
       padding: EdgeInsets.all(16), // 8
       decoration: BoxDecoration(
-        color: getIt<AppTheme>().extendedColors.white.withValues(alpha: 0.15),
+        color: AppTheme.extendedColorOf(context).white.withValues(alpha: 0.15),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: getIt<AppTheme>().extendedColors.white.withValues(alpha: 0.1),
+          color: AppTheme.extendedColorOf(context).white.withValues(alpha: 0.1),
           width: 1,
         ),
       ),
       child: Icon(
-        getIcon(),
+        getIconByName(icon),
         // getIconByName(subject.iconName),
         size: 48, // 24
-        color: getIt<AppTheme>().extendedColors.white,
+        color: AppTheme.extendedColorOf(context).white,
       ),
     );
-  }
-
-  IconData getIcon() {
-    switch (subject.id) {
-      case 1:
-        return Icons.calculate; // الرياضيات
-      case 2:
-        return Icons.abc; // English
-      case 3:
-        return Icons.biotech; // علم الأحياء
-      case 4:
-        return Icons.content_cut; // المهارات الجراحية
-      case 5:
-        return Icons.sick; // علم المناعة و الدمويات
-      case 6:
-        return Icons.vaccines; // علم الأدوية
-      case 7:
-        return Icons.electric_bolt; // الفيزياء
-      case 8:
-        return Icons.science; // الكيمياء
-      case 9:
-        return Icons.mosque; // التربية الدينية
-      default:
-        return Icons.calculate; // fallback icon
-    }
   }
 }
 
@@ -349,10 +313,13 @@ class _DescriptionSection extends StatelessWidget {
           constraints: const BoxConstraints(maxHeight: 130),
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: getIt<AppTheme>().extendedColors.white.withValues(alpha: 0.12),
+            color:
+                AppTheme.extendedColorOf(context).white.withValues(alpha: 0.12),
             borderRadius: BorderRadius.circular(16),
             border: Border.all(
-              color: getIt<AppTheme>().extendedColors.white.withValues(alpha: 0.08),
+              color: AppTheme.extendedColorOf(context)
+                  .white
+                  .withValues(alpha: 0.08),
               width: 1,
             ),
           ),
@@ -362,7 +329,7 @@ class _DescriptionSection extends StatelessWidget {
                 Text(
                   subject.description,
                   style: TextStyle(
-                    color: getIt<AppTheme>().extendedColors.white,
+                    color: AppTheme.extendedColorOf(context).white,
                     fontSize: 14,
                     height: 1.6,
                     letterSpacing: 0.3,
@@ -395,18 +362,21 @@ class _ProgressIndicator extends StatelessWidget {
         height: 40,
         padding: const EdgeInsets.all(8),
         decoration: BoxDecoration(
-          color: getIt<AppTheme>().extendedColors.white.withValues(alpha: 0.15),
+          color:
+              AppTheme.extendedColorOf(context).white.withValues(alpha: 0.15),
           shape: BoxShape.circle,
           border: Border.all(
-            color: getIt<AppTheme>().extendedColors.white.withValues(alpha: 0.1),
+            color:
+                AppTheme.extendedColorOf(context).white.withValues(alpha: 0.1),
             width: 1,
           ),
         ),
         child: CircularProgressIndicator(
           value: 0.7,
           strokeWidth: 2,
-          backgroundColor: getIt<AppTheme>().extendedColors.white.withValues(alpha: 0.1),
-          color: getIt<AppTheme>().extendedColors.white,
+          backgroundColor:
+              AppTheme.extendedColorOf(context).white.withValues(alpha: 0.1),
+          color: AppTheme.extendedColorOf(context).white,
         ),
       ),
     );

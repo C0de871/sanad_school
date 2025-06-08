@@ -1,6 +1,7 @@
 // AllTagsScreen.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:sanad_school/core/helper/extensions.dart';
 
 import '../../../../../core/theme/theme.dart';
 import '../../../../../core/utils/services/service_locator.dart';
@@ -40,8 +41,14 @@ class AllTagsScreen extends StatelessWidget {
 
                 return AnimatedRaisedButtonWithChild(
                   onPressed: () => cubit.toggleTag(tag.id),
-                  backgroundColor: isSelected ? cubit.quizScreenArgs.subjectColor : Theme.of(context).colorScheme.surfaceVariant,
-                  shadowColor: isSelected ? (null) : (getIt<AppTheme>().isDark ? Colors.blueGrey.withAlpha(70) : null),
+                  backgroundColor: isSelected
+                      ? cubit.quizScreenArgs.subjectColor
+                      : Theme.of(context).colorScheme.surfaceVariant,
+                  shadowColor: isSelected
+                      ? (null)
+                      : (Theme.of(context).brightness.isDark
+                          ? Colors.blueGrey.withAlpha(70)
+                          : null),
                   shadowOffset: 5,
                   lerpValue: 0.1,
                   borderWidth: 1.5,
