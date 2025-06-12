@@ -3,10 +3,8 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:sanad_school/core/Routes/app_routes.dart';
 import 'package:sanad_school/core/shared/widgets/vibratation_container.dart';
-import 'package:sanad_school/core/utils/services/service_locator.dart';
 import 'package:sanad_school/features/auth/presentation/widgets/animated_raised_button.dart';
 
-import '../../../../core/helper/string_to_icon_converter.dart';
 import '../../../../core/theme/theme.dart';
 import '../../domain/entities/subject_entity.dart';
 
@@ -27,6 +25,7 @@ class SubjectCard extends StatelessWidget {
   });
 
   @override
+
   Widget build(BuildContext context) {
     return VibrationWidget(
       condition: () => subject.isLocked == 1,
@@ -188,7 +187,8 @@ class _DecorativeIcon extends StatelessWidget {
       child: Transform.rotate(
         angle: 0.2,
         child: Icon(
-          getIconByName(subject.icon),
+          // getIconByName(subject.icon),
+          Icons.abc,
           size: 140,
           color:
               AppTheme.extendedColorOf(context).white.withValues(alpha: 0.05),
@@ -288,7 +288,8 @@ class _IconTitleSection extends StatelessWidget {
         ),
       ),
       child: Icon(
-        getIconByName(icon),
+        // getIconByName(icon),
+        Icons.abc,
         // getIconByName(subject.iconName),
         size: 48, // 24
         color: AppTheme.extendedColorOf(context).white,
