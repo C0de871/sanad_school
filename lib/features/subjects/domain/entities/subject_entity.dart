@@ -12,6 +12,8 @@ class SubjectEntity extends Equatable {
   final int isLocked;
   final String teacher;
   final String description;
+  final String? lightColorCode;
+  final String? darkColorCode;
   final int? isSynced;
 
   const SubjectEntity({
@@ -26,22 +28,26 @@ class SubjectEntity extends Equatable {
     required this.isLocked,
     required this.teacher,
     required this.description,
+    this.lightColorCode,
+    this.darkColorCode,
     this.isSynced,
   });
 
   @override
   List<Object?> get props => [
-        id,
-        name,
-        icon,
-        link,
-        numberOfLessons,
-        numberOfTags,
-        numberOfExams,
-        numberOfQuestions,
-        isLocked,
-        teacher,
-        description,
-        isSynced,
-      ];
+    id,
+    name,
+    icon,
+    link,
+    numberOfLessons,
+    numberOfTags,
+    numberOfExams,
+    numberOfQuestions,
+    isLocked,
+    teacher,
+    description,
+    lightColorCode,
+    darkColorCode,
+    isSynced,
+  ];
 }

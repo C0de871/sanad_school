@@ -14,6 +14,8 @@ class SubjectModel extends SubjectEntity {
     required super.teacher,
     required super.description,
     super.isSynced,
+    super.lightColorCode,
+    super.darkColorCode,
   });
 
   factory SubjectModel.fromMap(Map<String, dynamic> map) {
@@ -30,6 +32,8 @@ class SubjectModel extends SubjectEntity {
       teacher: map['teacher'] as String,
       description: map['description'] as String,
       isSynced: map['is_synced'] as int?,
+      lightColorCode: map['light_color_code'] as String?,
+      darkColorCode: map['dark_color_code'] as String?,
     );
   }
 
@@ -47,6 +51,8 @@ class SubjectModel extends SubjectEntity {
       'teacher': teacher,
       'description': description,
       'is_synced': isSynced,
+      'light_color_code': lightColorCode,
+      'dark_color_code': darkColorCode,
     };
   }
 }

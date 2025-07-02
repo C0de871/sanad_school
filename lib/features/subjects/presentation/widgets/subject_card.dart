@@ -13,7 +13,7 @@ class SubjectCard extends StatelessWidget {
   final bool isExpanded;
   final bool isShrunk;
   final VoidCallback onLongPress;
-  final Color color;
+  final Color placeHolderColor;
 
   const SubjectCard({
     super.key,
@@ -21,11 +21,30 @@ class SubjectCard extends StatelessWidget {
     required this.isExpanded,
     required this.isShrunk,
     required this.onLongPress,
-    required this.color,
+    required this.placeHolderColor,
   });
 
-  @override
+  Color? checkColorNullness(String? colorCode) {
+    if (colorCode != null) {
+      final int? colorCodeAsInt = int.tryParse(colorCode);
+      if (colorCodeAsInt != null) return Color(colorCodeAsInt);
+    }
+    return null;
+  }
 
+  Color? getOnlineSubjectColor(BuildContext context) {
+    if (Theme.of(context).colorScheme.brightness == Brightness.light) {
+      return checkColorNullness(subject.lightColorCode);
+    } else {
+      return checkColorNullness(subject.darkColorCode);
+    }
+  }
+
+  Color getOfflineSubjectColor(BuildContext context) {
+    return getOnlineSubjectColor(context) ?? placeHolderColor;
+  }
+
+  @override
   Widget build(BuildContext context) {
     return VibrationWidget(
       condition: () => subject.isLocked == 1,
@@ -38,9 +57,13 @@ class SubjectCard extends StatelessWidget {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: [
-            color,
-            Color.lerp(color, Theme.of(context).colorScheme.scrim, 0.2) ??
-                color,
+            getOfflineSubjectColor(context),
+            Color.lerp(
+                  getOfflineSubjectColor(context),
+                  Theme.of(context).colorScheme.scrim,
+                  0.2,
+                ) ??
+                getOfflineSubjectColor(context),
           ],
           stops: const [0.3, 1],
         ),
@@ -59,8 +82,8 @@ class SubjectCard extends StatelessWidget {
             AppRoutes.subjectDetails,
             arguments: {
               "subject": subject,
-              "color": color,
-              "direction": direction
+              "color": getOfflineSubjectColor(context),
+              "direction": direction,
             },
           );
         },
@@ -78,9 +101,7 @@ class SubjectCard extends StatelessWidget {
               ],
             ),
             Padding(
-              padding: EdgeInsets.symmetric(
-                horizontal: 20,
-              ),
+              padding: EdgeInsets.symmetric(horizontal: 20),
               child: AnimatedSize(
                 duration: Duration(milliseconds: 300),
                 curve: Curves.easeInOut,
@@ -160,7 +181,7 @@ class SubjectCard extends StatelessWidget {
                             ],
                           ),
                         ],
-                      )
+                      ),
                     ],
                   ),
                 ),
@@ -186,12 +207,19 @@ class _DecorativeIcon extends StatelessWidget {
       top: -30,
       child: Transform.rotate(
         angle: 0.2,
-        child: Icon(
-          // getIconByName(subject.icon),
-          Icons.abc,
-          size: 140,
-          color:
-              AppTheme.extendedColorOf(context).white.withValues(alpha: 0.05),
+        // child: Icon(
+        //   // getIconByName(subject.icon),
+        //   // Icons.abc,
+        //   size: 140,
+        //   color:
+        //       AppTheme.extendedColorOf(context).white.withValues(alpha: 0.05),
+        // ),
+        child: Image.asset(
+          "assets/icons/calcuator.png",
+          colorBlendMode: BlendMode.srcIn,
+          color: AppTheme.extendedColorOf(
+            context,
+          ).white.withValues(alpha: 0.05),
         ),
       ),
     );
@@ -222,15 +250,9 @@ class _SubjectContent extends StatelessWidget {
         children: [
           Expanded(
             flex: 2,
-            child: _IconTitleSection(
-              subject: subject,
-              isShrunk: isShrunk,
-            ),
+            child: _IconTitleSection(subject: subject, isShrunk: isShrunk),
           ),
-          Expanded(
-            flex: 3,
-            child: _DescriptionSection(subject: subject),
-          ),
+          Expanded(flex: 3, child: _DescriptionSection(subject: subject)),
         ],
       ),
     );
@@ -243,10 +265,7 @@ class _IconTitleSection extends StatelessWidget {
   final SubjectEntity subject;
   final bool isShrunk;
 
-  const _IconTitleSection({
-    required this.subject,
-    required this.isShrunk,
-  });
+  const _IconTitleSection({required this.subject, required this.isShrunk});
 
   @override
   Widget build(BuildContext context) {
@@ -287,11 +306,11 @@ class _IconTitleSection extends StatelessWidget {
           width: 1,
         ),
       ),
-      child: Icon(
-        // getIconByName(icon),
-        Icons.abc,
-        // getIconByName(subject.iconName),
-        size: 48, // 24
+      child: Image.asset(
+        "assets/icons/calcuator.png",
+        colorBlendMode: BlendMode.srcIn,
+        height: 48,
+        width: 48,
         color: AppTheme.extendedColorOf(context).white,
       ),
     );
@@ -314,13 +333,14 @@ class _DescriptionSection extends StatelessWidget {
           constraints: const BoxConstraints(maxHeight: 130),
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color:
-                AppTheme.extendedColorOf(context).white.withValues(alpha: 0.12),
+            color: AppTheme.extendedColorOf(
+              context,
+            ).white.withValues(alpha: 0.12),
             borderRadius: BorderRadius.circular(16),
             border: Border.all(
-              color: AppTheme.extendedColorOf(context)
-                  .white
-                  .withValues(alpha: 0.08),
+              color: AppTheme.extendedColorOf(
+                context,
+              ).white.withValues(alpha: 0.08),
               width: 1,
             ),
           ),
@@ -363,20 +383,23 @@ class _ProgressIndicator extends StatelessWidget {
         height: 40,
         padding: const EdgeInsets.all(8),
         decoration: BoxDecoration(
-          color:
-              AppTheme.extendedColorOf(context).white.withValues(alpha: 0.15),
+          color: AppTheme.extendedColorOf(
+            context,
+          ).white.withValues(alpha: 0.15),
           shape: BoxShape.circle,
           border: Border.all(
-            color:
-                AppTheme.extendedColorOf(context).white.withValues(alpha: 0.1),
+            color: AppTheme.extendedColorOf(
+              context,
+            ).white.withValues(alpha: 0.1),
             width: 1,
           ),
         ),
         child: CircularProgressIndicator(
           value: 0.7,
           strokeWidth: 2,
-          backgroundColor:
-              AppTheme.extendedColorOf(context).white.withValues(alpha: 0.1),
+          backgroundColor: AppTheme.extendedColorOf(
+            context,
+          ).white.withValues(alpha: 0.1),
           color: AppTheme.extendedColorOf(context).white,
         ),
       ),

@@ -5,6 +5,7 @@ import 'dart:typed_data';
 import 'package:dartz/dartz.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:sanad_school/features/questions/enums/question_type_enum.dart';
 import '../../../../core/databases/errors/failure.dart';
 import '../../../../core/databases/params/params.dart';
 import '../../../../core/utils/services/service_locator.dart';
@@ -29,7 +30,7 @@ class QuestionCubit extends Cubit<QuestionState> {
   final GetQuestionsInSubjectByTagUseCase _getQuestionsInSubjectByTagUseCase;
   final GetEditedQuestionsByLessonUseCase _getEditedQuestionsByLessonUseCase;
   final GetIncorrectAnswerGroupsQuestionsUseCase
-      _getIncorrectQuestionsByLessonUseCase;
+  _getIncorrectQuestionsByLessonUseCase;
   final GetFavoriteGroupsQuestionsUseCase _getFavQuestionsByLessonUseCase;
   final SaveQuestionNoteUseCase _saveQuestionNoteUseCase;
   final ToggleQuestionFavoriteUseCase _toggleQuestionFavoriteUseCase;
@@ -39,7 +40,7 @@ class QuestionCubit extends Cubit<QuestionState> {
   final GetQuizQuestionsUsecase _getQuizQuestionsUseCase;
   final UpdateQuestionAnsweredUsecase _updateQuestionAnsweredUsecase;
   final UpdateQuestionAnsweredCorrectlyUsecase
-      _updateQuestionAnsweredCorrectlyUsecase;
+  _updateQuestionAnsweredCorrectlyUsecase;
   final UpdateQuestionCorrectedUsecase _updateQuestionCorrectedUsecase;
   Timer? timer;
   TextEditingController noteController = TextEditingController();
@@ -52,22 +53,22 @@ class QuestionCubit extends Cubit<QuestionState> {
   static String answersControllerNodeKey = "answers-controller";
 
   QuestionCubit()
-      : _getLessonQuestionsByTypeUseCase = getIt(),
-        _getQuestionsInSubjectByTagUseCase = getIt(),
-        _getEditedQuestionsByLessonUseCase = getIt(),
-        _getIncorrectQuestionsByLessonUseCase = getIt(),
-        _getFavQuestionsByLessonUseCase = getIt(),
-        _saveQuestionNoteUseCase = getIt(),
-        _toggleQuestionFavoriteUseCase = getIt(),
-        _toggleQuestionCorrectUseCase = getIt(),
-        _getQuestionPhotoUseCase = getIt(),
-        _getQuestionHintPhotoUseCase = getIt(),
-        _getQuizQuestionsUseCase = getIt(),
-        _updateQuestionAnsweredUsecase = getIt(),
-        _updateQuestionAnsweredCorrectlyUsecase = getIt(),
-        _updateQuestionCorrectedUsecase = getIt(),
-        super(QuestionInitial()) {
-    // disableScreenshot(); 
+    : _getLessonQuestionsByTypeUseCase = getIt(),
+      _getQuestionsInSubjectByTagUseCase = getIt(),
+      _getEditedQuestionsByLessonUseCase = getIt(),
+      _getIncorrectQuestionsByLessonUseCase = getIt(),
+      _getFavQuestionsByLessonUseCase = getIt(),
+      _saveQuestionNoteUseCase = getIt(),
+      _toggleQuestionFavoriteUseCase = getIt(),
+      _toggleQuestionCorrectUseCase = getIt(),
+      _getQuestionPhotoUseCase = getIt(),
+      _getQuestionHintPhotoUseCase = getIt(),
+      _getQuizQuestionsUseCase = getIt(),
+      _updateQuestionAnsweredUsecase = getIt(),
+      _updateQuestionAnsweredCorrectlyUsecase = getIt(),
+      _updateQuestionCorrectedUsecase = getIt(),
+      super(QuestionInitial()) {
+    disableScreenshot();
   }
 
   FocusNode getQuestionFocusNode(int questionIndex) {
@@ -95,19 +96,18 @@ class QuestionCubit extends Cubit<QuestionState> {
   }
 
   QuillController getAnswerController(int questionIndex, int answerIndex) {
-    return questionsController[questionIndex][answersControllerNodeKey]
-        [answerIndex];
+    return questionsController[questionIndex][answersControllerNodeKey][answerIndex];
   }
 
   FocusNode getAnswerFocusNode(int questionIndex, int answerIndex) {
-    return questionsFocusNode[questionIndex][answersControllerNodeKey]
-        [answerIndex];
+    return questionsFocusNode[questionIndex][answersControllerNodeKey][answerIndex];
   }
 
   ScrollController getAnswerScrollController(
-      int questionIndex, int answerIndex) {
-    return questionsScrollController[questionIndex][answersControllerNodeKey]
-        [answerIndex];
+    int questionIndex,
+    int answerIndex,
+  ) {
+    return questionsScrollController[questionIndex][answersControllerNodeKey][answerIndex];
   }
 
   void _initializeControllers(List<QuestionEntity> questions) {
@@ -119,10 +119,11 @@ class QuestionCubit extends Cubit<QuestionState> {
           readOnly: true,
         ),
         hintControllersNodeKey: QuillController(
-          document: (questions[questionIndex].hint == null ||
-                  questions[questionIndex].hint!.isEmpty)
-              ? Document()
-              : Document.fromJson(questions[questionIndex].hint!),
+          document:
+              (questions[questionIndex].hint == null ||
+                      questions[questionIndex].hint!.isEmpty)
+                  ? Document()
+                  : Document.fromJson(questions[questionIndex].hint!),
           selection: const TextSelection.collapsed(offset: 0),
           readOnly: true,
         ),
@@ -130,7 +131,8 @@ class QuestionCubit extends Cubit<QuestionState> {
           questions[questionIndex].choices.length,
           (choiceIndex) => QuillController(
             document: Document.fromJson(
-                questions[questionIndex].choices[choiceIndex]),
+              questions[questionIndex].choices[choiceIndex],
+            ),
             selection: const TextSelection.collapsed(offset: 0),
             readOnly: true,
           ),
@@ -142,8 +144,10 @@ class QuestionCubit extends Cubit<QuestionState> {
       return {
         questionControllersNodeKey: ScrollController(),
         hintControllersNodeKey: ScrollController(),
-        answersControllerNodeKey:
-            List.filled(questions[index].choices.length, ScrollController()),
+        answersControllerNodeKey: List.filled(
+          questions[index].choices.length,
+          ScrollController(),
+        ),
       };
     });
 
@@ -151,30 +155,40 @@ class QuestionCubit extends Cubit<QuestionState> {
       return {
         questionControllersNodeKey: FocusNode(),
         hintControllersNodeKey: FocusNode(),
-        answersControllerNodeKey:
-            List.filled(questions[index].choices.length, FocusNode()),
+        answersControllerNodeKey: List.filled(
+          questions[index].choices.length,
+          FocusNode(),
+        ),
       };
     });
-    emit(QuestionSuccess(
-      questions: questions,
-      userAnswers: List.generate(questions.length, (index) {
-        return questions[index].userAnswer;
-      }),
-      isRightList: List.generate(questions.length, (index) {
-        if (questions[index].isCorrected) {
-          return questions[index].isAnsweredCorrectly;
-        }
-        return null;
-      }),
-      wrongAnswersCount: questions
-          .where((question) =>
-              question.isCorrected && !question.isAnsweredCorrectly)
-          .length,
-      correctAnswersCount: questions
-          .where((question) =>
-              question.isCorrected && question.isAnsweredCorrectly)
-          .length,
-    ));
+    emit(
+      QuestionSuccess(
+        questions: questions,
+        userAnswers: List.generate(questions.length, (index) {
+          return questions[index].userAnswer;
+        }),
+        isRightList: List.generate(questions.length, (index) {
+          if (questions[index].isCorrected) {
+            return questions[index].isAnsweredCorrectly;
+          }
+          return null;
+        }),
+        wrongAnswersCount:
+            questions
+                .where(
+                  (question) =>
+                      question.isCorrected && !question.isAnsweredCorrectly,
+                )
+                .length,
+        correctAnswersCount:
+            questions
+                .where(
+                  (question) =>
+                      question.isCorrected && question.isAnsweredCorrectly,
+                )
+                .length,
+      ),
+    );
   }
 
   Future<void> getQuestionsByLessonAndType({
@@ -182,20 +196,18 @@ class QuestionCubit extends Cubit<QuestionState> {
     required int? typeId,
   }) async {
     emit(QuestionLoading());
-    QuestionsInLessonWithTypeParams params =
-        QuestionsInLessonWithTypeParams(lessonId: lessonId, typeId: typeId);
-    final result = await _getLessonQuestionsByTypeUseCase.call(
-      params: params,
+    QuestionsInLessonWithTypeParams params = QuestionsInLessonWithTypeParams(
+      lessonId: lessonId,
+      typeId: typeId,
     );
+    final result = await _getLessonQuestionsByTypeUseCase.call(params: params);
     result.fold(
       (failure) => emit(QuestionFailure(failure.errMessage)),
       _initializeControllers,
     );
   }
 
-  Future<void> getSubjectQuestionsByTag({
-    required int tagId,
-  }) async {
+  Future<void> getSubjectQuestionsByTag({required int tagId}) async {
     emit(QuestionLoading());
     QuestionsInSubjectByTag params = QuestionsInSubjectByTag(tagId: tagId);
     final result = await _getQuestionsInSubjectByTagUseCase.call(
@@ -237,34 +249,46 @@ class QuestionCubit extends Cubit<QuestionState> {
     final currentState = state as QuestionSuccess;
 
     for (int i = 0; i < currentState.questions.length; i++) {
-      _updateQuestionCorrectedUsecase.call(UpdateQuestionCorrectedParams(
-        questionId: currentState.questions[i].id,
-        isCorrected: false,
-      ));
+      _updateQuestionCorrectedUsecase.call(
+        UpdateQuestionCorrectedParams(
+          questionId: currentState.questions[i].id,
+          isCorrected: false,
+        ),
+      );
 
-      _updateQuestionAnsweredUsecase.call(UpdateQuestionAnsweredParams(
-        questionId: currentState.questions[i].id,
-        isAnswered: false,
-        userAnswer: null,
-      ));
+      _updateQuestionAnsweredUsecase.call(
+        UpdateQuestionAnsweredParams(
+          questionId: currentState.questions[i].id,
+          isAnswered: false,
+          userAnswer: null,
+        ),
+      );
 
-      _updateQuestionAnsweredCorrectlyUsecase
-          .call(UpdateQuestionAnsweredCorrectlyParams(
-        questionId: currentState.questions[i].id,
-        isAnsweredCorrectly: false,
-      ));
+      _updateQuestionAnsweredCorrectlyUsecase.call(
+        UpdateQuestionAnsweredCorrectlyParams(
+          questionId: currentState.questions[i].id,
+          isAnsweredCorrectly: false,
+        ),
+      );
     }
 
-    emit(currentState.copyWith(
-      userAnswers:
-          List.generate(currentState.questions.length, (index) => null),
-      isCorrect: List.generate(currentState.questions.length, (index) => null),
-      correctAnswers: 0,
-      wrongAnswers: 0,
-    ));
+    emit(
+      currentState.copyWith(
+        userAnswers: List.generate(
+          currentState.questions.length,
+          (index) => null,
+        ),
+        isRightList: List.generate(
+          currentState.questions.length,
+          (index) => null,
+        ),
+        correctAnswersCount: 0,
+        wrongAnswersCount: 0,
+      ),
+    );
   }
 
-// Extract common state checking logic
+  // Extract common state checking logic
   QuestionSuccess? _getCurrentState(dynamic state) {
     return state is QuestionSuccess ? state : null;
   }
@@ -326,24 +350,31 @@ class QuestionCubit extends Cubit<QuestionState> {
 
     for (int i = 0; i < currentState.questions.length; i++) {
       final result = _evaluateAnswer(
-          currentState.questions[i], currentState.userAnswers[i]);
+        currentState.questions[i],
+        currentState.userAnswers[i],
+      );
 
-      _updateQuestionCorrectedUsecase.call(UpdateQuestionCorrectedParams(
-        questionId: currentState.questions[i].id,
-        isCorrected: true,
-      ));
+      _updateQuestionCorrectedUsecase.call(
+        UpdateQuestionCorrectedParams(
+          questionId: currentState.questions[i].id,
+          isCorrected: true,
+        ),
+      );
 
-      _updateQuestionAnsweredUsecase.call(UpdateQuestionAnsweredParams(
-        questionId: currentState.questions[i].id,
-        isAnswered: true,
-        userAnswer: currentState.userAnswers[i],
-      ));
+      _updateQuestionAnsweredUsecase.call(
+        UpdateQuestionAnsweredParams(
+          questionId: currentState.questions[i].id,
+          isAnswered: true,
+          userAnswer: currentState.userAnswers[i],
+        ),
+      );
 
-      _updateQuestionAnsweredCorrectlyUsecase
-          .call(UpdateQuestionAnsweredCorrectlyParams(
-        questionId: currentState.questions[i].id,
-        isAnsweredCorrectly: result.isCorrect,
-      ));
+      _updateQuestionAnsweredCorrectlyUsecase.call(
+        UpdateQuestionAnsweredCorrectlyParams(
+          questionId: currentState.questions[i].id,
+          isAnsweredCorrectly: result.isCorrect,
+        ),
+      );
 
       isRightListUpdated[i] = result.isCorrect;
       result.isCorrect ? correctAnswers++ : wrongAnswers++;
@@ -352,7 +383,11 @@ class QuestionCubit extends Cubit<QuestionState> {
     }
 
     _emitUpdatedState(
-        currentState, correctAnswers, wrongAnswers, isRightListUpdated);
+      currentState,
+      correctAnswers,
+      wrongAnswers,
+      isRightListUpdated,
+    );
   }
 
   void checkUserAnswersOnly() {
@@ -370,34 +405,45 @@ class QuestionCubit extends Cubit<QuestionState> {
       }
 
       final result = _evaluateAnswer(
-          currentState.questions[i], currentState.userAnswers[i]);
+        currentState.questions[i],
+        currentState.userAnswers[i],
+      );
 
       if (result.hasAnswer) {
         updatedIsCorrect[i] = result.isCorrect;
         result.isCorrect ? correctAnswers++ : wrongAnswers++;
         _updateQuestionStatus(currentState.questions[i].id, result.isCorrect);
 
-        _updateQuestionCorrectedUsecase.call(UpdateQuestionCorrectedParams(
-          questionId: currentState.questions[i].id,
-          isCorrected: true,
-        ));
+        _updateQuestionCorrectedUsecase.call(
+          UpdateQuestionCorrectedParams(
+            questionId: currentState.questions[i].id,
+            isCorrected: true,
+          ),
+        );
 
-        _updateQuestionAnsweredUsecase.call(UpdateQuestionAnsweredParams(
-          questionId: currentState.questions[i].id,
-          isAnswered: true,
-          userAnswer: currentState.userAnswers[i],
-        ));
+        _updateQuestionAnsweredUsecase.call(
+          UpdateQuestionAnsweredParams(
+            questionId: currentState.questions[i].id,
+            isAnswered: true,
+            userAnswer: currentState.userAnswers[i],
+          ),
+        );
 
-        _updateQuestionAnsweredCorrectlyUsecase
-            .call(UpdateQuestionAnsweredCorrectlyParams(
-          questionId: currentState.questions[i].id,
-          isAnsweredCorrectly: result.isCorrect,
-        ));
+        _updateQuestionAnsweredCorrectlyUsecase.call(
+          UpdateQuestionAnsweredCorrectlyParams(
+            questionId: currentState.questions[i].id,
+            isAnsweredCorrectly: result.isCorrect,
+          ),
+        );
       }
     }
 
     _emitUpdatedState(
-        currentState, correctAnswers, wrongAnswers, updatedIsCorrect);
+      currentState,
+      correctAnswers,
+      wrongAnswers,
+      updatedIsCorrect,
+    );
   }
 
   void checkMultipleChoiceAnswer(int index) {
@@ -411,24 +457,31 @@ class QuestionCubit extends Cubit<QuestionState> {
     }
 
     final result = _evaluateAnswer(
-        currentState.questions[index], currentState.userAnswers[index]);
+      currentState.questions[index],
+      currentState.userAnswers[index],
+    );
 
-    _updateQuestionCorrectedUsecase.call(UpdateQuestionCorrectedParams(
-      questionId: currentState.questions[index].id,
-      isCorrected: true,
-    ));
+    _updateQuestionCorrectedUsecase.call(
+      UpdateQuestionCorrectedParams(
+        questionId: currentState.questions[index].id,
+        isCorrected: true,
+      ),
+    );
 
-    _updateQuestionAnsweredUsecase.call(UpdateQuestionAnsweredParams(
-      questionId: currentState.questions[index].id,
-      isAnswered: true,
-      userAnswer: currentState.userAnswers[index],
-    ));
+    _updateQuestionAnsweredUsecase.call(
+      UpdateQuestionAnsweredParams(
+        questionId: currentState.questions[index].id,
+        isAnswered: true,
+        userAnswer: currentState.userAnswers[index],
+      ),
+    );
 
-    _updateQuestionAnsweredCorrectlyUsecase
-        .call(UpdateQuestionAnsweredCorrectlyParams(
-      questionId: currentState.questions[index].id,
-      isAnsweredCorrectly: result.isCorrect,
-    ));
+    _updateQuestionAnsweredCorrectlyUsecase.call(
+      UpdateQuestionAnsweredCorrectlyParams(
+        questionId: currentState.questions[index].id,
+        isAnsweredCorrectly: result.isCorrect,
+      ),
+    );
 
     List<bool?> updatedIsCorrect = List<bool?>.from(currentState.isRightList);
     updatedIsCorrect[index] = result.isCorrect;
@@ -442,8 +495,12 @@ class QuestionCubit extends Cubit<QuestionState> {
     );
 
     _updateQuestionStatus(currentState.questions[index].id, result.isCorrect);
-    _emitUpdatedState(currentState, scoreUpdate.correctAnswers,
-        scoreUpdate.wrongAnswers, updatedIsCorrect);
+    _emitUpdatedState(
+      currentState,
+      scoreUpdate.correctAnswers,
+      scoreUpdate.wrongAnswers,
+      updatedIsCorrect,
+    );
   }
 
   void checkWrittenAnswer(int index, bool isCorrect) {
@@ -455,29 +512,36 @@ class QuestionCubit extends Cubit<QuestionState> {
 
     final hadAnswer = updatedUserAnswers[index] != null;
     final wasCorrect = updatedIsCorrect[index] ?? false;
-    log("hadAnswer: $hadAnswer, wasCorrect: ${updatedIsCorrect[index] ?? "null"}, isCorrect: $isCorrect");
+    log(
+      "hadAnswer: $hadAnswer, wasCorrect: ${updatedIsCorrect[index] ?? "null"}, isCorrect: $isCorrect",
+    );
 
     // Only update if answer changed or is new
     if (!hadAnswer || wasCorrect != isCorrect) {
       updatedUserAnswers[index] = isCorrect ? 1 : 0; // Mark as answered
       updatedIsCorrect[index] = isCorrect;
 
-      _updateQuestionCorrectedUsecase.call(UpdateQuestionCorrectedParams(
-        questionId: currentState.questions[index].id,
-        isCorrected: true,
-      ));
+      _updateQuestionCorrectedUsecase.call(
+        UpdateQuestionCorrectedParams(
+          questionId: currentState.questions[index].id,
+          isCorrected: true,
+        ),
+      );
 
-      _updateQuestionAnsweredUsecase.call(UpdateQuestionAnsweredParams(
-        questionId: currentState.questions[index].id,
-        isAnswered: true,
-        userAnswer: isCorrect ? 1 : 0,
-      ));
+      _updateQuestionAnsweredUsecase.call(
+        UpdateQuestionAnsweredParams(
+          questionId: currentState.questions[index].id,
+          isAnswered: true,
+          userAnswer: isCorrect ? 1 : 0,
+        ),
+      );
 
-      _updateQuestionAnsweredCorrectlyUsecase
-          .call(UpdateQuestionAnsweredCorrectlyParams(
-        questionId: currentState.questions[index].id,
-        isAnsweredCorrectly: isCorrect,
-      ));
+      _updateQuestionAnsweredCorrectlyUsecase.call(
+        UpdateQuestionAnsweredCorrectlyParams(
+          questionId: currentState.questions[index].id,
+          isAnsweredCorrectly: isCorrect,
+        ),
+      );
 
       final scoreUpdate = _updateScores(
         currentCorrect: currentState.correctAnswersCount,
@@ -491,10 +555,10 @@ class QuestionCubit extends Cubit<QuestionState> {
 
       emit(
         currentState.copyWith(
-          correctAnswers: scoreUpdate.correctAnswers,
-          wrongAnswers: scoreUpdate.wrongAnswers,
+          correctAnswersCount: scoreUpdate.correctAnswers,
+          wrongAnswersCount: scoreUpdate.wrongAnswers,
           userAnswers: updatedUserAnswers,
-          isCorrect: updatedIsCorrect,
+          isRightList: updatedIsCorrect,
         ),
       );
     }
@@ -503,7 +567,9 @@ class QuestionCubit extends Cubit<QuestionState> {
   // Helper methods
   void _updateQuestionStatus(int questionId, bool isCorrect) {
     toggleQuestionIncorrectAnswer(
-        questionId: questionId, answerStatus: isCorrect);
+      questionId: questionId,
+      answerStatus: isCorrect,
+    );
   }
 
   void _emitUpdatedState(
@@ -514,18 +580,22 @@ class QuestionCubit extends Cubit<QuestionState> {
   ) {
     emit(
       currentState.copyWith(
-        correctAnswers: correctAnswers,
-        wrongAnswers: wrongAnswers,
-        isCorrect: isCorrect,
+        correctAnswersCount: correctAnswers,
+        wrongAnswersCount: wrongAnswers,
+        isRightList: isCorrect,
       ),
     );
   }
 
   Future<Either<Failure, Uint8List?>> _getQuestionPhoto(
-      int questionId, String questionUrl) async {
+    int questionId,
+    String questionUrl,
+  ) async {
     if (state is QuestionSuccess) {
-      QuestionPhotoParams params =
-          QuestionPhotoParams(questionId: questionId, questionUrl: questionUrl);
+      QuestionPhotoParams params = QuestionPhotoParams(
+        questionId: questionId,
+        questionUrl: questionUrl,
+      );
       final result = await _getQuestionPhotoUseCase.call(params);
       log("done ===========================================");
       return result;
@@ -534,53 +604,70 @@ class QuestionCubit extends Cubit<QuestionState> {
   }
 
   Future<void> getQuestionHintPhoto(
-      int questionId, String questionHintUrl) async {
+    int questionId,
+    String questionHintUrl,
+  ) async {
     if (state is QuestionSuccess) {
       final currentState = state as QuestionSuccess;
       QuestionPhotoParams params = QuestionPhotoParams(
-          questionId: questionId, questionUrl: questionHintUrl);
+        questionId: questionId,
+        questionUrl: questionHintUrl,
+      );
       final result = await _getQuestionHintPhotoUseCase.call(params);
 
       result.fold(
         (failure) {},
-        (photo) => emit(currentState.copyWith(
-          questions: currentState.questions
-              .map((question) => question.id == questionId
-                  ? question.copyWith(downloadedHintPhoto: photo)
-                  : question)
-              .toList(),
-        )),
+        (photo) => emit(
+          currentState.copyWith(
+            questions:
+                currentState.questions
+                    .map(
+                      (question) =>
+                          question.id == questionId
+                              ? question.copyWith(downloadedHintPhoto: photo)
+                              : question,
+                    )
+                    .toList(),
+          ),
+        ),
       );
     }
   }
 
+  
+
   void toggleExpandedImage(int index) async {
     final currentState = state;
     if (currentState is QuestionSuccess) {
-      Map<int, bool> updatedExpandedImages =
-          Map<int, bool>.from(currentState.expandedImages);
-      updatedExpandedImages[index] = !(updatedExpandedImages[index] ?? false);
-      emit(
-        currentState.copyWith(
-          expandedImages: updatedExpandedImages,
-        ),
+      Map<int, bool> updatedExpandedImages = Map<int, bool>.from(
+        currentState.expandedImages,
       );
+      updatedExpandedImages[index] = !(updatedExpandedImages[index] ?? false);
+      emit(currentState.copyWith(expandedImages: updatedExpandedImages));
       if (currentState.questions[index].downloadedQuestionPhoto == null) {
         if (currentState.questions[index].questionPhoto != null) {
           final response = await _getQuestionPhoto(
-              currentState.questions[index].id,
-              currentState.questions[index].questionPhoto!);
+            currentState.questions[index].id,
+            currentState.questions[index].questionPhoto!,
+          );
           response.fold(
             (failure) {},
-            (photo) => emit(currentState.copyWith(
-              expandedImages: updatedExpandedImages,
-              questions: currentState.questions
-                  .map((question) =>
-                      question.id == currentState.questions[index].id
-                          ? question.copyWith(downloadedQuestionPhoto: photo)
-                          : question)
-                  .toList(),
-            )),
+            (photo) => emit(
+              currentState.copyWith(
+                expandedImages: updatedExpandedImages,
+                questions:
+                    currentState.questions
+                        .map(
+                          (question) =>
+                              question.id == currentState.questions[index].id
+                                  ? question.copyWith(
+                                    downloadedQuestionPhoto: photo,
+                                  )
+                                  : question,
+                        )
+                        .toList(),
+              ),
+            ),
           );
           return;
         }
@@ -591,16 +678,13 @@ class QuestionCubit extends Cubit<QuestionState> {
   void toggleExpandedAnswer(int index) {
     final currentState = state;
     if (currentState is QuestionSuccess) {
-      Map<int, bool> updatedExpandedAnswers =
-          Map<int, bool>.from(currentState.expandedAnswers);
+      Map<int, bool> updatedExpandedAnswers = Map<int, bool>.from(
+        currentState.expandedAnswers,
+      );
 
       updatedExpandedAnswers[index] = !(updatedExpandedAnswers[index] ?? false);
 
-      emit(
-        currentState.copyWith(
-          expandedAnswers: updatedExpandedAnswers,
-        ),
-      );
+      emit(currentState.copyWith(expandedAnswers: updatedExpandedAnswers));
     }
   }
 
@@ -643,9 +727,9 @@ class QuestionCubit extends Cubit<QuestionState> {
     emit(QuestionLoading());
     IncorrectAnswerGroupsQuestionsParams params =
         IncorrectAnswerGroupsQuestionsParams(
-      lessonId: lessonId,
-      typeId: typeId,
-    );
+          lessonId: lessonId,
+          typeId: typeId,
+        );
     final result = await _getIncorrectQuestionsByLessonUseCase.call(params);
     result.fold(
       (failure) => emit(QuestionFailure(failure.errMessage)),
@@ -662,18 +746,23 @@ class QuestionCubit extends Cubit<QuestionState> {
       note: note,
     );
     final result = await _saveQuestionNoteUseCase.call(params);
-    result.fold(
-      (failure) => emit(QuestionFailure(failure.errMessage)),
-      (success) {
-        if (state is QuestionSuccess) {
-          final currentState = state as QuestionSuccess;
-          emit(currentState);
-          emit(QuestionSuccess(
-            questions: currentState.questions
-                .map((question) => question.id == questionId
-                    ? question.copyWith(note: note)
-                    : question)
-                .toList(),
+    result.fold((failure) => emit(QuestionFailure(failure.errMessage)), (
+      success,
+    ) {
+      if (state is QuestionSuccess) {
+        final currentState = state as QuestionSuccess;
+        emit(currentState);
+        emit(
+          currentState.copyWith(
+            questions:
+                currentState.questions
+                    .map(
+                      (question) =>
+                          question.id == questionId
+                              ? question.copyWith(note: note)
+                              : question,
+                    )
+                    .toList(),
             correctAnswersCount: currentState.correctAnswersCount,
             wrongAnswersCount: currentState.wrongAnswersCount,
             seconds: currentState.seconds,
@@ -682,10 +771,10 @@ class QuestionCubit extends Cubit<QuestionState> {
             isRightList: currentState.isRightList,
             expandedImages: currentState.expandedImages,
             expandedAnswers: currentState.expandedAnswers,
-          ));
-        }
-      },
-    );
+          ),
+        );
+      }
+    });
   }
 
   Future<void> toggleQuestionFavorite({
@@ -697,8 +786,9 @@ class QuestionCubit extends Cubit<QuestionState> {
     final currentState = state as QuestionSuccess;
 
     // Find the question group ID for the given question
-    final question =
-        currentState.questions.firstWhere((q) => q.id == questionId);
+    final question = currentState.questions.firstWhere(
+      (q) => q.id == questionId,
+    );
     final questionGroupId = question.questionGroupId;
 
     ToggleQuestionFavoriteParams params = ToggleQuestionFavoriteParams(
@@ -706,18 +796,23 @@ class QuestionCubit extends Cubit<QuestionState> {
       isFavorite: isFavorite,
     );
     final result = await _toggleQuestionFavoriteUseCase.call(params);
-    result.fold(
-      (failure) => emit(QuestionFailure(failure.errMessage)),
-      (success) {
-        if (state is QuestionSuccess) {
-          final currentState = state as QuestionSuccess;
-          emit(currentState);
-          emit(QuestionSuccess(
-            questions: currentState.questions
-                .map((question) => question.questionGroupId == questionGroupId
-                    ? question.copyWith(isFavorite: isFavorite)
-                    : question)
-                .toList(),
+    result.fold((failure) => emit(QuestionFailure(failure.errMessage)), (
+      success,
+    ) {
+      if (state is QuestionSuccess) {
+        final currentState = state as QuestionSuccess;
+        emit(currentState);
+        emit(
+          currentState.copyWith(
+            questions:
+                currentState.questions
+                    .map(
+                      (question) =>
+                          question.questionGroupId == questionGroupId
+                              ? question.copyWith(isFavorite: isFavorite)
+                              : question,
+                    )
+                    .toList(),
             correctAnswersCount: currentState.correctAnswersCount,
             wrongAnswersCount: currentState.wrongAnswersCount,
             seconds: currentState.seconds,
@@ -726,10 +821,10 @@ class QuestionCubit extends Cubit<QuestionState> {
             isRightList: currentState.isRightList,
             expandedImages: currentState.expandedImages,
             expandedAnswers: currentState.expandedAnswers,
-          ));
-        }
-      },
-    );
+          ),
+        );
+      }
+    });
   }
 
   Future<void> toggleQuestionIncorrectAnswer({
@@ -738,17 +833,18 @@ class QuestionCubit extends Cubit<QuestionState> {
   }) async {
     ToggleQuestionIncorrectAnswerParams params =
         ToggleQuestionIncorrectAnswerParams(
-      questionId: questionId,
-      answerStatus: answerStatus,
-    );
+          questionId: questionId,
+          answerStatus: answerStatus,
+        );
     final result = await _toggleQuestionCorrectUseCase.call(params);
-    result.fold(
-      (failure) => emit(QuestionFailure(failure.errMessage)),
-      (success) {
-        if (state is QuestionSuccess) {
-          final currentState = state as QuestionSuccess;
-          emit(currentState);
-          emit(QuestionSuccess(
+    result.fold((failure) => emit(QuestionFailure(failure.errMessage)), (
+      success,
+    ) {
+      if (state is QuestionSuccess) {
+        final currentState = state as QuestionSuccess;
+        emit(currentState);
+        emit(
+          currentState.copyWith(
             questions: currentState.questions,
             correctAnswersCount: currentState.correctAnswersCount,
             wrongAnswersCount: currentState.wrongAnswersCount,
@@ -758,22 +854,22 @@ class QuestionCubit extends Cubit<QuestionState> {
             isRightList: currentState.isRightList,
             expandedImages: currentState.expandedImages,
             expandedAnswers: currentState.expandedAnswers,
-          ));
-        }
-      },
-    );
+          ),
+        );
+      }
+    });
   }
 
-  Future<void> startQuiz({
-    required QuestionFromQuizArg arg,
-  }) async {
+  Future<void> startQuiz({required QuestionFromQuizArg arg}) async {
     emit(QuestionLoading());
-    final result = await _getQuizQuestionsUseCase.call(QuizFilterParams(
-      subjectId: arg.subjectId,
-      lessonIds: arg.lessonIds,
-      typeIds: arg.typeIds,
-      tagIds: arg.tagIds,
-    ));
+    final result = await _getQuizQuestionsUseCase.call(
+      QuizFilterParams(
+        subjectId: arg.subjectId,
+        lessonIds: arg.lessonIds,
+        typeIds: arg.typeIds,
+        tagIds: arg.tagIds,
+      ),
+    );
     // log("result: $result");
     _shuffleQuestions(result, arg.questionCount);
 
@@ -792,7 +888,7 @@ class QuestionCubit extends Cubit<QuestionState> {
       //? add each question to the list of questions in the same group
       groupedQuestions[question.questionGroupId!] = [
         ...groupedQuestions[question.questionGroupId!] ?? [],
-        question
+        question,
       ];
     }
     log("groupedQuestions: $groupedQuestions");
@@ -812,8 +908,10 @@ class QuestionCubit extends Cubit<QuestionState> {
     _initializeControllers(shuffledQuestions);
   }
 
-  Future<void> updateQuestionAnswered(
-      {required int index, required int answerIndex}) async {
+  Future<void> updateQuestionAnswered({
+    required int index,
+    required int answerIndex,
+  }) async {
     final currentState = _getCurrentState(state);
     if (currentState == null) return;
 
@@ -821,12 +919,13 @@ class QuestionCubit extends Cubit<QuestionState> {
     final updatedAnswers = [...currentState.userAnswers];
     updatedAnswers[index] = answerIndex;
 
-    final result =
-        await _updateQuestionAnsweredUsecase.call(UpdateQuestionAnsweredParams(
-      questionId: currentState.questions[index].id,
-      isAnswered: true,
-      userAnswer: answerIndex,
-    ));
+    await _updateQuestionAnsweredUsecase.call(
+      UpdateQuestionAnsweredParams(
+        questionId: currentState.questions[index].id,
+        isAnswered: true,
+        userAnswer: answerIndex,
+      ),
+    );
 
     emit(currentState.copyWith(userAnswers: updatedAnswers));
   }

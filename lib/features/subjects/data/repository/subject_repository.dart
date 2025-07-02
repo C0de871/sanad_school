@@ -8,7 +8,7 @@ import '../../../../core/databases/params/params.dart';
 import '../../domain/entities/subject_entity.dart';
 import '../../domain/entities/subject_sync_entity.dart';
 import '../../domain/repo/subject_repository.dart';
-import '../data_sources/subject_details_data_source.dart';
+import '../data_sources/subject_details_local_data_source.dart';
 import '../data_sources/subject_remote_data_source.dart';
 import '../data_sources/subject_local_data_source.dart';
 

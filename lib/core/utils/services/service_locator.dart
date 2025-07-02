@@ -55,7 +55,7 @@ import 'package:sanad_school/features/settings/domain/usecases/get_theme.dart';
 import 'package:sanad_school/features/subject_type/data/data_sources/type_remote_data_source.dart';
 import 'package:sanad_school/features/subject_type/domain/repo/type_repository.dart';
 import 'package:sanad_school/features/subject_type/domain/use_cases/get_types_use_case.dart';
-import 'package:sanad_school/features/subjects/data/data_sources/subject_details_data_source.dart';
+import 'package:sanad_school/features/subjects/data/data_sources/subject_details_local_data_source.dart';
 import 'package:sanad_school/features/subjects/data/data_sources/subject_remote_data_source.dart';
 import 'package:sanad_school/features/subjects/domain/repo/subject_repository.dart';
 import 'package:sanad_school/features/subjects/domain/use_cases/get_subjects_use_case.dart';
@@ -331,7 +331,7 @@ Future<void> initApp() async {
   await deviceInfoService.init();
 
   final SqlDB sqlDb = getIt<SqlDB>();
-  // await enableScreenshot();
+  await enableScreenshot();
   // await sqlDb.deleteDB();
   await sqlDb.initialDb();
   await (getIt<ApiConsumer>() as DioConsumer)

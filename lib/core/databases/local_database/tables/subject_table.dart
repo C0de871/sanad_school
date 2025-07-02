@@ -13,6 +13,8 @@ class SubjectTable {
   static const String teacher = "teacher";
   static const String icon = "icon";
   static const String isSynced = "is_synced";
+  static const String lightColorCode = "light_color_code";
+  static const String darkColorCode = "dark_color_code";
 
   static const String createTableQuery = '''
     CREATE TABLE $tableName (
@@ -28,7 +30,9 @@ class SubjectTable {
     $description TEXT NOT NULL,
     $teacher TEXT NOT NULL,
     $icon TEXT NOT NULL,
-    $isSynced INTEGER DEFAULT 0
+    $isSynced INTEGER DEFAULT 0,
+    $lightColorCode TEXT,
+    $darkColorCode TEXT
     )
   ''';
 }

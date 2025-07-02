@@ -27,35 +27,35 @@ class SqlDB {
     return _db;
   }
 
-  initialDb() async {
+  Future<Database> initialDb() async {
     String databasePath = await getDatabasesPath();
     String path = join(databasePath, 'sanad_school.db');
     Database myDb = await openDatabase(
       path,
       onCreate: _onCreate,
-      version: 16,
+      version: 17,
       onUpgrade: _onUpgrade,
     );
     return myDb;
   }
 
-  deleteDB() async {
+  Future<void> deleteDB() async {
     String dataBasePath = await getDatabasesPath();
     String path = join(dataBasePath, 'sanad_school.db');
     await deleteDatabase(path);
   }
 
-  _onUpgrade(Database db, int oldVersion, int newVersion) async {
+  Future<void> _onUpgrade(Database db, int oldVersion, int newVersion) async {
     _createTables(db);
     log("upgrade database ================");
   }
 
-  _onCreate(Database db, int version) async {
+  Future<void> _onCreate(Database db, int version) async {
     log("create database ================");
     _createTables(db);
   }
 
-  _createTables(Database db) {
+  void _createTables(Database db) {
     Batch batch = db.batch();
     batch.execute(TypeTable.createTableQuery);
     batch.execute(StudentTable.createTableQuery);
@@ -98,8 +98,10 @@ class SqlDB {
     String? where,
   }) async {
     Database? myDB = await db;
-    List<Map<String, dynamic>> response =
-        await myDB!.query(table, where: where);
+    List<Map<String, dynamic>> response = await myDB!.query(
+      table,
+      where: where,
+    );
     return response;
   }
 
@@ -110,7 +112,10 @@ class SqlDB {
   }
 
   Future<int> updateData(
-      String table, Map<String, Object?> values, String? myWhere) async {
+    String table,
+    Map<String, Object?> values,
+    String? myWhere,
+  ) async {
     Database? myDB = await db;
     int response = await myDB!.update(table, values, where: myWhere);
     return response;
@@ -118,10 +123,7 @@ class SqlDB {
 
   Future<int> deleteData(String table, String? myWhere) async {
     Database? myDB = await db;
-    int response = await myDB!.delete(
-      table,
-      where: myWhere,
-    );
+    int response = await myDB!.delete(table, where: myWhere);
     return response;
   }
 
@@ -139,7 +141,9 @@ class SqlDB {
     log("=======================================");
     log("tag question table: ${await readData(TagQuestionTable.tableName)}");
     log("=======================================");
-    log("question groups table: ${await readData(QuestionGroupsTable.tableName)}");
+    log(
+      "question groups table: ${await readData(QuestionGroupsTable.tableName)}",
+    );
     log("=======================================");
     log("questions table: ${await readData(QuestionTable.tableName)}");
   }

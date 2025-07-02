@@ -37,14 +37,6 @@ class _SubjectsLayoutState extends State<SubjectsLayout> {
   @override
   Widget build(BuildContext context) {
     final List<Color> subjectColors = [
-      // Color(0xFF4CAF50), // Green
-      // Color(0xFF2196F3), // Blue
-      // Color(0xFFFF9800), // Orange
-      // Color(0xFFE91E63), // Pink
-      // Color(0xFF9C27B0), // Purple
-      // Color(0xFF00BCD4), // Cyan
-      // Color(0xFF795548), // Brown
-      // Color(0xFF607D8B), // Blue Grey
       AppTheme.extendedColorOf(context).gradientGreen,
       AppTheme.extendedColorOf(context).gradientBlue,
       AppTheme.extendedColorOf(context).gradientOrange,
@@ -66,26 +58,22 @@ class _SubjectsLayoutState extends State<SubjectsLayout> {
             }
             return switch (state) {
               SubjectInitial() => SizedBox(),
-              SubjectLoading() => Center(
-                  child: CoolLoadingScreen(),
-                ),
+              SubjectLoading() => Center(child: CoolLoadingScreen()),
               SubjectSuccess() => RefreshIndicator(
-                  onRefresh: () async {
-                    await context
-                        .read<SubjectCubit>()
-                        .getSubjects(isRefresh: true);
+                onRefresh: () async {
+                  await context.read<SubjectCubit>().getSubjects(
+                    isRefresh: true,
+                  );
+                },
+                child: ListView.builder(
+                  padding: const EdgeInsets.all(16),
+                  itemCount: state.subjects.length,
+                  itemBuilder: (context, index) {
+                    return _card(index, state, subjectColors);
                   },
-                  child: ListView.builder(
-                    padding: const EdgeInsets.all(16),
-                    itemCount: state.subjects.length,
-                    itemBuilder: (context, index) {
-                      return _card(index, state, subjectColors);
-                    },
-                  ),
                 ),
-              SubjectFailure() => Center(
-                  child: Text(state.message),
-                ),
+              ),
+              SubjectFailure() => Center(child: Text(state.message)),
             };
           },
         );
@@ -99,9 +87,10 @@ class _SubjectsLayoutState extends State<SubjectsLayout> {
         SubjectCard(
           subject: state.subjects[index],
           isExpanded: state.isExpanded[index],
-          isShrunk: ((index < state.isExpanded.length &&
-              state.isExpanded[index])), // index+1
-          color: subjectColors[index % subjectColors.length],
+          isShrunk:
+              ((index < state.isExpanded.length &&
+                  state.isExpanded[index])), // index+1
+          placeHolderColor: subjectColors[index % subjectColors.length],
           onLongPress: () {
             setState(() {
               state.isExpanded[index] = !state.isExpanded[index];

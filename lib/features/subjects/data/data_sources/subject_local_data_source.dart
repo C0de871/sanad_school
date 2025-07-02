@@ -21,7 +21,10 @@ class SubjectLocalDataSource {
 
   /// Checks if a specific subject is synced by checking its sync status column
   Future<bool> isSubjectSynced(int subjectId) async {
-    final result = await _db.readData(SubjectTable.tableName, where: '${SubjectTable.id} = $subjectId');
+    final result = await _db.readData(
+      SubjectTable.tableName,
+      where: '${SubjectTable.id} = $subjectId',
+    );
 
     if (result.isEmpty) return false;
 
@@ -32,7 +35,8 @@ class SubjectLocalDataSource {
   /// Updates existing subjects, inserts new subjects, and removes subjects not in the list
   Future<void> _syncSubjects(List<SubjectModel> subjects) async {
     final existingSubjects = await _db.readData(SubjectTable.tableName);
-    final existingSubjectIds = existingSubjects.map<int>((sub) => sub[SubjectTable.id] as int).toSet();
+    final existingSubjectIds =
+        existingSubjects.map<int>((sub) => sub[SubjectTable.id] as int).toSet();
     final responseSubjectIds = subjects.map((sub) => sub.id).toSet();
 
     // Insert or update subjects
@@ -55,10 +59,7 @@ class SubjectLocalDataSource {
     // Delete subjects that are in the local database but not in the response
     final subjectsToDelete = existingSubjectIds.difference(responseSubjectIds);
     for (final id in subjectsToDelete) {
-      await _db.deleteData(
-        SubjectTable.tableName,
-        '${SubjectTable.id} = $id',
-      );
+      await _db.deleteData(SubjectTable.tableName, '${SubjectTable.id} = $id');
     }
   }
 
@@ -66,8 +67,12 @@ class SubjectLocalDataSource {
   /// Updates existing types, inserts new types, and removes types not in the list
   Future<void> _syncQuestionTypes(List<QuestionTypeModel> types) async {
     final existingTypes = await _db.readData(TypeQuestionTable.tableName);
-    final existingTypeIds = existingTypes.map<int>((type) => type[TypeQuestionTable.id] as int).toSet();
-    final responseTypeIds = types.where((type) => type.id != null).map((type) => type.id!).toSet();
+    final existingTypeIds =
+        existingTypes
+            .map<int>((type) => type[TypeQuestionTable.id] as int)
+            .toSet();
+    final responseTypeIds =
+        types.where((type) => type.id != null).map((type) => type.id!).toSet();
 
     // Insert or update question types
     for (final type in types) {
@@ -104,7 +109,9 @@ class SubjectLocalDataSource {
   // Get all subjects from database
 
   Future<List<SubjectModel>> getAllSubjects() async {
-    final List<Map<String, dynamic>> response = await _db.readData(SubjectTable.tableName);
+    final List<Map<String, dynamic>> response = await _db.readData(
+      SubjectTable.tableName,
+    );
 
     return response.map((subjectMap) {
       return SubjectModel(
@@ -119,6 +126,8 @@ class SubjectLocalDataSource {
         isLocked: subjectMap[SubjectTable.isLocked],
         teacher: subjectMap[SubjectTable.teacher],
         description: subjectMap[SubjectTable.description],
+        darkColorCode: subjectMap[SubjectTable.darkColorCode],
+        lightColorCode: subjectMap[SubjectTable.lightColorCode],
       );
     }).toList();
   }

@@ -22,7 +22,8 @@ class QuestionSuccess extends QuestionState {
   final int seconds;
   final bool isTimerRunning;
   final List<int?> userAnswers; // User's answers
-  final List<bool?> isRightList; // list to store if the answer of the user is right or not
+  final List<bool?>
+  isRightList; // list to store if the answer of the user is right or not
   final Map<int, bool> expandedImages; //image expanded status
   final Map<int, bool> expandedAnswers; //answer expanded status
   final int unAnsweredQuestionsCount; // User's unanswered questions
@@ -42,41 +43,43 @@ class QuestionSuccess extends QuestionState {
 
   @override
   List<Object?> get props => [
-        questions,
-        correctAnswersCount,
-        wrongAnswersCount,
-        seconds,
-        isTimerRunning,
-        userAnswers,
-        isRightList,
-        expandedImages,
-        expandedAnswers,
-      ];
+    questions,
+    correctAnswersCount,
+    wrongAnswersCount,
+    seconds,
+    isTimerRunning,
+    userAnswers,
+    isRightList,
+    expandedImages,
+    expandedAnswers,
+    unAnsweredQuestionsCount,
+  ];
 
   QuestionSuccess copyWith({
     List<QuestionEntity>? questions,
-    int? correctAnswers,
-    int? wrongAnswers,
+    int? correctAnswersCount,
+    int? wrongAnswersCount,
     int? seconds,
     bool? isTimerRunning,
     bool? isInitialized,
     List<int?>? userAnswers,
-    List<bool?>? isCorrect,
+    List<bool?>? isRightList,
     Map<int, bool>? expandedImages,
     Map<int, bool>? expandedAnswers,
-    int? unAnsweredQuestions,
+    int? unAnsweredQuestionsCount,
   }) {
     return QuestionSuccess(
       questions: questions ?? this.questions,
-      correctAnswersCount: correctAnswers ?? this.correctAnswersCount,
-      wrongAnswersCount: wrongAnswers ?? this.wrongAnswersCount,
+      correctAnswersCount: correctAnswersCount ?? this.correctAnswersCount,
+      wrongAnswersCount: wrongAnswersCount ?? this.wrongAnswersCount,
       seconds: seconds ?? this.seconds,
       isTimerRunning: isTimerRunning ?? this.isTimerRunning,
       userAnswers: userAnswers ?? this.userAnswers,
-      isRightList: isCorrect ?? this.isRightList,
+      isRightList: isRightList ?? this.isRightList,
       expandedImages: expandedImages ?? this.expandedImages,
       expandedAnswers: expandedAnswers ?? this.expandedAnswers,
-      unAnsweredQuestionsCount: unAnsweredQuestions ?? this.unAnsweredQuestionsCount,
+      unAnsweredQuestionsCount:
+          unAnsweredQuestionsCount ?? this.unAnsweredQuestionsCount,
     );
   }
 }
