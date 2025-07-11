@@ -18,41 +18,56 @@ class SubjectModel extends SubjectEntity {
     super.darkColorCode,
   });
 
+  static const String idKey = 'id';
+  static const String nameKey = 'name';
+  static const String iconKey = 'icon';
+  static const String linkKey = 'link';
+  static const String numberOfLessonsKey = 'number_of_lessons';
+  static const String numberOfTagsKey = 'number_of_tags';
+  static const String numberOfExamsKey = 'number_of_exams';
+  static const String numberOfQuestionsKey = 'number_of_questions';
+  static const String isLockedKey = 'is_locked';
+  static const String teacherKey = 'teacher';
+  static const String descriptionKey = 'description';
+  static const String isSyncedKey = 'is_synced';
+  static const String lightColorCodeKey = 'light_color_code';
+  static const String darkColorCodeKey = 'dark_color_code';
+
   factory SubjectModel.fromMap(Map<String, dynamic> map) {
     return SubjectModel(
-      id: map['id'] as int,
-      name: map['name'] as String,
-      icon: map['icon'] as String,
-      link: map['link'] as String,
-      numberOfLessons: map['number_of_lessons'] as int,
-      numberOfTags: map['number_of_tags'] as int,
-      numberOfExams: map['number_of_exams'] as int,
-      numberOfQuestions: map['number_of_questions'] as int,
-      isLocked: map['is_locked'] ? 1 : 0,
-      teacher: map['teacher'] as String,
-      description: map['description'] as String,
-      isSynced: map['is_synced'] as int?,
-      lightColorCode: map['light_color_code'] as String?,
-      darkColorCode: map['dark_color_code'] as String?,
+      id: map[idKey] as int,
+      name: map[nameKey] as String,
+      icon: map[iconKey] as String,
+      link: map[linkKey] as String,
+      numberOfLessons: map[numberOfLessonsKey] as int,
+      numberOfTags: map[numberOfTagsKey] as int,
+      numberOfExams: map[numberOfExamsKey] as int,
+      numberOfQuestions: map[numberOfQuestionsKey] as int,
+      isLocked: map[isLockedKey] ? 1 : 0,
+      teacher: map[teacherKey] as String,
+      description: map[descriptionKey] as String,
+      isSynced: map[isSyncedKey] as int?,
+      lightColorCode: map[lightColorCodeKey] as String?,
+      darkColorCode: map[darkColorCodeKey] as String?,
     );
   }
 
   Map<String, dynamic> toMap() {
     return {
-      'id': id,
-      'name': name,
-      'icon': icon,
-      'link': link,
-      'number_of_lessons': numberOfLessons,
-      'number_of_tags': numberOfTags,
-      'number_of_exams': numberOfExams,
-      'number_of_questions': numberOfQuestions,
-      'is_locked': isLocked,
-      'teacher': teacher,
-      'description': description,
-      'is_synced': isSynced,
-      'light_color_code': lightColorCode,
-      'dark_color_code': darkColorCode,
+      idKey: id,
+      nameKey: name,
+      iconKey: icon,
+      linkKey: link,
+      numberOfLessonsKey: numberOfLessons,
+      numberOfTagsKey: numberOfTags,
+      numberOfExamsKey: numberOfExams,
+      numberOfQuestionsKey: numberOfQuestions,
+      isLockedKey: isLocked,
+      teacherKey: teacher,
+      descriptionKey: description,
+      isSyncedKey: isSynced,
+      lightColorCodeKey: lightColorCode,
+      darkColorCodeKey: darkColorCode,
     };
   }
 }

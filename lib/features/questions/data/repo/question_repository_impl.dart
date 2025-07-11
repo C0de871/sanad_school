@@ -121,16 +121,16 @@ class QuestionRepositoryImpl extends QuestionRepository {
     }
   }
 
-  @override
-  Future<Either<Failure, bool>> saveQuestionPhoto({required QuestionPhotoParams params}) async {
-    try {
-      final photo = await remoteDataSource.downloadQuestionPhoto(params: params);
-      final response = await localDataSource.saveQuestionPhoto(params.questionId, photo);
-      return Right(response);
-    } on ServerException catch (e) {
-      return Left(Failure(errMessage: e.errorModel.errorMessage));
-    }
-  }
+  // @override
+  // Future<Either<Failure, bool>> saveQuestionPhoto({required QuestionPhotoParams params}) async {
+  //   try {
+  //     final photo = await remoteDataSource.downloadQuestionPhoto(params: params);
+  //     final response = await localDataSource.saveQuestionPhoto(params.questionId, photo);
+  //     return Right(response);
+  //   } on ServerException catch (e) {
+  //     return Left(Failure(errMessage: e.errorModel.errorMessage));
+  //   }
+  // }
 
   @override
   Future<Either<Failure, Uint8List?>> getQuestionPhoto({required QuestionPhotoParams params}) async {

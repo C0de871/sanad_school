@@ -43,9 +43,9 @@ abstract class QuestionRepository {
     required GetQuestionNoteParams params,
   });
 
-  Future<Either<Failure, bool>> saveQuestionPhoto({
-    required QuestionPhotoParams params,
-  });
+  // Future<Either<Failure, bool>> saveQuestionPhoto({
+  //   required QuestionPhotoParams params,
+  // });
 
   Future<Either<Failure, Uint8List?>> getQuestionPhoto({
     required QuestionPhotoParams params,

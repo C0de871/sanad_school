@@ -433,6 +433,7 @@ class SubjectDetailLocalDataSource {
     }
   }
 
+
   /// Syncs question types with the local database
   // Future<void> _syncQuestionTypes(List<TypeModel> types, dynamic txn) async {
   //   // Get existing types

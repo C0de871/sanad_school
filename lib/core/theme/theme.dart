@@ -1,7 +1,6 @@
 // ignore_for_file: constant_identifier_names
 
 import "package:flutter/material.dart";
-import 'package:sanad_school/core/helper/extensions.dart';
 
 class AppTheme {
   static AppColor colorScheme = AppColor.BLUE;

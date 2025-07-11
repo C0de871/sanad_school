@@ -2,12 +2,15 @@ import 'dart:convert';
 import 'dart:developer';
 import 'dart:typed_data';
 
+import 'package:sanad_school/core/databases/local_database/tables/lesson_table.dart';
 import 'package:sanad_school/core/databases/local_database/tables/subject_table.dart';
+import 'package:sanad_school/features/download/data/model/download_item.dart';
 
 import '../../../../core/databases/local_database/sql_db.dart';
 import '../../../../core/databases/local_database/tables/bridge_tables/question_groups_table.dart';
 import '../../../../core/databases/local_database/tables/bridge_tables/tag_question_table.dart';
 import '../../../../core/databases/local_database/tables/question_table.dart';
+import '../../../download/data/model/subject_download.dart';
 import '../models/question_model.dart';
 import '../models/questions_response_model.dart';
 
@@ -81,14 +84,18 @@ class QuestionLocalDataSource {
 
   /// Get questions inside the lesson by type
   Future<QuestionsResponseModel> getQuestionsByLessonAndType(
-      int lessonId, int? typeId) async {
-    final whereClause = typeId != null
-        ? 'qg.${QuestionGroupsTable.lessonId} = $lessonId AND q.${QuestionTable.idTypeQuestion} = $typeId'
-        : 'qg.${QuestionGroupsTable.lessonId} = $lessonId';
+    int lessonId,
+    int? typeId,
+  ) async {
+    final whereClause =
+        typeId != null
+            ? 'qg.${QuestionGroupsTable.lessonId} = $lessonId AND q.${QuestionTable.idTypeQuestion} = $typeId'
+            : 'qg.${QuestionGroupsTable.lessonId} = $lessonId';
 
-    final message = typeId != null
-        ? 'Questions in Lesson $lessonId with Type $typeId'
-        : 'Questions in Lesson $lessonId';
+    final message =
+        typeId != null
+            ? 'Questions in Lesson $lessonId with Type $typeId'
+            : 'Questions in Lesson $lessonId';
 
     return _executeQuestionQuery(
       whereClause: whereClause,
@@ -113,9 +120,14 @@ class QuestionLocalDataSource {
 
   /// Get questions from favorite groups by lesson ID and type
   Future<QuestionsResponseModel> getFavoriteGroupsQuestions(
-      int lessonId, int? typeId) async {
+    int lessonId,
+    int? typeId,
+  ) async {
     final whereClause = _buildLessonTypeWhereClause(
-        lessonId, typeId, 'qg.${QuestionGroupsTable.isFavorite} = 1');
+      lessonId,
+      typeId,
+      'qg.${QuestionGroupsTable.isFavorite} = 1',
+    );
 
     final message = _buildSuccessMessage(
       'Questions from favorite groups in Lesson $lessonId',
@@ -130,9 +142,14 @@ class QuestionLocalDataSource {
 
   /// Get questions from groups with incorrect answers
   Future<QuestionsResponseModel> getIncorrectAnswerGroupsQuestions(
-      int lessonId, int? typeId) async {
+    int lessonId,
+    int? typeId,
+  ) async {
     final whereClause = _buildLessonTypeWhereClause(
-        lessonId, typeId, 'qg.${QuestionGroupsTable.answerStatus} = 0');
+      lessonId,
+      typeId,
+      'qg.${QuestionGroupsTable.answerStatus} = 0',
+    );
 
     final message = _buildSuccessMessage(
       'Questions from incorrect answer groups in Lesson $lessonId',
@@ -147,9 +164,14 @@ class QuestionLocalDataSource {
 
   /// Get edited questions by lesson ID and type
   Future<QuestionsResponseModel> getEditedQuestionsByLesson(
-      int lessonId, int? typeId) async {
+    int lessonId,
+    int? typeId,
+  ) async {
     final whereClause = _buildLessonTypeWhereClause(
-        lessonId, typeId, 'q.${QuestionTable.isEdited} = 1');
+      lessonId,
+      typeId,
+      'q.${QuestionTable.isEdited} = 1',
+    );
 
     final message = _buildSuccessMessage(
       'Edited Questions in Lesson $lessonId',
@@ -164,7 +186,10 @@ class QuestionLocalDataSource {
 
   /// Helper method to build where clause for lesson and type filtering
   String _buildLessonTypeWhereClause(
-      int lessonId, int? typeId, String additionalCondition) {
+    int lessonId,
+    int? typeId,
+    String additionalCondition,
+  ) {
     final baseCondition =
         'qg.${QuestionGroupsTable.lessonId} = $lessonId AND $additionalCondition';
 
@@ -188,27 +213,34 @@ class QuestionLocalDataSource {
           QuestionTable.questionGroupId: q[QuestionTable.questionGroupId],
           QuestionTable.displayOrder: q[QuestionTable.displayOrder],
           QuestionModel.typeIdKey: q[QuestionTable.idTypeQuestion],
-          QuestionModel.textQuestionKey:
-              _parseJsonField(q[QuestionTable.textQuestion]),
+          QuestionModel.textQuestionKey: _parseJsonField(
+            q[QuestionTable.textQuestion],
+          ),
           QuestionModel.questionPhotoKey: q[QuestionTable.questionPhoto],
-          QuestionModel.choicesKey:
-              _parseChoicesField(q[QuestionTable.choices]),
+          QuestionModel.choicesKey: _parseChoicesField(
+            q[QuestionTable.choices],
+          ),
           QuestionModel.rightChoiceKey: q[QuestionTable.rightChoice],
           QuestionModel.isEditedKey: q[QuestionTable.isEdited],
           QuestionModel.hintKey: _parseJsonField(q[QuestionTable.hint]),
           QuestionModel.hintPhotoKey: q[QuestionTable.hintPhoto],
           QuestionModel.noteKey: q[QuestionTable.note],
-          QuestionModel.isAnsweredKey:
-              _convertToBool(q[QuestionTable.isAnswered]),
-          QuestionModel.isCorrectedKey:
-              _convertToBool(q[QuestionTable.isCorrected]),
-          QuestionModel.isAnsweredCorrectlyKey:
-              _convertToBool(q[QuestionTable.isAnsweredCorrectly]),
+          QuestionModel.isAnsweredKey: _convertToBool(
+            q[QuestionTable.isAnswered],
+          ),
+          QuestionModel.isCorrectedKey: _convertToBool(
+            q[QuestionTable.isCorrected],
+          ),
+          QuestionModel.isAnsweredCorrectlyKey: _convertToBool(
+            q[QuestionTable.isAnsweredCorrectly],
+          ),
           QuestionModel.userAnswerKey: q[QuestionTable.userAnswer],
-          QuestionModel.isFavoriteKey:
-              _convertToBool(q[QuestionGroupsTable.isFavorite]),
-          QuestionModel.answerStatusKey:
-              _convertToBool(q[QuestionGroupsTable.answerStatus]),
+          QuestionModel.isFavoriteKey: _convertToBool(
+            q[QuestionGroupsTable.isFavorite],
+          ),
+          QuestionModel.answerStatusKey: _convertToBool(
+            q[QuestionGroupsTable.answerStatus],
+          ),
         };
       } catch (e) {
         log('Error formatting question ${q[QuestionTable.id]}: $e');
@@ -298,7 +330,9 @@ class QuestionLocalDataSource {
 
   /// Toggle question incorrect answer status
   Future<bool> toggleQuestionIncorrectAnswer(
-      int questionId, bool answerStatus) async {
+    int questionId,
+    bool answerStatus,
+  ) async {
     return _toggleQuestionGroupProperty(
       questionId,
       QuestionGroupsTable.answerStatus,
@@ -365,7 +399,10 @@ class QuestionLocalDataSource {
 
   /// Update question answered status
   Future<bool> updateQuestionAnswered(
-      int questionId, bool isAnswered, int? userAnswer) async {
+    int questionId,
+    bool isAnswered,
+    int? userAnswer,
+  ) async {
     return _updateTwoQuestionFields(
       questionId,
       QuestionTable.isAnswered,
@@ -388,7 +425,9 @@ class QuestionLocalDataSource {
 
   /// Update question answered correctly status
   Future<bool> updateQuestionAnsweredCorrectly(
-      int questionId, bool isAnsweredCorrectly) async {
+    int questionId,
+    bool isAnsweredCorrectly,
+  ) async {
     return _updateQuestionField(
       questionId,
       QuestionTable.isAnsweredCorrectly,
