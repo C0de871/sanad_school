@@ -261,6 +261,7 @@ class DownloadCubit extends Cubit<DownloadState> {
         fileName: nextItem.fileName,
         showNotification: true,
         openFileFromNotification: false,
+        saveInPublicStorage: false,
       );
 
       _updateItemStatus(
@@ -689,8 +690,7 @@ class DownloadItemTile extends StatelessWidget {
           if (item.status == DownloadItemStatus.paused)
             IconButton(
               icon: const Icon(Icons.play_arrow, size: 20),
-              onPressed:
-                  () => context.read<DownloadCubit>().resumeItem(item.id),
+              onPressed: () => context.read<DownloadCubit>().retryItem(item.id),
             ),
           if (item.status == DownloadItemStatus.failed)
             IconButton(
@@ -755,372 +755,356 @@ context.read<DownloadCubit>().startSubjectDownloads(
 );
 */
 
-class Subject {
-  final String id;
-  final String name;
-  final String description;
-  final int imageCount;
-  final List<String> sampleImageUrls;
+// class SubjectsScreen extends StatelessWidget {
+//   const SubjectsScreen({super.key});
 
-  Subject({
-    required this.id,
-    required this.name,
-    required this.description,
-    required this.imageCount,
-    required this.sampleImageUrls,
-  });
-}
+//   // Mock data for testing
+//   static final List<Subject> _mockSubjects = [
+//     Subject(
+//       id: 'math_101',
+//       name: 'Mathematics 101',
+//       description: 'Basic mathematics concepts and formulas',
+//       imageCount: 25,
+//       sampleImageUrls: List.generate(
+//         25,
+//         (index) => 'https://picsum.photos/400/600?random=${100 + index}',
+//       ),
+//     ),
+//     Subject(
+//       id: 'physics_201',
+//       name: 'Physics 201',
+//       description: 'Advanced physics theories and experiments',
+//       imageCount: 40,
+//       sampleImageUrls: List.generate(
+//         40,
+//         (index) => 'https://picsum.photos/400/600?random=${200 + index}',
+//       ),
+//     ),
+//     Subject(
+//       id: 'chemistry_301',
+//       name: 'Chemistry 301',
+//       description: 'Organic and inorganic chemistry',
+//       imageCount: 30,
+//       sampleImageUrls: List.generate(
+//         30,
+//         (index) => 'https://picsum.photos/400/600?random=${300 + index}',
+//       ),
+//     ),
+//     Subject(
+//       id: 'biology_401',
+//       name: 'Biology 401',
+//       description: 'Cell biology and genetics',
+//       imageCount: 50,
+//       sampleImageUrls: List.generate(
+//         50,
+//         (index) => 'https://picsum.photos/400/600?random=${400 + index}',
+//       ),
+//     ),
+//     Subject(
+//       id: 'history_501',
+//       name: 'History 501',
+//       description: 'World history and civilizations',
+//       imageCount: 35,
+//       sampleImageUrls: List.generate(
+//         35,
+//         (index) => 'https://picsum.photos/400/600?random=${500 + index}',
+//       ),
+//     ),
+//     Subject(
+//       id: 'english_601',
+//       name: 'English Literature',
+//       description: 'Classic and modern literature',
+//       imageCount: 20,
+//       sampleImageUrls: List.generate(
+//         20,
+//         (index) => 'https://picsum.photos/400/600?random=${600 + index}',
+//       ),
+//     ),
+//   ];
 
-class SubjectsScreen extends StatelessWidget {
-  const SubjectsScreen({super.key});
+//   @override
+//   Widget build(BuildContext context) {
+//     return Scaffold(
+//       appBar: AppBar(
+//         title: const Text('Subjects'),
+//         backgroundColor: Colors.blue,
+//         foregroundColor: Colors.white,
+//         actions: [
+//           IconButton(
+//             icon: const Icon(Icons.download),
+//             onPressed: () {
+//               Navigator.push(
+//                 context,
+//                 MaterialPageRoute(builder: (context) => const DownloadScreen()),
+//               );
+//             },
+//             tooltip: 'View Downloads',
+//           ),
+//         ],
+//       ),
+//       body: Padding(
+//         padding: const EdgeInsets.all(16.0),
+//         child: Column(
+//           crossAxisAlignment: CrossAxisAlignment.start,
+//           children: [
+//             Text(
+//               'Select a subject to download images',
+//               style: Theme.of(
+//                 context,
+//               ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+//             ),
+//             const SizedBox(height: 16),
+//             Expanded(
+//               child: GridView.builder(
+//                 gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+//                   crossAxisCount: 2,
+//                   childAspectRatio: 0.8,
+//                   crossAxisSpacing: 16,
+//                   mainAxisSpacing: 16,
+//                 ),
+//                 itemCount: _mockSubjects.length,
+//                 itemBuilder: (context, index) {
+//                   final subject = _mockSubjects[index];
+//                   return SubjectCard(
+//                     subject: subject,
+//                     onTap: () => _startDownload(context, subject),
+//                   );
+//                 },
+//               ),
+//             ),
+//           ],
+//         ),
+//       ),
+//     );
+//   }
 
-  // Mock data for testing
-  static final List<Subject> _mockSubjects = [
-    Subject(
-      id: 'math_101',
-      name: 'Mathematics 101',
-      description: 'Basic mathematics concepts and formulas',
-      imageCount: 25,
-      sampleImageUrls: List.generate(
-        25,
-        (index) => 'https://picsum.photos/400/600?random=${100 + index}',
-      ),
-    ),
-    Subject(
-      id: 'physics_201',
-      name: 'Physics 201',
-      description: 'Advanced physics theories and experiments',
-      imageCount: 40,
-      sampleImageUrls: List.generate(
-        40,
-        (index) => 'https://picsum.photos/400/600?random=${200 + index}',
-      ),
-    ),
-    Subject(
-      id: 'chemistry_301',
-      name: 'Chemistry 301',
-      description: 'Organic and inorganic chemistry',
-      imageCount: 30,
-      sampleImageUrls: List.generate(
-        30,
-        (index) => 'https://picsum.photos/400/600?random=${300 + index}',
-      ),
-    ),
-    Subject(
-      id: 'biology_401',
-      name: 'Biology 401',
-      description: 'Cell biology and genetics',
-      imageCount: 50,
-      sampleImageUrls: List.generate(
-        50,
-        (index) => 'https://picsum.photos/400/600?random=${400 + index}',
-      ),
-    ),
-    Subject(
-      id: 'history_501',
-      name: 'History 501',
-      description: 'World history and civilizations',
-      imageCount: 35,
-      sampleImageUrls: List.generate(
-        35,
-        (index) => 'https://picsum.photos/400/600?random=${500 + index}',
-      ),
-    ),
-    Subject(
-      id: 'english_601',
-      name: 'English Literature',
-      description: 'Classic and modern literature',
-      imageCount: 20,
-      sampleImageUrls: List.generate(
-        20,
-        (index) => 'https://picsum.photos/400/600?random=${600 + index}',
-      ),
-    ),
-  ];
+//   void _startDownload(BuildContext context, Subject subject) {
+//     // Show confirmation dialog
+//     showDialog(
+//       context: context,
+//       builder: (BuildContext dialogContext) {
+//         return AlertDialog(
+//           title: Text('Download ${subject.name}'),
+//           content: Text(
+//             'Do you want to download ${subject.imageCount} images from ${subject.name}?\n\n'
+//             'This will start downloading all images one by one.',
+//           ),
+//           actions: [
+//             TextButton(
+//               onPressed: () => Navigator.of(dialogContext).pop(),
+//               child: const Text('Cancel'),
+//             ),
+//             ElevatedButton(
+//               onPressed: () {
+//                 Navigator.of(dialogContext).pop();
+//                 _initiateDownload(context, subject);
+//               },
+//               child: const Text('Download'),
+//             ),
+//           ],
+//         );
+//       },
+//     );
+//   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Subjects'),
-        backgroundColor: Colors.blue,
-        foregroundColor: Colors.white,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.download),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const DownloadScreen()),
-              );
-            },
-            tooltip: 'View Downloads',
-          ),
-        ],
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Select a subject to download images',
-              style: Theme.of(
-                context,
-              ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 16),
-            Expanded(
-              child: GridView.builder(
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2,
-                  childAspectRatio: 0.8,
-                  crossAxisSpacing: 16,
-                  mainAxisSpacing: 16,
-                ),
-                itemCount: _mockSubjects.length,
-                itemBuilder: (context, index) {
-                  final subject = _mockSubjects[index];
-                  return SubjectCard(
-                    subject: subject,
-                    onTap: () => _startDownload(context, subject),
-                  );
-                },
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
+//   void _initiateDownload(BuildContext context, Subject subject) {
+//     // Prepare image URLs with file names
+//     final imageUrls =
+//         subject.sampleImageUrls.asMap().entries.map((entry) {
+//           final index = entry.key;
+//           final url = entry.value;
+//           return {
+//             'url': url,
+//             'fileName': '${subject.id}_image_${index + 1}.jpg',
+//           };
+//         }).toList();
 
-  void _startDownload(BuildContext context, Subject subject) {
-    // Show confirmation dialog
-    showDialog(
-      context: context,
-      builder: (BuildContext dialogContext) {
-        return AlertDialog(
-          title: Text('Download ${subject.name}'),
-          content: Text(
-            'Do you want to download ${subject.imageCount} images from ${subject.name}?\n\n'
-            'This will start downloading all images one by one.',
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(dialogContext).pop(),
-              child: const Text('Cancel'),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.of(dialogContext).pop();
-                _initiateDownload(context, subject);
-              },
-              child: const Text('Download'),
-            ),
-          ],
-        );
-      },
-    );
-  }
+//     // Start the download using the DownloadCubit
+//     context.read<DownloadCubit>().startSubjectDownloads(
+//       subjectId: subject.id,
+//       subjectName: subject.name,
+//       imageUrls: imageUrls,
+//     );
 
-  void _initiateDownload(BuildContext context, Subject subject) {
-    // Prepare image URLs with file names
-    final imageUrls =
-        subject.sampleImageUrls.asMap().entries.map((entry) {
-          final index = entry.key;
-          final url = entry.value;
-          return {
-            'url': url,
-            'fileName': '${subject.id}_image_${index + 1}.jpg',
-          };
-        }).toList();
+//     // Show success message and navigate to downloads
+//     ScaffoldMessenger.of(context).showSnackBar(
+//       SnackBar(
+//         content: Text('Started downloading ${subject.name}'),
+//         action: SnackBarAction(
+//           label: 'View Downloads',
+//           onPressed: () {
+//             Navigator.push(
+//               context,
+//               MaterialPageRoute(builder: (context) => const DownloadScreen()),
+//             );
+//           },
+//         ),
+//       ),
+//     );
 
-    // Start the download using the DownloadCubit
-    context.read<DownloadCubit>().startSubjectDownloads(
-      subjectId: subject.id,
-      subjectName: subject.name,
-      imageUrls: imageUrls,
-    );
+//     // Optional: Auto-navigate to downloads screen
+//     Future.delayed(const Duration(seconds: 1), () {
+//       Navigator.push(
+//         context,
+//         MaterialPageRoute(builder: (context) => const DownloadScreen()),
+//       );
+//     });
+//   }
+// }
 
-    // Show success message and navigate to downloads
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Started downloading ${subject.name}'),
-        action: SnackBarAction(
-          label: 'View Downloads',
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => const DownloadScreen()),
-            );
-          },
-        ),
-      ),
-    );
+// class SubjectCard extends StatelessWidget {
+//   final Subject subject;
+//   final VoidCallback onTap;
 
-    // Optional: Auto-navigate to downloads screen
-    Future.delayed(const Duration(seconds: 1), () {
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => const DownloadScreen()),
-      );
-    });
-  }
-}
+//   const SubjectCard({super.key, required this.subject, required this.onTap});
 
-class SubjectCard extends StatelessWidget {
-  final Subject subject;
-  final VoidCallback onTap;
+//   @override
+//   Widget build(BuildContext context) {
+//     return Card(
+//       elevation: 4,
+//       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+//       child: InkWell(
+//         onTap: onTap,
+//         borderRadius: BorderRadius.circular(12),
+//         child: Padding(
+//           padding: const EdgeInsets.all(16.0),
+//           child: Column(
+//             crossAxisAlignment: CrossAxisAlignment.start,
+//             children: [
+//               // Subject icon/image placeholder
+//               Container(
+//                 width: double.infinity,
+//                 height: 80,
+//                 decoration: BoxDecoration(
+//                   gradient: LinearGradient(
+//                     colors: [
+//                       _getSubjectColor(subject.id),
+//                       _getSubjectColor(subject.id).withOpacity(0.7),
+//                     ],
+//                     begin: Alignment.topLeft,
+//                     end: Alignment.bottomRight,
+//                   ),
+//                   borderRadius: BorderRadius.circular(8),
+//                 ),
+//                 child: Icon(
+//                   _getSubjectIcon(subject.id),
+//                   size: 40,
+//                   color: Colors.white,
+//                 ),
+//               ),
+//               const SizedBox(height: 12),
 
-  const SubjectCard({super.key, required this.subject, required this.onTap});
+//               // Subject name
+//               Text(
+//                 subject.name,
+//                 style: Theme.of(
+//                   context,
+//                 ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+//                 maxLines: 2,
+//                 overflow: TextOverflow.ellipsis,
+//               ),
+//               const SizedBox(height: 4),
 
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      elevation: 4,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(12),
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Subject icon/image placeholder
-              Container(
-                width: double.infinity,
-                height: 80,
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [
-                      _getSubjectColor(subject.id),
-                      _getSubjectColor(subject.id).withOpacity(0.7),
-                    ],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                  ),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Icon(
-                  _getSubjectIcon(subject.id),
-                  size: 40,
-                  color: Colors.white,
-                ),
-              ),
-              const SizedBox(height: 12),
+//               // Description
+//               Text(
+//                 subject.description,
+//                 style: Theme.of(
+//                   context,
+//                 ).textTheme.bodySmall?.copyWith(color: Colors.grey[600]),
+//                 maxLines: 2,
+//                 overflow: TextOverflow.ellipsis,
+//               ),
+//               const Spacer(),
 
-              // Subject name
-              Text(
-                subject.name,
-                style: Theme.of(
-                  context,
-                ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-              ),
-              const SizedBox(height: 4),
+//               // Image count and download button
+//               Row(
+//                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
+//                 children: [
+//                   Text(
+//                     '${subject.imageCount} images',
+//                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
+//                       fontWeight: FontWeight.w500,
+//                       color: _getSubjectColor(subject.id),
+//                     ),
+//                   ),
+//                   Icon(
+//                     Icons.download,
+//                     color: _getSubjectColor(subject.id),
+//                     size: 20,
+//                   ),
+//                 ],
+//               ),
+//             ],
+//           ),
+//         ),
+//       ),
+//     );
+//   }
 
-              // Description
-              Text(
-                subject.description,
-                style: Theme.of(
-                  context,
-                ).textTheme.bodySmall?.copyWith(color: Colors.grey[600]),
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-              ),
-              const Spacer(),
+//   Color _getSubjectColor(String subjectId) {
+//     switch (subjectId) {
+//       case 'math_101':
+//         return Colors.blue;
+//       case 'physics_201':
+//         return Colors.purple;
+//       case 'chemistry_301':
+//         return Colors.green;
+//       case 'biology_401':
+//         return Colors.orange;
+//       case 'history_501':
+//         return Colors.brown;
+//       case 'english_601':
+//         return Colors.red;
+//       default:
+//         return Colors.grey;
+//     }
+//   }
 
-              // Image count and download button
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    '${subject.imageCount} images',
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      fontWeight: FontWeight.w500,
-                      color: _getSubjectColor(subject.id),
-                    ),
-                  ),
-                  Icon(
-                    Icons.download,
-                    color: _getSubjectColor(subject.id),
-                    size: 20,
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
+//   IconData _getSubjectIcon(String subjectId) {
+//     switch (subjectId) {
+//       case 'math_101':
+//         return Icons.calculate;
+//       case 'physics_201':
+//         return Icons.science;
+//       case 'chemistry_301':
+//         return Icons.biotech;
+//       case 'biology_401':
+//         return Icons.local_florist;
+//       case 'history_501':
+//         return Icons.history_edu;
+//       case 'english_601':
+//         return Icons.menu_book;
+//       default:
+//         return Icons.school;
+//     }
+//   }
+// }
 
-  Color _getSubjectColor(String subjectId) {
-    switch (subjectId) {
-      case 'math_101':
-        return Colors.blue;
-      case 'physics_201':
-        return Colors.purple;
-      case 'chemistry_301':
-        return Colors.green;
-      case 'biology_401':
-        return Colors.orange;
-      case 'history_501':
-        return Colors.brown;
-      case 'english_601':
-        return Colors.red;
-      default:
-        return Colors.grey;
-    }
-  }
+// class MyApp extends StatelessWidget {
+//   const MyApp({super.key});
 
-  IconData _getSubjectIcon(String subjectId) {
-    switch (subjectId) {
-      case 'math_101':
-        return Icons.calculate;
-      case 'physics_201':
-        return Icons.science;
-      case 'chemistry_301':
-        return Icons.biotech;
-      case 'biology_401':
-        return Icons.local_florist;
-      case 'history_501':
-        return Icons.history_edu;
-      case 'english_601':
-        return Icons.menu_book;
-      default:
-        return Icons.school;
-    }
-  }
-}
+//   @override
+//   Widget build(BuildContext context) {
+//     return BlocProvider(
+//       create: (context) => DownloadCubit(),
+//       child: MaterialApp(
+//         title: 'Download Manager',
+//         theme: ThemeData(primarySwatch: Colors.blue, useMaterial3: true),
+//         home: const SubjectsScreen(),
+//       ),
+//     );
+//   }
+// }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+// void main() async {
+//   WidgetsFlutterBinding.ensureInitialized();
 
-  @override
-  Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) => DownloadCubit(),
-      child: MaterialApp(
-        title: 'Download Manager',
-        theme: ThemeData(primarySwatch: Colors.blue, useMaterial3: true),
-        home: const SubjectsScreen(),
-      ),
-    );
-  }
-}
-
-void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-
-  // Initialize flutter_downloader
-  await FlutterDownloader.initialize(
-    debug:
-        true, // optional: set to false to disable printing logs to console (default: true)
-    ignoreSsl:
-        true, // option: set to false to disable working with http links (default: false)
-  );
-  runApp(const MyApp());
-}
+//   // Initialize flutter_downloader
+//   await FlutterDownloader.initialize(
+//     debug:
+//         true, // optional: set to false to disable printing logs to console (default: true)
+//     ignoreSsl:
+//         true, // option: set to false to disable working with http links (default: false)
+//   );
+//   runApp(const MyApp());
+// }
